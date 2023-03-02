@@ -18,7 +18,12 @@ export const initialState = {
     text: "",
     link: "",
   },
+  moveDialog: {
+    isOpen: false,
+    link: "",
+  },
   selectedFolder: "get_recent_file",
+  moveSelectedFolder: "",
   selectedFile: {
     id: null,
     fav: null,
@@ -38,6 +43,10 @@ export const reducer = (state, action) => {
       return { ...state, selectedFolder: action.payload };
     case "setSelectedFile":
       return { ...state, selectedFile: action.payload };
+    case "setMoveDialog":
+      return { ...state, moveDialog: action.payload };
+    case "setMoveSelectedFolder":
+      return { ...state, moveSelectedFolder: action.payload };
     default:
       throw new Error("Invalid action type");
   }

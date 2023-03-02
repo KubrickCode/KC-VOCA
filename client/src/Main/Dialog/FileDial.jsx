@@ -91,7 +91,13 @@ const FileDial = (props) => {
       name: "단어장 이동",
       click: () => {
         props.handleOpen();
-        console.log("Hi");
+        dispatch({
+          type: "setMoveDialog",
+          payload: {
+            isOpen: true,
+            link: "http://localhost:3000/modify/move_file",
+          },
+        });
       },
     },
     {

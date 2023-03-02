@@ -36,7 +36,11 @@ const FileArea = () => {
           setFiles(res.data);
         });
     }
-  }, [state.selectedFolder, state.snackBar.fileState]);
+  }, [
+    state.selectedFolder,
+    state.snackBar.fileState,
+    state.snackBar.folderState,
+  ]);
 
   if (files.length > 0) {
     return (

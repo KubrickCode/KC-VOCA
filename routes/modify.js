@@ -101,4 +101,44 @@ router.post("/shared", (req, res) => {
   );
 });
 
+router.post("/move_folder", (req, res) => {
+  const post = req.body;
+  db.query(
+    `SELECT parent_id FROM voca_folder WHERE folder_id=?`,
+    [post.folder_id],
+    (err, result) => {
+      const parent_id = result[0].parent_id;
+      if (parent_id == "0") {
+        res.send(["Home 폴더는 이동할 수 없습니다", "error", "folder"]);
+      } else if (
+        parent_id == post.parent_folder ||
+        post.parent_folder == post.folder_id
+      ) {
+        res.send(["해당 위치로 이동할 수 없습니다", "error", "folder"]);
+      } else {
+        db.query(
+          `UPDATE voca_folder SET parent_id=? WHERE folder_id=?`,
+          [post.parent_folder, post.folder_id],
+          (err, result) => {
+            res.send(["폴더가 이동되었습니다", "success", "folder"]);
+          }
+        );
+      }
+    }
+  );
+});
+
+router.post("/move_file", (req, res) => {
+  const post = req.body;
+  db.query(
+    `
+    UPDATE voca_file SET folder_id=? WHERE file_id=?
+    `,
+    [post.parent_folder, post.file_id],
+    () => {
+      res.send(["단어장이 이동되었습니다", "success", "file"]);
+    }
+  );
+});
+
 module.exports = router;

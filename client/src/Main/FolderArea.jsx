@@ -73,6 +73,19 @@ const FolderArea = () => {
   const buildTree = useCallback(
     (folderData, parent_id) => {
       let tree = [];
+      const clickFolder = (id) => {
+        if (!state.moveDialog.isOpen) {
+          dispatch({
+            type: "setSelectedFolder",
+            payload: String(id),
+          });
+        } else {
+          dispatch({
+            type: "setMoveSelectedFolder",
+            payload: String(id),
+          });
+        }
+      };
       folderData.forEach((folder) => {
         if (
           folder.parent_id === parent_id ||
@@ -86,10 +99,7 @@ const FolderArea = () => {
               labelText={folder.folder_name}
               labelIcon={FolderIcon}
               onClick={() => {
-                dispatch({
-                  type: "setSelectedFolder",
-                  payload: String(folder.folder_id),
-                });
+                clickFolder(folder.folder_id);
               }}
             >
               {children}
@@ -122,6 +132,7 @@ const FolderArea = () => {
         onClick={() => {
           dispatch({ type: "setSelectedFolder", payload: "get_recent_file" });
         }}
+        sx={{ display: !state.moveDialog.isOpen ? "block" : "none" }}
       />
       <StyledTreeItem
         nodeId="0-1"
@@ -130,6 +141,7 @@ const FolderArea = () => {
         onClick={() => {
           dispatch({ type: "setSelectedFolder", payload: "get_fav_file" });
         }}
+        sx={{ display: !state.moveDialog.isOpen ? "block" : "none" }}
       />
       {buildTree(folderData, "0")}
     </TreeView>

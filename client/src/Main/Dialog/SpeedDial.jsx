@@ -79,7 +79,14 @@ const SpeedDialComp = () => {
       {
         icon: <DriveFileMoveIcon />,
         name: "폴더 이동",
-        dialog: () => console.log("hi"),
+        dialog: () =>
+          dispatch({
+            type: "setMoveDialog",
+            payload: {
+              isOpen: true,
+              link: "http://localhost:3000/modify/move_folder",
+            },
+          }),
       },
     ];
   }, []);
@@ -94,7 +101,7 @@ const SpeedDialComp = () => {
         open={open}
         direction={"up"}
         sx={{
-          visibility: Number(state.selectedFolder) ? "visible" : "hidden",
+          display: Number(state.selectedFolder) ? "inlineBlock" : "none",
         }}
       >
         {speedDialActions.map((action) => (

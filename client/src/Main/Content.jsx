@@ -5,6 +5,7 @@ import MySpeedDial from "./Dialog/SpeedDial";
 import FileArea from "./FileArea";
 import FolderArea from "./FolderArea";
 import { Item } from "../Style/MUIStyle";
+import MoveDial from "./Dialog/MoveDialog";
 
 const Content = () => {
   return (
@@ -32,6 +33,7 @@ const Content = () => {
         }}
       >
         <MySpeedDial />
+        <MoveDial />
       </Box>
     </>
   );
