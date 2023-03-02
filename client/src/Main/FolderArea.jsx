@@ -12,7 +12,7 @@ import axios from "axios";
 import { MyContext } from "../Context";
 import { StyledTreeItemRoot } from "../Style/MUIStyle";
 
-function StyledTreeItem(props) {
+const StyledTreeItem = (props) => {
   const {
     bgColor,
     color,
@@ -45,7 +45,7 @@ function StyledTreeItem(props) {
       {...other}
     />
   );
-}
+};
 
 StyledTreeItem.propTypes = {
   bgColor: PropTypes.string,
@@ -55,7 +55,7 @@ StyledTreeItem.propTypes = {
   labelText: PropTypes.string.isRequired,
 };
 
-export default function FolderArea() {
+const FolderArea = () => {
   const [folderData, setFolderData] = useState([]);
 
   const { state, dispatch } = useContext(MyContext);
@@ -134,4 +134,6 @@ export default function FolderArea() {
       {buildTree(folderData, "0")}
     </TreeView>
   );
-}
+};
+
+export default FolderArea;

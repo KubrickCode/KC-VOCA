@@ -4,11 +4,11 @@ import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import { MyContext } from "../../Context";
 
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+const Alert = React.forwardRef((props, ref) => (
+  <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
+));
 
-export default function MySnackBar() {
+const MySnackBar = () => {
   const { state, dispatch } = useContext(MyContext);
   const handleSnackClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -32,4 +32,6 @@ export default function MySnackBar() {
       </Alert>
     </Snackbar>
   );
-}
+};
+
+export default MySnackBar;

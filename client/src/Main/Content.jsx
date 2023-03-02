@@ -6,7 +6,7 @@ import FileArea from "./FileArea";
 import FolderArea from "./FolderArea";
 import { Item } from "../Style/MUIStyle";
 
-function Content() {
+const Content = () => {
   return (
     <>
       <Grid container spacing={2}>
@@ -35,6 +35,6 @@ function Content() {
       </Box>
     </>
   );
-}
+};
 
 export default Content;

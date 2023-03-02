@@ -14,7 +14,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Alert from "@mui/material/Alert";
 
-function Copyright(props) {
+const Copyright = (props) => {
   return (
     <Typography
       variant="body2"
@@ -27,11 +27,11 @@ function Copyright(props) {
       {"."}
     </Typography>
   );
-}
+};
 
 const theme = createTheme();
 
-export default function SignUp() {
+const SignUp = () => {
   const [btnState, setBtnState] = useState(true);
 
   const [formData, setFormData] = useState({
@@ -242,4 +242,6 @@ export default function SignUp() {
       </Container>
     </ThemeProvider>
   );
-}
+};
+
+export default SignUp;

@@ -14,7 +14,7 @@ import Alert from "@mui/material/Alert";
 import axios from "axios";
 import { useState, useEffect } from "react";
 
-function Copyright(props) {
+const Copyright = (props) => {
   return (
     <Typography
       variant="body2"
@@ -30,15 +30,15 @@ function Copyright(props) {
       {"."}
     </Typography>
   );
-}
+};
 
 const theme = createTheme();
 
-export default function SignInSide() {
+const SignInSide = () => {
   const [errmsg, setErrMsg] = useState("");
 
   useEffect(() => {
-    async function fetchData() {
+    const fetchData = async () => {
       try {
         const res = await axios.get(
           "http://localhost:3000/signpage/login_process",
@@ -50,7 +50,7 @@ export default function SignInSide() {
       } catch (err) {
         console.error("Error fetching data:", err);
       }
-    }
+    };
     fetchData();
   }, []);
 
@@ -145,4 +145,6 @@ export default function SignInSide() {
       </Grid>
     </ThemeProvider>
   );
-}
+};
+
+export default SignInSide;

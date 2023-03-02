@@ -39,7 +39,7 @@ import {
   DrawerHeader,
 } from "./Style/MUIStyle";
 
-export default function PersistentDrawerLeft() {
+const PersistentDrawerLeft = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const theme = useTheme();
   const [open, handleOpen, setOpen] = useHandleOpen(false, () => {
@@ -152,4 +152,6 @@ export default function PersistentDrawerLeft() {
       <CheckDialog />
     </MyContext.Provider>
   );
-}
+};
+
+export default PersistentDrawerLeft;

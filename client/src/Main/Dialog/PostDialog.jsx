@@ -9,7 +9,7 @@ import Button from "@mui/material/Button";
 import axios from "axios";
 import { useHandleOpen } from "./../../CustomHook";
 
-export default function PostDialog() {
+const PostDialog = () => {
   const [formData, setFormData] = useState({ value1: "", value2: "" });
   const { state, dispatch } = useContext(MyContext);
 
@@ -83,4 +83,6 @@ export default function PostDialog() {
       </Dialog>
     </div>
   );
-}
+};
+
+export default PostDialog;

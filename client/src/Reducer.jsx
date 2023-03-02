@@ -26,7 +26,7 @@ export const initialState = {
   },
 };
 
-export function reducer(state, action) {
+export const reducer = (state, action) => {
   switch (action.type) {
     case "setSnackBar":
       return { ...state, snackBar: action.payload };
@@ -41,4 +41,6 @@ export function reducer(state, action) {
     default:
       throw new Error("Invalid action type");
   }
-}
+};
+
+export default reducer;

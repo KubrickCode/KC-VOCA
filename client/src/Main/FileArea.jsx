@@ -9,7 +9,7 @@ import { Item } from "../Style/MUIStyle";
 import FileDial from "./Dialog/FileDial";
 import { useHandleOpen } from "./../CustomHook";
 
-export function FileArea() {
+const FileArea = () => {
   const [files, setFiles] = useState([]);
 
   const { state, dispatch } = useContext(MyContext);
@@ -102,6 +102,6 @@ export function FileArea() {
   } else {
     return <Typography>해당 폴더 내에 생성된 단어장이 없습니다</Typography>;
   }
-}
+};
 
 export default FileArea;

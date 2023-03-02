@@ -11,7 +11,7 @@ import {
 import axios from "axios";
 import { useHandleOpen } from "./../../CustomHook";
 
-export default function CheckDialog() {
+const CheckDialog = () => {
   const { state, dispatch } = useContext(MyContext);
 
   const [, handleOpen] = useHandleOpen(false, () => {
@@ -68,4 +68,6 @@ export default function CheckDialog() {
       </DialogActions>
     </Dialog>
   );
-}
+};
+
+export default CheckDialog;
