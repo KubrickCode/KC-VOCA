@@ -3,6 +3,16 @@ const router = express.Router();
 const bodyParser = require("body-parser");
 const mysql = require("mysql");
 const db = mysql.createConnection(require("../lib/config").user);
+const AWS = require("aws-sdk");
+const aws_info = require("../lib/config").aws;
+
+const Polly = new AWS.Polly({
+  accessKeyId: aws_info.accessKeyId,
+  secretAccessKey: aws_info.secretAccessKey,
+  signatureVersion: aws_info.signatureVersion,
+  region: aws_info.region,
+});
+
 db.connect();
 
 router.use(bodyParser.json());
@@ -65,6 +75,22 @@ router.post("/get_data", (req, res) => {
       res.json(result);
     }
   );
+});
+
+router.post("/tts", (req, res) => {
+  const post = req.body;
+  const params = {
+    Text: post.text,
+    OutputFormat: "mp3",
+    VoiceId: "Matthew",
+  };
+  Polly.synthesizeSpeech(params, (err, data) => {
+    if (err) {
+      console.log(err.code);
+    } else if (data?.AudioStream instanceof Buffer) {
+      res.send(data.AudioStream);
+    }
+  });
 });
 
 module.exports = router;

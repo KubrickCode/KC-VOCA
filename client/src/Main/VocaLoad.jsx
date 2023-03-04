@@ -160,7 +160,11 @@ const VocaLoad = () => {
           }}
         >
           {title}
-          <IconButton>
+          <IconButton
+            onClick={() => {
+              onListen(label);
+            }}
+          >
             <VolumeMuteIcon />
           </IconButton>
         </TableCell>
@@ -189,6 +193,28 @@ const VocaLoad = () => {
         </TableCell>
       </StyledTableRow>
     );
+  };
+
+  const onListen = (text) => {
+    axios
+      .post(
+        "http://localhost:3000/getdata/tts",
+        {
+          text,
+        },
+        {
+          responseType: "arraybuffer",
+        }
+      )
+      .then((res) => {
+        const context = new AudioContext();
+        context.decodeAudioData(res.data, (buffer) => {
+          const source = context.createBufferSource();
+          source.buffer = buffer;
+          source.connect(context.destination);
+          source.start(0);
+        });
+      });
   };
 
   return (
