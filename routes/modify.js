@@ -141,4 +141,24 @@ router.post("/move_file", (req, res) => {
   );
 });
 
+router.post("/modify_data", (req, res) => {
+  const post = req.body;
+  const formData = post.formData;
+  db.query(
+    `
+  UPDATE voca_data SET voca=?, voca_mean=?, exam=?, exam_mean=? WHERE data_id=?
+  `,
+    [
+      formData.voca,
+      formData.voca_mean,
+      formData.exam,
+      formData.exam_mean,
+      post.data_id,
+    ],
+    (err, result) => {
+      res.send(["데이터가 수정되었습니다", "success", "data"]);
+    }
+  );
+});
+
 module.exports = router;

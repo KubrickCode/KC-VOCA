@@ -66,6 +66,9 @@ const FileArea = () => {
                 height: "200px",
               }}
               align="center"
+              onClick={() => {
+                location.href = `/load/${file.file_id}`;
+              }}
             >
               <div>
                 <TextSnippetIcon sx={{ fontSize: 100 }} />

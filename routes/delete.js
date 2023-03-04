@@ -41,4 +41,16 @@ router.post("/delete_file", (req, res) => {
   );
 });
 
+router.post("/delete_data", (req, res) => {
+  const post = req.body;
+  db.query(
+    `DELETE FROM voca_data WHERE data_id=?
+  `,
+    [post.data_id],
+    () => {
+      res.send(["데이터가 삭제되었습니다", "success", "data"]);
+    }
+  );
+});
+
 module.exports = router;

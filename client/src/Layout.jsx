@@ -27,6 +27,7 @@ import Content from "./Main/Content";
 import PostDialog from "./Main/Dialog/PostDialog";
 import CheckDialog from "./Main/Dialog/CheckDialog";
 import MySnackBar from "./Main/Dialog/MySnackbar";
+import VocaLoad from "./Main/VocaLoad";
 import { MyContext } from "./Context";
 import { Route, Routes } from "react-router-dom";
 import { initialState, reducer } from "./Reducer";
@@ -144,6 +145,7 @@ const PersistentDrawerLeft = () => {
           <DrawerHeader />
           <Routes>
             <Route path="/" element={<Content />} />
+            <Route path="/load/:id" element={<VocaLoad />} />
           </Routes>
         </Main>
       </Box>

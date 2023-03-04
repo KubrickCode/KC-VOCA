@@ -27,13 +27,20 @@ const CheckDialog = () => {
           file_id: state.selectedFile.id,
           file_favorites: state.selectedFile.fav,
           file_shared: state.selectedFile.sha,
+          data_id: state.selectedData.id,
         },
         { withCredentials: true }
       )
       .then((res) => {
         handleOpen();
-        const stateType =
-          res.data[2] === "folder" ? "folderState" : "fileState";
+        let stateType;
+        if (res.data[2] === "folder") {
+          stateType = "folderState";
+        } else if (res.data[2] === "file") {
+          stateType = "fileState";
+        } else {
+          stateType = "dataState";
+        }
 
         dispatch({
           type: "setSnackBar",

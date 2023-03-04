@@ -15,9 +15,11 @@ import ShareIcon from "@mui/icons-material/Share";
 import DeleteIcon from "@mui/icons-material/Delete";
 import StarIcon from "@mui/icons-material/Star";
 import { useHandleOpen } from "./../../CustomHook";
+import { useNavigate } from "react-router-dom";
 
 const FileDial = (props) => {
   const { state, dispatch } = useContext(MyContext);
+  const navigate = useNavigate();
   const [favObject, setFavObject] = useState({
     title: "",
     text: "",
@@ -66,8 +68,9 @@ const FileDial = (props) => {
       icon: <AutoStoriesIcon />,
       name: "단어장 공부",
       click: () => {
-        props.handleOpen();
-        console.log("Hi");
+        navigate(`/load/${state.selectedFile.id}`, {
+          state: { viewState: true },
+        });
       },
     },
     {
@@ -82,6 +85,7 @@ const FileDial = (props) => {
             title: "단어장 변경",
             label: "단어장명을 입력해 주세요",
             link: "http://localhost:3000/modify/rename_file",
+            content: "basic",
           },
         });
       },

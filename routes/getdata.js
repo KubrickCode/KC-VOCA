@@ -53,4 +53,18 @@ router.get("/get_recent_file", (req, res) => {
   );
 });
 
+router.post("/get_data", (req, res) => {
+  const post = req.body;
+  db.query(
+    `
+  SELECT * FROM voca_data WHERE file_id=?;
+  SELECT * FROM voca_file WHERE file_id=?
+  `,
+    [post.file_id, post.file_id],
+    (err, result) => {
+      res.json(result);
+    }
+  );
+});
+
 module.exports = router;

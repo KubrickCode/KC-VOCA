@@ -57,4 +57,27 @@ router.post("/create_file", async (req, res) => {
   }
 });
 
+router.post("/create_data", (req, res) => {
+  const post = req.body;
+  const user = req.user[0];
+  console.log(post);
+  db.query(
+    `
+      INSERT INTO voca_data(user_id,folder_id,file_id,voca,voca_mean,exam,exam_mean) VALUES(?,?,?,?,?,?,?)
+      `,
+    [
+      user.user_id,
+      post.folder_id,
+      post.file_id,
+      post.formData.voca,
+      post.formData.voca_mean,
+      post.formData.exam,
+      post.formData.exam_mean,
+    ],
+    () => {
+      res.send(["데이터가 추가되었습니다", "success", "data"]);
+    }
+  );
+});
+
 module.exports = router;

@@ -3,6 +3,13 @@ import { styled } from "@mui/material/styles";
 import { createTheme } from "@mui/material/styles";
 import TreeItem, { treeItemClasses } from "@mui/lab/TreeItem";
 import Paper from "@mui/material/Paper";
+import TableRow from "@mui/material/TableRow";
+
+export const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:nth-of-type(odd)": {
+    backgroundColor: theme.palette.action.hover,
+  },
+}));
 
 export const darkTheme = createTheme({
   palette: {
