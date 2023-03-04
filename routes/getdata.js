@@ -77,6 +77,17 @@ router.post("/get_data", (req, res) => {
   );
 });
 
+router.get("/user", (req, res) => {
+  const user = req.user[0];
+  db.query(
+    `SELECT * FROM localuser WHERE user_id=?`,
+    [user.user_id],
+    (err, result) => {
+      res.send(result[0]);
+    }
+  );
+});
+
 router.post("/tts", (req, res) => {
   const post = req.body;
   const params = {

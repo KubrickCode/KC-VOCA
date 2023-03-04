@@ -53,8 +53,10 @@ const PostDialog = () => {
           stateType = "folderState";
         } else if (res.data[2] === "file") {
           stateType = "fileState";
-        } else {
+        } else if (res.data[2] === "data") {
           stateType = "dataState";
+        } else if (res.data[2] === "set") {
+          stateType = "setState";
         }
 
         dispatch({
@@ -84,12 +86,12 @@ const PostDialog = () => {
             setFormData({ ...formData, value1: e.target.value });
           }}
         />
-        {state.postDialog.title == "비밀번호 변경" && (
+        {state.postDialog.title === "비밀번호 변경" && (
           <TextField
             margin="dense"
             id="name2"
             type="text"
-            label={statePostDialog.label}
+            label={"새 " + state.postDialog.label}
             fullWidth
             variant="standard"
             onChange={(e) => {

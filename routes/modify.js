@@ -3,6 +3,7 @@ const router = express.Router();
 const bodyParser = require("body-parser");
 const myModule = require("../lib/myModule");
 const mysql = require("mysql");
+const bcrypt = require("bcrypt");
 const db = mysql.createConnection(require("../lib/config").user);
 db.connect();
 
@@ -157,6 +158,63 @@ router.post("/modify_data", (req, res) => {
     ],
     (err, result) => {
       res.send(["데이터가 수정되었습니다", "success", "data"]);
+    }
+  );
+});
+
+router.post("/nickname", async (req, res) => {
+  try {
+    const {
+      formData: { value1: nickname },
+    } = req.body;
+    const { user_id } = req.user[0];
+
+    const result = await db.query(
+      "SELECT nickname FROM localuser WHERE nickname=?",
+      [nickname]
+    );
+
+    if (result[0] && result[0].nickname) {
+      res.send(["같은 닉네임이 존재합니다", "warning", "set"]);
+    } else {
+      await db.query("UPDATE localuser SET nickname=? WHERE user_id=?", [
+        nickname,
+        user_id,
+      ]);
+      res.send(["닉네임이 변경되었습니다", "success", "set"]);
+    }
+  } catch (err) {
+    console.error(err);
+    res.send(["An error occurred", "error", "unset"]);
+  }
+});
+
+router.post("/password", (req, res) => {
+  const {
+    formData: { value1: password, value2: password2 },
+  } = req.body;
+  const { user_id } = req.user[0];
+  db.query(
+    "SELECT password FROM localuser WHERE user_id=?",
+    [user_id],
+    (err, result) => {
+      bcrypt.compare(password, result[0].password, (err, results) => {
+        if (results) {
+          bcrypt.hash(password2, 10, (err, hash) => {
+            db.query(
+              `
+              UPDATE localuser SET password=? WHERE user_id=?
+              `,
+              [hash, user_id],
+              () => {
+                res.send(["비밀번호가 변경되었습니다", "success", "set"]);
+              }
+            );
+          });
+        } else {
+          res.send(["기존 비밀번호가 일치하지 않습니다", "warning", "set"]);
+        }
+      });
     }
   );
 });

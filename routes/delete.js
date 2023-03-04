@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const bodyParser = require("body-parser");
+const bcrypt = require("bcrypt");
 const mysql = require("mysql");
 const db = mysql.createConnection(require("../lib/config").user);
 db.connect();
@@ -49,6 +50,41 @@ router.post("/delete_data", (req, res) => {
     [post.data_id],
     () => {
       res.send(["데이터가 삭제되었습니다", "success", "data"]);
+    }
+  );
+});
+
+router.post("/user", (req, res) => {
+  const post = req.body;
+  const password = post.formData.value1;
+  const user_id = req.user[0].user_id;
+  db.query(
+    "SELECT password FROM localuser WHERE user_id=?",
+    [user_id],
+    (err, result) => {
+      bcrypt.compare(password, result[0].password, (err, results) => {
+        if (results) {
+          req.logout((err) => {
+            if (err) {
+              return next(err);
+            }
+            db.query(
+              `
+          DELETE FROM voca_data WHERE user_id=?;
+          DELETE FROM voca_file WHERE user_id=?;
+          DELETE FROM voca_folder WHERE user_id=?;
+          DELETE FROM localuser WHERE user_id=?;
+          `,
+              [user_id, user_id, user_id, user_id, user_id],
+              (err, result) => {
+                res.redirect("http://localhost:5173/");
+              }
+            );
+          });
+        } else {
+          res.send(["비밀번호가 일치하지 않습니다", "warning", "set"]);
+        }
+      });
     }
   );
 });

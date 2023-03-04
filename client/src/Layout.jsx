@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useReducer } from "react";
+import { useReducer, useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
 import { ThemeProvider } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -13,6 +13,8 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { Stack } from "@mui/material";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
@@ -39,6 +41,8 @@ import {
   AppBar,
   DrawerHeader,
 } from "./Style/MUIStyle";
+import axios from "axios";
+import SetDialog from "./Main/Dialog/SetDialog";
 
 const PersistentDrawerLeft = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -46,6 +50,19 @@ const PersistentDrawerLeft = () => {
   const [open, handleOpen, setOpen] = useHandleOpen(false, () => {
     setOpen(!open);
   });
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/getdata/user", {
+        withCredentials: true,
+      })
+      .then((res) =>
+        dispatch({
+          type: "setUser",
+          payload: { email: res.data.email, nickname: res.data.nickname },
+        })
+      );
+  }, [state.snackBar.setState]);
 
   return (
     <MyContext.Provider
@@ -88,6 +105,10 @@ const PersistentDrawerLeft = () => {
           open={open}
         >
           <DrawerHeader>
+            <Stack direction="row" spacing={1}>
+              <AccountCircleIcon />
+              <Typography>{state.user.nickname}</Typography>
+            </Stack>
             <IconButton onClick={handleOpen}>
               {theme.direction === "ltr" ? (
                 <ChevronLeftIcon />
@@ -99,7 +120,14 @@ const PersistentDrawerLeft = () => {
           <Divider />
           <List>
             <ListItem disablePadding>
-              <ListItemButton>
+              <ListItemButton
+                onClick={() => {
+                  dispatch({
+                    type: "setSetDialog",
+                    payload: { isOpen: true },
+                  });
+                }}
+              >
                 <ListItemIcon>
                   <SettingsIcon />
                 </ListItemIcon>
@@ -112,14 +140,6 @@ const PersistentDrawerLeft = () => {
                   <ShareIcon />
                 </ListItemIcon>
                 <ListItemText primary="공유마당" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  <HelpOutlineIcon />
-                </ListItemIcon>
-                <ListItemText primary="문의하기" />
               </ListItemButton>
             </ListItem>
             <ListItem disablePadding>
@@ -152,6 +172,7 @@ const PersistentDrawerLeft = () => {
       <MySnackBar />
       <PostDialog />
       <CheckDialog />
+      <SetDialog />
     </MyContext.Provider>
   );
 };
