@@ -37,14 +37,20 @@ const VocaLoad = () => {
     toggleBtn: <AutoStoriesIcon />,
     text: "공부 모드",
   });
+  const [share, setShare] = useState(false);
 
   useEffect(() => {
     axios
-      .post("http://localhost:3000/getdata/get_data", {
-        file_id: location.id,
-      })
+      .post(
+        "http://localhost:3000/getdata/get_data",
+        {
+          file_id: location.id,
+        },
+        { withCredentials: true }
+      )
       .then((res) => {
         setData(res.data[0]);
+        res.data[2] ? setShare(true) : setShare(false);
         setFileName(res.data[1][0].file_name);
         dispatch({
           type: "setSelectedFolder",
@@ -110,7 +116,7 @@ const VocaLoad = () => {
 
   const MyHeader = () => {
     return (
-      <Stack direction="row" spacing={2} m={1}>
+      <Stack direction="row" spacing={2} mb={2}>
         <IconButton
           sx={{ border: "1px solid lightgray" }}
           onClick={() => {
@@ -128,6 +134,7 @@ const VocaLoad = () => {
           onClick={() => {
             handleData("create");
           }}
+          sx={{ display: share ? "none" : "inlineBlock" }}
         >
           단어 추가
         </Button>
@@ -138,6 +145,7 @@ const VocaLoad = () => {
           onClick={() => {
             setView({ ...view, state: !view.state });
           }}
+          sx={{ display: share ? "none" : "inlineBlock" }}
         >
           {view.text}
         </Button>
@@ -159,11 +167,12 @@ const VocaLoad = () => {
             padding: "0 15px",
           }}
         >
-          {title}
+          <Typography sx={{ display: "inline" }}>{title}</Typography>
           <IconButton
             onClick={() => {
               onListen(label);
             }}
+            sx={{ float: "right", padding: 0 }}
           >
             <VolumeMuteIcon />
           </IconButton>
@@ -228,7 +237,12 @@ const VocaLoad = () => {
             sx={{ mb: "20px" }}
           >
             <Table sx={{ minWidth: 650 }} aria-label="caption table">
-              <caption>
+              <caption
+                style={{
+                  padding: "10px",
+                  display: share ? "none" : "inlineBlock",
+                }}
+              >
                 <ButtonGroup
                   variant="outlined"
                   aria-label="outlined button group"

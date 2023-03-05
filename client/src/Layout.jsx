@@ -21,7 +21,6 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ShareIcon from "@mui/icons-material/Share";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import SettingsBrightnessIcon from "@mui/icons-material/SettingsBrightness";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
@@ -30,8 +29,10 @@ import PostDialog from "./Main/Dialog/PostDialog";
 import CheckDialog from "./Main/Dialog/CheckDialog";
 import MySnackBar from "./Main/Dialog/MySnackbar";
 import VocaLoad from "./Main/VocaLoad";
+import SearchPage from "./Main/SearchPage";
+import SharePage from "./Main/SharePage";
 import { MyContext } from "./Context";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import { initialState, reducer } from "./Reducer";
 import { useHandleOpen } from "./CustomHook";
 import {
@@ -46,7 +47,9 @@ import SetDialog from "./Main/Dialog/SetDialog";
 
 const PersistentDrawerLeft = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [searchValue, setSearchValue] = useState("");
   const theme = useTheme();
+  const navigate = useNavigate();
   const [open, handleOpen, setOpen] = useHandleOpen(false, () => {
     setOpen(!open);
   });
@@ -85,7 +88,13 @@ const PersistentDrawerLeft = () => {
               >
                 <MenuIcon />
               </IconButton>
-              <Typography variant="h6" noWrap component="div">
+              <Typography
+                variant="h6"
+                noWrap
+                component="div"
+                onClick={() => (window.location.href = "/")}
+                sx={{ cursor: "pointer" }}
+              >
                 KC VOCA
               </Typography>
             </Toolbar>
@@ -135,7 +144,7 @@ const PersistentDrawerLeft = () => {
               </ListItemButton>
             </ListItem>
             <ListItem disablePadding>
-              <ListItemButton>
+              <ListItemButton onClick={() => (window.location.href = "/share")}>
                 <ListItemIcon>
                   <ShareIcon />
                 </ListItemIcon>
@@ -154,8 +163,19 @@ const PersistentDrawerLeft = () => {
               disablePadding
               sx={{ borderBottom: 1, borderColor: "grey.500" }}
             >
-              <InputBase sx={{ ml: 1, flex: 1 }} placeholder="Search..." />
-              <IconButton type="button" sx={{ p: "10px" }} aria-label="search">
+              <InputBase
+                sx={{ ml: 1, flex: 1 }}
+                placeholder="Search..."
+                onChange={(e) => setSearchValue(e.target.value)}
+              />
+              <IconButton
+                type="button"
+                sx={{ p: "10px" }}
+                aria-label="search"
+                onClick={() => {
+                  navigate("/search", { state: { value: searchValue } });
+                }}
+              >
                 <SearchIcon />
               </IconButton>
             </ListItem>
@@ -166,6 +186,8 @@ const PersistentDrawerLeft = () => {
           <Routes>
             <Route path="/" element={<Content />} />
             <Route path="/load/:id" element={<VocaLoad />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/share" element={<SharePage />} />
           </Routes>
         </Main>
       </Box>

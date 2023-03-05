@@ -63,8 +63,25 @@ router.get("/get_recent_file", (req, res) => {
   );
 });
 
+router.get("/get_share_file", (req, res) => {
+  db.query(
+    `
+    SELECT v.*, u.nickname
+    FROM voca_file v
+    JOIN localuser u ON v.user_id = u.user_id
+    WHERE v.shared = 1;
+    
+  `,
+    (err, result) => {
+      res.json(result);
+    }
+  );
+});
+
 router.post("/get_data", (req, res) => {
   const post = req.body;
+  const user_id = req.user[0].user_id;
+
   db.query(
     `
   SELECT * FROM voca_data WHERE file_id=?;
@@ -72,7 +89,14 @@ router.post("/get_data", (req, res) => {
   `,
     [post.file_id, post.file_id],
     (err, result) => {
-      res.json(result);
+      if (result[1][0] && result[1][0].user_id === user_id) {
+        res.json(result);
+      } else if (result[1][0] && result[1][0].user_id !== user_id) {
+        result.push(true);
+        res.json(result);
+      } else {
+        res.json(false);
+      }
     }
   );
 });
@@ -102,6 +126,19 @@ router.post("/tts", (req, res) => {
       res.send(data.AudioStream);
     }
   });
+});
+
+router.post("/search", (req, res) => {
+  const post = req.body;
+  const user = req.user[0];
+  db.query(
+    `SELECT * FROM voca_data WHERE voca REGEXP ? AND voca_data.user_id=? OR voca_mean REGEXP ? AND voca_data.user_id=?;
+  `,
+    [post.word, user.user_id, post.word, user.user_id],
+    (err, result) => {
+      res.send(result);
+    }
+  );
 });
 
 module.exports = router;

@@ -27,6 +27,14 @@ const FileArea = () => {
         .then((res) => {
           setFiles(res.data);
         });
+    } else if (state.selectedFolder === "get_share_file") {
+      axios
+        .get(`http://localhost:3000/getdata/${state.selectedFolder}`, {
+          withCredentials: true,
+        })
+        .then((res) => {
+          setFiles(res.data);
+        });
     } else if (state.selectedFolder === "get_fave_file" || "get_recent_file") {
       axios
         .get(`http://localhost:3000/getdata/${state.selectedFolder}`, {
@@ -77,6 +85,18 @@ const FileArea = () => {
                 <Typography variant="h6" gutterBottom>
                   {file.file_name}
                 </Typography>
+                <Typography
+                  variant="h7"
+                  gutterBottom
+                  sx={{
+                    display:
+                      state.selectedFolder === "get_share_file"
+                        ? "block"
+                        : "none",
+                  }}
+                >
+                  by {file.nickname}
+                </Typography>
               </div>
             </Item>
             <MoreVertIcon
@@ -84,6 +104,8 @@ const FileArea = () => {
                 position: "absolute",
                 right: 10,
                 top: 15,
+                display:
+                  state.selectedFolder === "get_share_file" ? "none" : "block",
                 "&:hover": {
                   backgroundColor: "lightgray",
                   cursor: "pointer",
