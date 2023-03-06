@@ -16,7 +16,7 @@ const SharePage = () => {
       <Typography
         variant="h5"
         mb={3}
-        sx={{ color: theme === "dark" ? "lightgray" : undefined }}
+        sx={{ color: theme === "dark" && "lightgray" }}
       >
         공유마당
       </Typography>

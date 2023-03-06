@@ -26,7 +26,7 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const backgroundColor = theme === "dark" ? "hsl(0, 0%, 20%)" : undefined;
+    const backgroundColor = theme === "dark" ? "hsl(0, 0%, 20%)" : "#fff";
     window.localStorage.setItem("kcvoca_theme", theme);
     document.body.style.backgroundColor = backgroundColor;
   }, [theme]);

@@ -13,12 +13,15 @@ import Paper from "@mui/material/Paper";
 import VolumeMuteIcon from "@mui/icons-material/VolumeMute";
 import { StyledTableRow } from "../Style/MUIStyle";
 import { ThemeContext } from "./../Context";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 const SearchPage = () => {
   const location = useLocation();
   const [data, setData] = useState([]);
   const { theme } = useContext(ThemeContext);
   const isDark = theme === "dark";
+  const matches2 = useMediaQuery("(max-width:1092px)");
+  const matches3 = useMediaQuery("(max-width:554px)");
 
   useEffect(() => {
     axios
@@ -56,7 +59,8 @@ const SearchPage = () => {
       });
   };
 
-  const MyTableRow = ({ width, title, label }) => {
+  const MyTableRow = ({ title, label }) => {
+    const width = matches3 ? "35%" : matches2 ? "20%" : "10%";
     return (
       <StyledTableRow>
         <TableCell
@@ -67,8 +71,8 @@ const SearchPage = () => {
             borderRight: 1,
             borderRightColor: "grey.300",
             padding: "0 15px",
-            backgroundColor: isDark ? "hsl(0, 0%, 30%)" : undefined,
-            color: isDark ? "lightgray" : undefined,
+            backgroundColor: isDark && "hsl(0, 0%, 30%)",
+            color: isDark && "lightgray",
           }}
         >
           <Typography sx={{ display: "inline" }}>{title}</Typography>
@@ -79,7 +83,7 @@ const SearchPage = () => {
             sx={{
               float: "right",
               padding: 0,
-              color: isDark ? "lightgray" : undefined,
+              color: isDark && "lightgray",
             }}
           >
             <VolumeMuteIcon />
@@ -88,13 +92,14 @@ const SearchPage = () => {
         <TableCell
           align="left"
           sx={{
-            backgroundColor: isDark ? "hsl(0, 0%, 30%)" : undefined,
+            backgroundColor: isDark && "hsl(0, 0%, 30%)",
+            wordBreak: "break-all",
           }}
         >
           <Typography
             sx={{
               fontSize: 17,
-              color: isDark ? "lightgray" : undefined,
+              color: isDark && "lightgray",
             }}
           >
             {label}
@@ -106,11 +111,11 @@ const SearchPage = () => {
 
   return (
     <>
-      <Stack direction="row" spacing={2} mb={2}>
+      <Stack direction="row" spacing={2} mb={2} mt={10}>
         <IconButton
           sx={{
             border: "1px solid lightgray",
-            color: isDark ? "lightgray" : undefined,
+            color: isDark && "lightgray",
             "&:hover": {
               backgroundColor: isDark ? "hsl(0, 0%, 45%)" : "lightgray",
             },
@@ -124,7 +129,7 @@ const SearchPage = () => {
         <Typography
           fontSize={"18px"}
           pt={"7px"}
-          sx={{ color: isDark ? "lightgray" : undefined }}
+          sx={{ color: isDark && "lightgray" }}
         >
           검색 키워드 : {location.state.value}
         </Typography>
@@ -138,10 +143,10 @@ const SearchPage = () => {
           >
             <Table sx={{ minWidth: 650 }} aria-label="caption table">
               <TableBody>
-                <MyTableRow width="10%" title="단어" label={item.voca} />
-                <MyTableRow width="7%" title="단어 뜻" label={item.voca_mean} />
-                <MyTableRow width="7%" title="예문" label={item.exam} />
-                <MyTableRow width="7%" title="예문 뜻" label={item.exam_mean} />
+                <MyTableRow title="단어" label={item.voca} />
+                <MyTableRow title="단어 뜻" label={item.voca_mean} />
+                <MyTableRow title="예문" label={item.exam} />
+                <MyTableRow title="예문 뜻" label={item.exam_mean} />
               </TableBody>
             </Table>
           </TableContainer>

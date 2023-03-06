@@ -175,7 +175,7 @@ const SignUp = () => {
                   name="email"
                   autoComplete="email"
                   autoFocus
-                  error={formErrors.emailError ? true : false}
+                  error={formErrors.emailError && true}
                   helperText={formErrors.emailMsg}
                 />
               </Grid>
@@ -188,7 +188,7 @@ const SignUp = () => {
                   type="password"
                   id="password"
                   autoComplete="new-password"
-                  error={formErrors.pwdError ? true : false}
+                  error={formErrors.pwdError && true}
                   helperText={formErrors.pwdMsg}
                 />
               </Grid>
@@ -201,7 +201,7 @@ const SignUp = () => {
                   type="password"
                   id="password2"
                   autoComplete="new-password"
-                  error={formErrors.pwdError2 ? true : false}
+                  error={formErrors.pwdError2 && true}
                   helperText={formErrors.pwdMsg2}
                 />
               </Grid>
@@ -213,7 +213,7 @@ const SignUp = () => {
                   fullWidth
                   id="nickname"
                   label="닉네임"
-                  error={formErrors.nickError ? true : false}
+                  error={formErrors.nickError && true}
                   helperText={formErrors.nickMsg}
                 />
               </Grid>

@@ -2,8 +2,6 @@ import * as React from "react";
 import { useReducer, useState, useEffect, useContext } from "react";
 import { useTheme } from "@mui/material/styles";
 import { ThemeProvider } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import CssBaseline from "@mui/material/CssBaseline";
 import Drawer from "@mui/material/Drawer";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
@@ -35,13 +33,8 @@ import { MyContext, ThemeContext } from "./Context";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { initialState, reducer } from "./Reducer";
 import { useHandleOpen } from "./CustomHook";
-import {
-  darkTheme,
-  drawerWidth,
-  Main,
-  AppBar,
-  DrawerHeader,
-} from "./Style/MUIStyle";
+import { darkTheme, DrawerHeader } from "./Style/MUIStyle";
+import AppBar from "@mui/material/AppBar";
 import axios from "axios";
 import SetDialog from "./Main/Dialog/SetDialog";
 
@@ -75,127 +68,111 @@ const PersistentDrawerLeft = () => {
         dispatch,
       }}
     >
-      <Box sx={{ display: "flex" }}>
-        <CssBaseline />
-        <ThemeProvider theme={darkTheme}>
-          <AppBar position="fixed" open={open}>
-            <Toolbar>
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={handleOpen}
-                edge="start"
-                sx={{ mr: 2, ...(open && { display: "none" }) }}
-              >
-                <MenuIcon />
-              </IconButton>
-              <Typography
-                variant="h6"
-                noWrap
-                component="div"
-                onClick={() => (window.location.href = "/")}
-                sx={{ cursor: "pointer" }}
-              >
-                KC VOCA
-              </Typography>
-            </Toolbar>
-          </AppBar>
-        </ThemeProvider>
-        <Drawer
-          sx={{
-            width: drawerWidth,
-            flexShrink: 0,
-            "& .MuiDrawer-paper": {
-              width: drawerWidth,
-              boxSizing: "border-box",
-            },
-          }}
-          variant="persistent"
-          anchor="left"
-          open={open}
-        >
-          <DrawerHeader>
-            <Stack direction="row" spacing={1}>
-              <AccountCircleIcon />
-              <Typography>{state.user.nickname}</Typography>
-            </Stack>
-            <IconButton onClick={handleOpen}>
-              {theme2.direction === "ltr" ? (
-                <ChevronLeftIcon />
-              ) : (
-                <ChevronRightIcon />
-              )}
-            </IconButton>
-          </DrawerHeader>
-          <Divider />
-          <List>
-            <ListItem disablePadding>
-              <ListItemButton
-                onClick={() => {
-                  dispatch({
-                    type: "setSetDialog",
-                    payload: { isOpen: true },
-                  });
-                }}
-              >
-                <ListItemIcon>
-                  <SettingsIcon />
-                </ListItemIcon>
-                <ListItemText primary="설정" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton onClick={() => (window.location.href = "/share")}>
-                <ListItemIcon>
-                  <ShareIcon />
-                </ListItemIcon>
-                <ListItemText primary="공유마당" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton
-                onClick={() => {
-                  theme === "dark" ? setTheme("light") : setTheme("dark");
-                }}
-              >
-                <ListItemIcon>
-                  <SettingsBrightnessIcon />
-                </ListItemIcon>
-                <ListItemText primary="다크모드" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem
-              disablePadding
-              sx={{ borderBottom: 1, borderColor: "grey.500" }}
+      <ThemeProvider theme={darkTheme}>
+        <AppBar>
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              onClick={handleOpen}
+              edge="start"
+              sx={{ mr: 2 }}
             >
-              <InputBase
-                sx={{ ml: 1, flex: 1 }}
-                placeholder="Search..."
-                onChange={(e) => setSearchValue(e.target.value)}
-              />
-              <IconButton
-                type="button"
-                sx={{ p: "10px" }}
-                aria-label="search"
-                onClick={() => {
-                  navigate("/search", { state: { value: searchValue } });
-                }}
-              >
-                <SearchIcon />
-              </IconButton>
-            </ListItem>
-          </List>
-        </Drawer>
-        <Main open={open}>
-          <DrawerHeader />
-          <Routes>
-            <Route path="/" element={<Content />} />
-            <Route path="/load/:id" element={<VocaLoad />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/share" element={<SharePage />} />
-          </Routes>
-        </Main>
-      </Box>
+              <MenuIcon />
+            </IconButton>
+            <Typography
+              variant="h6"
+              noWrap
+              component="div"
+              onClick={() => (window.location.href = "/")}
+              sx={{ cursor: "pointer" }}
+            >
+              KC VOCA
+            </Typography>
+          </Toolbar>
+        </AppBar>
+      </ThemeProvider>
+
+      <Routes>
+        <Route path="/" element={<Content />} />
+        <Route path="/load/:id" element={<VocaLoad />} />
+        <Route path="/search" element={<SearchPage />} />
+        <Route path="/share" element={<SharePage />} />
+      </Routes>
+
+      <Drawer anchor="left" open={open}>
+        <DrawerHeader>
+          <Stack direction="row" spacing={1}>
+            <AccountCircleIcon />
+            <Typography>{state.user.nickname}</Typography>
+          </Stack>
+          <IconButton onClick={handleOpen}>
+            {theme2.direction === "ltr" ? (
+              <ChevronLeftIcon />
+            ) : (
+              <ChevronRightIcon />
+            )}
+          </IconButton>
+        </DrawerHeader>
+        <Divider />
+        <List>
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => {
+                dispatch({
+                  type: "setSetDialog",
+                  payload: { isOpen: true },
+                });
+              }}
+            >
+              <ListItemIcon>
+                <SettingsIcon />
+              </ListItemIcon>
+              <ListItemText primary="설정" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton onClick={() => (window.location.href = "/share")}>
+              <ListItemIcon>
+                <ShareIcon />
+              </ListItemIcon>
+              <ListItemText primary="공유마당" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => {
+                theme === "dark" ? setTheme("light") : setTheme("dark");
+              }}
+            >
+              <ListItemIcon>
+                <SettingsBrightnessIcon />
+              </ListItemIcon>
+              <ListItemText primary="다크모드" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem
+            disablePadding
+            sx={{ borderBottom: 1, borderColor: "grey.500" }}
+          >
+            <InputBase
+              sx={{ ml: 1, flex: 1 }}
+              placeholder="Search..."
+              onChange={(e) => setSearchValue(e.target.value)}
+            />
+            <IconButton
+              type="button"
+              sx={{ p: "10px" }}
+              aria-label="search"
+              onClick={() => {
+                navigate("/search", { state: { value: searchValue } });
+              }}
+            >
+              <SearchIcon />
+            </IconButton>
+          </ListItem>
+        </List>
+      </Drawer>
+
       <MySnackBar />
       <PostDialog />
       <CheckDialog />

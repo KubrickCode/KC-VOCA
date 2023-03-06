@@ -75,9 +75,10 @@ const FileArea = () => {
                   backgroundColor: isDark ? "hsl(0, 0%, 45%)" : "lightgray",
                   cursor: "pointer",
                 },
-                height: "200px",
+                height:
+                  state.selectedFolder === "get_share_file" ? "230px" : "200px",
                 backgroundColor: isDark ? "hsl(0, 0%, 35%)" : "white",
-                color: isDark ? "lightgray" : undefined,
+                color: isDark && "lightgray",
               }}
               align="center"
               onClick={() => {
@@ -110,7 +111,7 @@ const FileArea = () => {
                 position: "absolute",
                 right: 10,
                 top: 15,
-                color: isDark ? "lightgray" : undefined,
+                color: isDark && "lightgray",
                 display:
                   state.selectedFolder === "get_share_file" ? "none" : "block",
                 "&:hover": {

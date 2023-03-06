@@ -30,13 +30,14 @@ const StyledTreeItem = (props) => {
         <Box
           sx={{
             display: "flex",
+
             alignItems: "center",
             p: 0.5,
             pr: 0,
             color:
-              theme === "dark" && state.moveDialog.isOpen === false
-                ? "lightgray"
-                : undefined,
+              theme === "dark" &&
+              state.moveDialog.isOpen === false &&
+              "lightgray",
           }}
         >
           <Box component={LabelIcon} color="inherit" sx={{ mr: 1 }} />
@@ -138,7 +139,7 @@ const FolderArea = () => {
       defaultEndIcon={<div style={{ width: 24 }} />}
       sx={{
         flexGrow: 1,
-        overflowY: "auto",
+        overflow: "hidden",
       }}
     >
       <StyledTreeItem
