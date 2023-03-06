@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useLocation } from "react-router-dom";
 import Typography from "@mui/material/Typography";
 import axios from "axios";
@@ -12,10 +12,13 @@ import TableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
 import VolumeMuteIcon from "@mui/icons-material/VolumeMute";
 import { StyledTableRow } from "../Style/MUIStyle";
+import { ThemeContext } from "./../Context";
 
 const SearchPage = () => {
   const location = useLocation();
   const [data, setData] = useState([]);
+  const { theme } = useContext(ThemeContext);
+  const isDark = theme === "dark";
 
   useEffect(() => {
     axios
@@ -64,6 +67,8 @@ const SearchPage = () => {
             borderRight: 1,
             borderRightColor: "grey.300",
             padding: "0 15px",
+            backgroundColor: isDark ? "hsl(0, 0%, 30%)" : undefined,
+            color: isDark ? "lightgray" : undefined,
           }}
         >
           <Typography sx={{ display: "inline" }}>{title}</Typography>
@@ -71,15 +76,25 @@ const SearchPage = () => {
             onClick={() => {
               onListen(label);
             }}
-            sx={{ float: "right", padding: 0 }}
+            sx={{
+              float: "right",
+              padding: 0,
+              color: isDark ? "lightgray" : undefined,
+            }}
           >
             <VolumeMuteIcon />
           </IconButton>
         </TableCell>
-        <TableCell align="left">
+        <TableCell
+          align="left"
+          sx={{
+            backgroundColor: isDark ? "hsl(0, 0%, 30%)" : undefined,
+          }}
+        >
           <Typography
             sx={{
               fontSize: 17,
+              color: isDark ? "lightgray" : undefined,
             }}
           >
             {label}
@@ -93,14 +108,24 @@ const SearchPage = () => {
     <>
       <Stack direction="row" spacing={2} mb={2}>
         <IconButton
-          sx={{ border: "1px solid lightgray" }}
+          sx={{
+            border: "1px solid lightgray",
+            color: isDark ? "lightgray" : undefined,
+            "&:hover": {
+              backgroundColor: isDark ? "hsl(0, 0%, 45%)" : "lightgray",
+            },
+          }}
           onClick={() => {
             window.location.href = "/";
           }}
         >
           <HomeIcon />
         </IconButton>
-        <Typography fontSize={"18px"} pt={"7px"}>
+        <Typography
+          fontSize={"18px"}
+          pt={"7px"}
+          sx={{ color: isDark ? "lightgray" : undefined }}
+        >
           검색 키워드 : {location.state.value}
         </Typography>
       </Stack>

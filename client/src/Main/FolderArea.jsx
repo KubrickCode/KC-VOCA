@@ -9,10 +9,12 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import WatchLaterIcon from "@mui/icons-material/WatchLater";
 import StarIcon from "@mui/icons-material/Star";
 import axios from "axios";
-import { MyContext } from "../Context";
+import { MyContext, ThemeContext } from "../Context";
 import { StyledTreeItemRoot } from "../Style/MUIStyle";
 
 const StyledTreeItem = (props) => {
+  const { theme } = useContext(ThemeContext);
+  const { state } = useContext(MyContext);
   const {
     bgColor,
     color,
@@ -25,11 +27,25 @@ const StyledTreeItem = (props) => {
   return (
     <StyledTreeItemRoot
       label={
-        <Box sx={{ display: "flex", alignItems: "center", p: 0.5, pr: 0 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            p: 0.5,
+            pr: 0,
+            color:
+              theme === "dark" && state.moveDialog.isOpen === false
+                ? "lightgray"
+                : undefined,
+          }}
+        >
           <Box component={LabelIcon} color="inherit" sx={{ mr: 1 }} />
           <Typography
             variant="body2"
-            sx={{ fontWeight: "inherit", flexGrow: 1 }}
+            sx={{
+              fontWeight: "inherit",
+              flexGrow: 1,
+            }}
           >
             {labelText}
           </Typography>
@@ -132,7 +148,9 @@ const FolderArea = () => {
         onClick={() => {
           dispatch({ type: "setSelectedFolder", payload: "get_recent_file" });
         }}
-        sx={{ display: !state.moveDialog.isOpen ? "block" : "none" }}
+        sx={{
+          display: !state.moveDialog.isOpen ? "block" : "none",
+        }}
       />
       <StyledTreeItem
         nodeId="0-1"

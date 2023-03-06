@@ -4,13 +4,15 @@ import Grid from "@mui/material/Unstable_Grid2";
 import Typography from "@mui/material/Typography";
 import axios from "axios";
 import { useEffect, useState, useContext } from "react";
-import { MyContext } from "../Context";
+import { MyContext, ThemeContext } from "../Context";
 import { Item } from "../Style/MUIStyle";
 import FileDial from "./Dialog/FileDial";
 import { useHandleOpen } from "./../CustomHook";
 
 const FileArea = () => {
   const [files, setFiles] = useState([]);
+  const { theme } = useContext(ThemeContext);
+  const isDark = theme === "dark";
 
   const { state, dispatch } = useContext(MyContext);
 
@@ -63,15 +65,19 @@ const FileArea = () => {
             sm={2}
             md={2}
             key={file.file_id}
-            sx={{ position: "relative" }}
+            sx={{
+              position: "relative",
+            }}
           >
             <Item
               sx={{
                 "&:hover": {
-                  backgroundColor: "lightgray",
+                  backgroundColor: isDark ? "hsl(0, 0%, 45%)" : "lightgray",
                   cursor: "pointer",
                 },
                 height: "200px",
+                backgroundColor: isDark ? "hsl(0, 0%, 35%)" : "white",
+                color: isDark ? "lightgray" : undefined,
               }}
               align="center"
               onClick={() => {
@@ -104,10 +110,11 @@ const FileArea = () => {
                 position: "absolute",
                 right: 10,
                 top: 15,
+                color: isDark ? "lightgray" : undefined,
                 display:
                   state.selectedFolder === "get_share_file" ? "none" : "block",
                 "&:hover": {
-                  backgroundColor: "lightgray",
+                  backgroundColor: isDark ? "hsl(0, 0%, 45%)" : "lightgray",
                   cursor: "pointer",
                 },
               }}

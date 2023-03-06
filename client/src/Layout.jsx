@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useReducer, useState, useEffect } from "react";
+import { useReducer, useState, useEffect, useContext } from "react";
 import { useTheme } from "@mui/material/styles";
 import { ThemeProvider } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -31,7 +31,7 @@ import MySnackBar from "./Main/Dialog/MySnackbar";
 import VocaLoad from "./Main/VocaLoad";
 import SearchPage from "./Main/SearchPage";
 import SharePage from "./Main/SharePage";
-import { MyContext } from "./Context";
+import { MyContext, ThemeContext } from "./Context";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { initialState, reducer } from "./Reducer";
 import { useHandleOpen } from "./CustomHook";
@@ -47,8 +47,9 @@ import SetDialog from "./Main/Dialog/SetDialog";
 
 const PersistentDrawerLeft = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const { theme, setTheme } = useContext(ThemeContext);
   const [searchValue, setSearchValue] = useState("");
-  const theme = useTheme();
+  const theme2 = useTheme();
   const navigate = useNavigate();
   const [open, handleOpen, setOpen] = useHandleOpen(false, () => {
     setOpen(!open);
@@ -119,7 +120,7 @@ const PersistentDrawerLeft = () => {
               <Typography>{state.user.nickname}</Typography>
             </Stack>
             <IconButton onClick={handleOpen}>
-              {theme.direction === "ltr" ? (
+              {theme2.direction === "ltr" ? (
                 <ChevronLeftIcon />
               ) : (
                 <ChevronRightIcon />
@@ -152,7 +153,11 @@ const PersistentDrawerLeft = () => {
               </ListItemButton>
             </ListItem>
             <ListItem disablePadding>
-              <ListItemButton>
+              <ListItemButton
+                onClick={() => {
+                  theme === "dark" ? setTheme("light") : setTheme("dark");
+                }}
+              >
                 <ListItemIcon>
                   <SettingsBrightnessIcon />
                 </ListItemIcon>

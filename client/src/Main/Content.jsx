@@ -6,18 +6,30 @@ import FileArea from "./FileArea";
 import FolderArea from "./FolderArea";
 import { Item } from "../Style/MUIStyle";
 import MoveDial from "./Dialog/MoveDialog";
+import { ThemeContext } from "../Context";
+import { useContext } from "react";
 
 const Content = () => {
+  const { theme } = useContext(ThemeContext);
+  const isDark = theme === "dark";
   return (
     <>
       <Grid container spacing={2}>
         <Grid xs={3}>
-          <Item>
+          <Item
+            sx={{
+              backgroundColor: isDark ? "hsl(0, 0%, 30%)" : "white",
+            }}
+          >
             <FolderArea />
           </Item>
         </Grid>
         <Grid xs={9}>
-          <Item>
+          <Item
+            sx={{
+              backgroundColor: isDark ? "hsl(0, 0%, 30%)" : "white",
+            }}
+          >
             <FileArea />
           </Item>
         </Grid>

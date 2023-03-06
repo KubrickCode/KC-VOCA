@@ -2,9 +2,14 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import Layout from "./Layout";
 import Sign from "./Logoff/Sign";
+import { ThemeContext } from "./Context";
 
 const App = () => {
-  const [isLogin, setAuth] = useState(false);
+  const [isLogin, setIsLogin] = useState(false);
+  const [theme, setTheme] = useState(() => {
+    const savedTheme = window.localStorage.getItem("kcvoca_theme");
+    return savedTheme || "light";
+  });
 
   useEffect(() => {
     const fetchIsLogin = async () => {
@@ -12,7 +17,7 @@ const App = () => {
         const res = await axios.get("http://localhost:3000/signpage/islogin", {
           withCredentials: true,
         });
-        setAuth(res.data);
+        setIsLogin(res.data);
       } catch (err) {
         console.error("Error fetching data: ", err);
       }
@@ -20,7 +25,17 @@ const App = () => {
     fetchIsLogin();
   }, []);
 
-  return <div>{isLogin ? <Layout /> : <Sign />}</div>;
+  useEffect(() => {
+    const backgroundColor = theme === "dark" ? "hsl(0, 0%, 20%)" : undefined;
+    window.localStorage.setItem("kcvoca_theme", theme);
+    document.body.style.backgroundColor = backgroundColor;
+  }, [theme]);
+
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      {isLogin ? <Layout /> : <Sign />}
+    </ThemeContext.Provider>
+  );
 };
 
 export default App;

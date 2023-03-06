@@ -13,7 +13,7 @@ import Typography from "@mui/material/Typography";
 import PlusOneIcon from "@mui/icons-material/PlusOne";
 import IconButton from "@mui/material/IconButton";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import { MyContext } from "./../Context";
+import { MyContext, ThemeContext } from "./../Context";
 import HomeIcon from "@mui/icons-material/Home";
 import AddIcon from "@mui/icons-material/Add";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
@@ -26,6 +26,7 @@ import { StyledTableRow } from "../Style/MUIStyle";
 
 const VocaLoad = () => {
   const { state, dispatch } = useContext(MyContext);
+  const { theme } = useContext(ThemeContext);
   const viewMode = useLocation();
   const location = useParams();
   const [data, setData] = useState([]);
@@ -38,6 +39,7 @@ const VocaLoad = () => {
     text: "공부 모드",
   });
   const [share, setShare] = useState(false);
+  const isDark = theme === "dark";
 
   useEffect(() => {
     axios
@@ -118,18 +120,30 @@ const VocaLoad = () => {
     return (
       <Stack direction="row" spacing={2} mb={2}>
         <IconButton
-          sx={{ border: "1px solid lightgray" }}
+          sx={{
+            border: "1px solid lightgray",
+            color: isDark ? "lightgray" : undefined,
+            "&:hover": {
+              backgroundColor: isDark ? "hsl(0, 0%, 45%)" : "lightgray",
+            },
+          }}
           onClick={() => {
             window.location.href = "/";
           }}
         >
           <HomeIcon />
         </IconButton>
-        <Typography fontSize={20} sx={{ pt: "5px" }}>
+        <Typography
+          fontSize={20}
+          sx={{
+            pt: "5px",
+            color: isDark ? "lightgray" : undefined,
+          }}
+        >
           단어장 : {fileName}
         </Typography>
         <Button
-          variant="outlined"
+          variant={isDark ? "contained" : "outlined"}
           endIcon={<AddIcon />}
           onClick={() => {
             handleData("create");
@@ -139,7 +153,7 @@ const VocaLoad = () => {
           단어 추가
         </Button>
         <Button
-          variant="outlined"
+          variant={isDark ? "contained" : "outlined"}
           endIcon={view.toggleBtn}
           color="secondary"
           onClick={() => {
@@ -165,6 +179,8 @@ const VocaLoad = () => {
             borderRightColor: "grey.300",
             fontSize: 17,
             padding: "0 15px",
+            backgroundColor: isDark ? "hsl(0, 0%, 30%)" : undefined,
+            color: isDark ? "lightgray" : undefined,
           }}
         >
           <Typography sx={{ display: "inline" }}>{title}</Typography>
@@ -172,18 +188,28 @@ const VocaLoad = () => {
             onClick={() => {
               onListen(label);
             }}
-            sx={{ float: "right", padding: 0 }}
+            sx={{
+              float: "right",
+              padding: 0,
+              color: isDark ? "lightgray" : undefined,
+            }}
           >
             <VolumeMuteIcon />
           </IconButton>
         </TableCell>
-        <TableCell align="left">
+        <TableCell
+          align="left"
+          sx={{
+            backgroundColor: isDark ? "hsl(0, 0%, 30%)" : undefined,
+          }}
+        >
           <Stack direction="row">
             <Checkbox
               sx={{
                 padding: 0,
                 display: view.state ? "none" : "block",
                 marginRight: "10px",
+                color: isDark ? "lightgray" : undefined,
               }}
               checked={checked}
               icon={<VisibilityIcon />}
@@ -194,6 +220,7 @@ const VocaLoad = () => {
               sx={{
                 fontSize: 17,
                 display: checked || view.state ? "block" : "none",
+                color: isDark ? "lightgray" : undefined,
               }}
             >
               {label}
@@ -241,10 +268,11 @@ const VocaLoad = () => {
                 style={{
                   padding: "10px",
                   display: share ? "none" : "inlineBlock",
+                  backgroundColor: isDark ? "hsl(0, 0%, 30%)" : undefined,
                 }}
               >
                 <ButtonGroup
-                  variant="outlined"
+                  variant={isDark ? "contained" : "outlined"}
                   aria-label="outlined button group"
                 >
                   <Button
@@ -285,6 +313,7 @@ const VocaLoad = () => {
                     padding: 0,
                     display: view.state ? "none" : "inlineBlock",
                     marginLeft: "10px",
+                    color: isDark ? "lightgray" : undefined,
                   }}
                   checked={
                     Boolean(checked["voca" + index]) &&
@@ -365,13 +394,24 @@ const VocaLoad = () => {
                       borderRight: 1,
                       borderRightColor: "grey.300",
                       fontSize: 17,
+                      backgroundColor: isDark ? "hsl(0, 0%, 30%)" : undefined,
+                      color: isDark ? "lightgray" : undefined,
                     }}
                   >
                     따라읽기
                   </TableCell>
-                  <TableCell align="left">
+                  <TableCell
+                    align="left"
+                    sx={{
+                      backgroundColor: isDark ? "hsl(0, 0%, 30%)" : undefined,
+                      color: isDark ? "lightgray" : undefined,
+                    }}
+                  >
                     <IconButton
-                      sx={{ border: "1px solid lightgray" }}
+                      sx={{
+                        border: "1px solid lightgray",
+                        color: isDark ? "lightgray" : undefined,
+                      }}
                       onClick={() => {
                         setCount({
                           ...count,
@@ -385,7 +425,10 @@ const VocaLoad = () => {
                       반복 횟수 : {count[index] ? count[index] : 0}
                     </Typography>
                     <IconButton
-                      sx={{ border: "1px solid lightgray" }}
+                      sx={{
+                        border: "1px solid lightgray",
+                        color: isDark ? "lightgray" : undefined,
+                      }}
                       onClick={() => {
                         setCount({ ...count, [index]: 0 });
                       }}
