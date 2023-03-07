@@ -46,6 +46,7 @@ const StyledTreeItem = (props) => {
             sx={{
               fontWeight: "inherit",
               flexGrow: 1,
+              paddingRight: "1px",
             }}
           >
             {labelText}

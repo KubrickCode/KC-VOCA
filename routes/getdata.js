@@ -85,9 +85,10 @@ router.post("/get_data", (req, res) => {
   db.query(
     `
   SELECT * FROM voca_data WHERE file_id=?;
-  SELECT * FROM voca_file WHERE file_id=?
+  SELECT * FROM voca_file WHERE file_id=?;
+  UPDATE voca_file SET current=CURRENT_TIMESTAMP WHERE file_id=?;
   `,
-    [post.file_id, post.file_id],
+    [post.file_id, post.file_id, post.file_id],
     (err, result) => {
       if (result[1][0] && result[1][0].user_id === user_id) {
         res.json(result);

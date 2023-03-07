@@ -19,16 +19,46 @@ const PostDialog = () => {
     exam: "",
     exam_mean: "",
   });
+  const [submitBtn, setSubmitBtn] = useState(true);
 
   useEffect(() => {
     setFormData({
       ...formData,
+      value1: "",
+      value2: "",
       voca: state.selectedData.voca,
       voca_mean: state.selectedData.voca_mean,
       exam: state.selectedData.exam,
       exam_mean: state.selectedData.exam_mean,
     });
-  }, [state.selectedData]);
+  }, [state.postDialog]);
+
+  useEffect(() => {
+    const { content, title } = state.postDialog;
+    const { value1, value2, voca } = formData;
+
+    if (content === "basic") {
+      let isValid;
+      switch (title) {
+        case "비밀번호 변경":
+          isValid = value1.length > 5 && value2.length > 5;
+          setSubmitBtn(!isValid);
+          break;
+        case "닉네임 변경":
+          isValid = value1.length > 1;
+          setSubmitBtn(!isValid);
+          break;
+        default:
+          isValid = value1.length > 0;
+          setSubmitBtn(!isValid);
+          break;
+      }
+    } else if (content === "data") {
+      console.log("hjio");
+      const isValid = voca.length > 0;
+      setSubmitBtn(!isValid);
+    }
+  }, [formData]);
 
   const [, handleOpen] = useHandleOpen(false, () => {
     dispatch({ type: "setPostDialog", payload: { isOpen: false } });
@@ -72,31 +102,34 @@ const PostDialog = () => {
   };
 
   const basicContent = () => {
+    const pwdState = state.postDialog.title === "비밀번호 변경";
     return (
       <div>
         <TextField
           autoFocus
           margin="dense"
           id="name"
-          type="text"
+          type={pwdState ? "password" : "text"}
           label={state.postDialog.label}
           fullWidth
           variant="standard"
           onChange={(e) => {
             setFormData({ ...formData, value1: e.target.value });
           }}
+          inputProps={{ minLength: pwdState ? 6 : 1, maxLength: 18 }}
         />
-        {state.postDialog.title === "비밀번호 변경" && (
+        {pwdState && (
           <TextField
             margin="dense"
             id="name2"
-            type="text"
+            type="password"
             label={"새 " + state.postDialog.label}
             fullWidth
             variant="standard"
             onChange={(e) => {
               setFormData({ ...formData, value2: e.target.value });
             }}
+            inputProps={{ minLength: 6, maxLength: 18 }}
           />
         )}
       </div>
@@ -118,6 +151,7 @@ const PostDialog = () => {
           onChange={(e) => {
             setFormData({ ...formData, voca: e.target.value });
           }}
+          inputProps={{ minLength: 1, maxLength: 100 }}
         />
         <TextField
           margin="dense"
@@ -130,6 +164,7 @@ const PostDialog = () => {
           onChange={(e) => {
             setFormData({ ...formData, voca_mean: e.target.value });
           }}
+          inputProps={{ maxLength: 100 }}
         />
         <TextField
           margin="dense"
@@ -142,6 +177,7 @@ const PostDialog = () => {
           onChange={(e) => {
             setFormData({ ...formData, exam: e.target.value });
           }}
+          inputProps={{ maxLength: 1000 }}
         />
         <TextField
           margin="dense"
@@ -154,6 +190,7 @@ const PostDialog = () => {
           onChange={(e) => {
             setFormData({ ...formData, exam_mean: e.target.value });
           }}
+          inputProps={{ maxLength: 1000 }}
         />
       </div>
     );
@@ -163,11 +200,13 @@ const PostDialog = () => {
     <Dialog open={state.postDialog.isOpen} onClose={handleOpen}>
       <DialogTitle>{state.postDialog.title}</DialogTitle>
       <DialogContent>
-        {state.postDialog.content == "basic" ? basicContent() : dataContent()}
+        {state.postDialog.content === "basic" ? basicContent() : dataContent()}
       </DialogContent>
       <DialogActions>
         <Button onClick={handleOpen}>닫기</Button>
-        <Button onClick={submitForm}>확인</Button>
+        <Button onClick={submitForm} disabled={submitBtn}>
+          확인
+        </Button>
       </DialogActions>
     </Dialog>
   );

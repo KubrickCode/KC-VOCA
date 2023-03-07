@@ -158,6 +158,7 @@ const PersistentDrawerLeft = () => {
               sx={{ ml: 1, flex: 1 }}
               placeholder="Search..."
               onChange={(e) => setSearchValue(e.target.value)}
+              inputProps={{ maxLength: 100 }}
             />
             <IconButton
               type="button"

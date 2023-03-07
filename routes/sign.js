@@ -114,3 +114,26 @@ router.get("/login_process", (req, res) => {
   res.json({ feedback });
 });
 module.exports = router;
+
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    successRedirect: "/",
+    failureRedirect: "/",
+  })
+);
+
+router.get("/kakao", passport.authenticate("kakao"));
+
+router.get(
+  "/kakao/callback",
+  passport.authenticate("kakao", {
+    successRedirect: "/",
+    failureRedirect: "/",
+  })
+);

@@ -13,6 +13,8 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Alert from "@mui/material/Alert";
 import axios from "axios";
 import { useState, useEffect } from "react";
+import IconButton from "@mui/material/IconButton";
+import "@fontsource/roboto/500.css";
 
 const Copyright = (props) => {
   return (
@@ -23,7 +25,7 @@ const Copyright = (props) => {
       {...props}
     >
       {"Copyright © "}
-      <Link color="inherit" href="https://mui.com/">
+      <Link color="inherit" href="/">
         KC VOCA
       </Link>{" "}
       {new Date().getFullYear()}
@@ -122,9 +124,45 @@ const SignInSide = () => {
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+                sx={{ boxShadow: 1, mt: 3, mb: 2 }}
               >
-                로그인
+                <Typography>로그인</Typography>
+              </Button>
+              <Button
+                fullWidth
+                sx={{ boxShadow: 1, marginBottom: "10px" }}
+                onClick={() =>
+                  (window.location.href =
+                    "http://localhost:3000/signpage/google")
+                }
+              >
+                <img height="20px" src={"/public/google.png"} />
+                <Typography
+                  color="black"
+                  sx={{ textTransform: "none", marginLeft: "10px" }}
+                >
+                  Google 계정으로 로그인
+                </Typography>
+              </Button>
+              <Button
+                fullWidth
+                sx={{
+                  boxShadow: 1,
+                  backgroundColor: "	#FEE500",
+                  marginBottom: "10px",
+                  "&:hover": {
+                    backgroundColor: "	#EDD70F",
+                  },
+                }}
+                onClick={() =>
+                  (window.location.href =
+                    "http://localhost:3000/signpage/kakao")
+                }
+              >
+                <img height="20px" src={"/public/kakao.png"} />
+                <Typography color="black" sx={{ marginLeft: "10px" }}>
+                  카카오 로그인
+                </Typography>
               </Button>
               <Grid container>
                 <Grid item xs>

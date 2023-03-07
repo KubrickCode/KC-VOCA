@@ -90,13 +90,12 @@ const VocaLoad = () => {
     delete: {
       title: "데이터 삭제",
       link: "http://localhost:3000/delete/delete_data",
-      content: "data",
       text: "정말 데이터를 삭제하시겠습니까?",
     },
   };
 
   const handleData = (type, id, voca, voca_mean, exam, exam_mean) => {
-    const { title, link, content, text } = options[type];
+    const { title, link, text } = options[type];
 
     dispatch({
       type: type === "delete" ? "setCheckDialog" : "setPostDialog",
@@ -104,7 +103,7 @@ const VocaLoad = () => {
         isOpen: true,
         title,
         link,
-        content,
+        content: "data",
         text,
       },
     });
