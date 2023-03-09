@@ -15,10 +15,12 @@ app.use(flash());
 
 require("dotenv").config();
 
+const link = "http://3.35.208.73/";
+
 const cors = require("cors");
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: link,
     credentials: true,
   })
 );
@@ -32,7 +34,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "http://localhost:5173");
+  res.header("Access-Control-Allow-Origin", link);
   res.header("Access-Control-Allow-Credentials", true);
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
   res.header(
