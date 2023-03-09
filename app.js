@@ -66,12 +66,12 @@ const createRouter = require("./routes/create");
 const modifyRouter = require("./routes/modify");
 const deleteRouter = require("./routes/delete");
 
-app.use("/", indexRouter);
-app.use("/signpage", signRouter);
-app.use("/getdata", getDataRouter);
-app.use("/create", createRouter);
-app.use("/modify", modifyRouter);
-app.use("/delete", deleteRouter);
+app.use("/api/", indexRouter);
+app.use("/api/signpage", signRouter);
+app.use("/api/getdata", getDataRouter);
+app.use("/api/create", createRouter);
+app.use("/api/modify", modifyRouter);
+app.use("/api/delete", deleteRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
