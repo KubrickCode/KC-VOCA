@@ -77,10 +77,11 @@ const FolderArea = () => {
   const [folderData, setFolderData] = useState([]);
 
   const { state, dispatch } = useContext(MyContext);
+  const { url } = useContext(ThemeContext);
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/getdata/get_folder", {
+      .get(`${url}/getdata/get_folder`, {
         withCredentials: true,
       })
       .then((res) => {

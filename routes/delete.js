@@ -9,6 +9,8 @@ db.connect();
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 
+const url = "/";
+
 router.post("/delete_folder", (req, res) => {
   const post = req.body;
   if (post.folder_id === "1") {
@@ -77,7 +79,7 @@ router.post("/user", (req, res) => {
           `,
               [user_id, user_id, user_id, user_id, user_id],
               (err, result) => {
-                res.redirect("http://localhost:5173/");
+                res.redirect(url);
               }
             );
           });

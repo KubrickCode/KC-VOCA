@@ -10,9 +10,10 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import Alert from "@mui/material/Alert";
+import { ThemeContext } from "../Context";
 
 const Copyright = (props) => {
   return (
@@ -33,6 +34,7 @@ const theme = createTheme();
 
 const SignUp = () => {
   const [btnState, setBtnState] = useState(true);
+  const { url } = useContext(ThemeContext);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -69,7 +71,7 @@ const SignUp = () => {
     const nickname = form.nickname.value;
 
     try {
-      await axios.post("http://localhost:3000/signpage/check_duplicate", {
+      await axios.post(`${url}/signpage/check_duplicate`, {
         email,
         nickname,
       });
@@ -158,7 +160,7 @@ const SignUp = () => {
             noValidate
             onSubmit={handleSubmit}
             sx={{ mt: 3 }}
-            action="http://localhost:3000/signpage/signup_process"
+            action={`${url}/signpage/signup_process`}
             method="post"
             onChange={handleChange}
           >

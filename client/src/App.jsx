@@ -11,10 +11,12 @@ const App = () => {
     return savedTheme || "light";
   });
 
+  const url = "http://localhost:3000";
+
   useEffect(() => {
     const fetchIsLogin = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/signpage/islogin", {
+        const res = await axios.get(`${url}/signpage/islogin`, {
           withCredentials: true,
         });
         setIsLogin(res.data);
@@ -32,7 +34,7 @@ const App = () => {
   }, [theme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme, url }}>
       {isLogin ? <Layout /> : <Sign />}
     </ThemeContext.Provider>
   );

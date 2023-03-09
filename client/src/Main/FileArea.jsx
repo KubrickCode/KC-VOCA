@@ -8,15 +8,11 @@ import { MyContext, ThemeContext } from "../Context";
 import { Item } from "../Style/MUIStyle";
 import FileDial from "./Dialog/FileDial";
 import { useHandleOpen } from "./../CustomHook";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
 
 const FileArea = () => {
   const [files, setFiles] = useState([]);
-  const [sort, setSort] = useState("");
-  const { theme } = useContext(ThemeContext);
+  const [setSort] = useState("");
+  const { theme, url } = useContext(ThemeContext);
   const isDark = theme === "dark";
 
   const { state, dispatch } = useContext(MyContext);
@@ -25,14 +21,10 @@ const FileArea = () => {
     setOpen(!open);
   });
 
-  const handleSort = (event) => {
-    setSort(event.target.value);
-  };
-
   useEffect(() => {
     if (Number(state.selectedFolder)) {
       axios
-        .post("http://localhost:3000/getdata/get_file", {
+        .post(`${url}/getdata/get_file`, {
           folder_id: state.selectedFolder,
         })
         .then((res) => {
@@ -40,7 +32,7 @@ const FileArea = () => {
         });
     } else if (state.selectedFolder === "get_share_file") {
       axios
-        .get(`http://localhost:3000/getdata/${state.selectedFolder}`, {
+        .get(`${url}/getdata/${state.selectedFolder}`, {
           withCredentials: true,
         })
         .then((res) => {
@@ -48,7 +40,7 @@ const FileArea = () => {
         });
     } else if (state.selectedFolder === "get_fave_file" || "get_recent_file") {
       axios
-        .get(`http://localhost:3000/getdata/${state.selectedFolder}`, {
+        .get(`${url}/getdata/${state.selectedFolder}`, {
           withCredentials: true,
         })
         .then((res) => {

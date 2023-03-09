@@ -12,9 +12,9 @@ import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Alert from "@mui/material/Alert";
 import axios from "axios";
-import { useState, useEffect } from "react";
-import IconButton from "@mui/material/IconButton";
+import { useState, useEffect, useContext } from "react";
 import "@fontsource/roboto/500.css";
+import { ThemeContext } from "../Context";
 
 const Copyright = (props) => {
   return (
@@ -38,16 +38,14 @@ const theme = createTheme();
 
 const SignInSide = () => {
   const [errmsg, setErrMsg] = useState("");
+  const { url } = useContext(ThemeContext);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:3000/signpage/login_process",
-          {
-            withCredentials: true,
-          }
-        );
+        const res = await axios.get(`${url}/signpage/login_process`, {
+          withCredentials: true,
+        });
         setErrMsg(res.data.feedback);
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -96,7 +94,7 @@ const SignInSide = () => {
               component="form"
               noValidate
               sx={{ mt: 1 }}
-              action="http://localhost:3000/signpage/login_process"
+              action={`${url}/signpage/login_process`}
               method="post"
             >
               <TextField
@@ -132,11 +130,10 @@ const SignInSide = () => {
                 fullWidth
                 sx={{ boxShadow: 1, marginBottom: "10px" }}
                 onClick={() =>
-                  (window.location.href =
-                    "http://localhost:3000/signpage/google")
+                  (window.location.href = `${url}/signpage/google`)
                 }
               >
-                <img height="20px" src={"/public/google.png"} />
+                <img height="20px" src={"/public/images/google.png"} />
                 <Typography
                   color="black"
                   sx={{ textTransform: "none", marginLeft: "10px" }}
@@ -154,12 +151,9 @@ const SignInSide = () => {
                     backgroundColor: "	#EDD70F",
                   },
                 }}
-                onClick={() =>
-                  (window.location.href =
-                    "http://localhost:3000/signpage/kakao")
-                }
+                onClick={() => (window.location.href = `${url}/signpage/kakao`)}
               >
-                <img height="20px" src={"/public/kakao.png"} />
+                <img height="20px" src={"/public/images/kakao.png"} />
                 <Typography color="black" sx={{ marginLeft: "10px" }}>
                   카카오 로그인
                 </Typography>

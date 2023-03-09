@@ -27,7 +27,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 
 const VocaLoad = () => {
   const { state, dispatch } = useContext(MyContext);
-  const { theme } = useContext(ThemeContext);
+  const { theme, url } = useContext(ThemeContext);
   const viewMode = useLocation();
   const location = useParams();
   const [data, setData] = useState([]);
@@ -49,7 +49,7 @@ const VocaLoad = () => {
   useEffect(() => {
     axios
       .post(
-        "http://localhost:3000/getdata/get_data",
+        `${url}/getdata/get_data`,
         {
           file_id: location.id,
         },
@@ -81,15 +81,15 @@ const VocaLoad = () => {
   const options = {
     modify: {
       title: "데이터 수정",
-      link: "http://localhost:3000/modify/modify_data",
+      link: `${url}/modify/modify_data`,
     },
     create: {
       title: "데이터 추가",
-      link: "http://localhost:3000/create/create_data",
+      link: `${url}/create/create_data`,
     },
     delete: {
       title: "데이터 삭제",
-      link: "http://localhost:3000/delete/delete_data",
+      link: `${url}/delete/delete_data`,
       text: "정말 데이터를 삭제하시겠습니까?",
     },
   };
@@ -244,7 +244,7 @@ const VocaLoad = () => {
   const onListen = (text) => {
     axios
       .post(
-        "http://localhost:3000/getdata/tts",
+        `${url}/getdata/tts`,
         {
           text,
         },

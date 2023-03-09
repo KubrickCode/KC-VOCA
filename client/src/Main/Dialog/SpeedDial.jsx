@@ -8,11 +8,12 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
 import DriveFileMoveIcon from "@mui/icons-material/DriveFileMove";
 import { useContext, useMemo } from "react";
-import { MyContext } from "../../Context";
+import { MyContext, ThemeContext } from "../../Context";
 import { useHandleOpen } from "./../../CustomHook";
 
 const SpeedDialComp = () => {
   const { state, dispatch } = useContext(MyContext);
+  const { url } = useContext(ThemeContext);
 
   const [open, handleOpen, setOpen] = useHandleOpen(false, () => {
     setOpen(!open);
@@ -30,7 +31,7 @@ const SpeedDialComp = () => {
               isOpen: true,
               title: "단어장 추가",
               label: "단어장명을 입력해 주세요",
-              link: "http://localhost:3000/create/create_file",
+              link: `${url}/create/create_file`,
               content: "basic",
             },
           }),
@@ -45,7 +46,7 @@ const SpeedDialComp = () => {
               isOpen: true,
               title: "폴더 추가",
               label: "폴더명을 입력해 주세요",
-              link: "http://localhost:3000/create/create_folder",
+              link: `${url}/create/create_folder`,
               content: "basic",
             },
           }),
@@ -60,7 +61,7 @@ const SpeedDialComp = () => {
               isOpen: true,
               title: "폴더 삭제",
               text: "정말 폴더를 삭제하시겠습니까?",
-              link: "http://localhost:3000/delete/delete_folder",
+              link: `${url}/delete/delete_folder`,
             },
           }),
       },
@@ -74,7 +75,7 @@ const SpeedDialComp = () => {
               isOpen: true,
               title: "폴더명 변경",
               label: "폴더명을 입력해 주세요",
-              link: "http://localhost:3000/modify/rename_folder",
+              link: `${url}/modify/rename_folder`,
               content: "basic",
             },
           }),
@@ -87,7 +88,7 @@ const SpeedDialComp = () => {
             type: "setMoveDialog",
             payload: {
               isOpen: true,
-              link: "http://localhost:3000/modify/move_folder",
+              link: `${url}/modify/move_folder`,
             },
           }),
       },

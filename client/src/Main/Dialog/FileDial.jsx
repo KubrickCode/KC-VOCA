@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext, memo } from "react";
-import { MyContext } from "../../Context";
+import { MyContext, ThemeContext } from "../../Context";
 import Avatar from "@mui/material/Avatar";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 
 const FileDial = (props) => {
   const { state, dispatch } = useContext(MyContext);
+  const { url } = useContext(ThemeContext);
   const navigate = useNavigate();
   const [favObject, setFavObject] = useState({
     title: "",
@@ -84,7 +85,7 @@ const FileDial = (props) => {
             isOpen: true,
             title: "단어장 변경",
             label: "단어장명을 입력해 주세요",
-            link: "http://localhost:3000/modify/rename_file",
+            link: `${url}/modify/rename_file`,
             content: "basic",
           },
         });
@@ -99,7 +100,7 @@ const FileDial = (props) => {
           type: "setMoveDialog",
           payload: {
             isOpen: true,
-            link: "http://localhost:3000/modify/move_file",
+            link: `${url}/modify/move_file`,
           },
         });
       },
@@ -115,7 +116,7 @@ const FileDial = (props) => {
             isOpen: true,
             title: favObject.title,
             text: favObject.text,
-            link: "http://localhost:3000/modify/favorites",
+            link: `${url}/modify/favorites`,
           },
         });
       },
@@ -131,7 +132,7 @@ const FileDial = (props) => {
             isOpen: true,
             title: shaObject.title,
             text: shaObject.text,
-            link: "http://localhost:3000/modify/shared",
+            link: `${url}/modify/shared`,
           },
         });
       },
@@ -147,7 +148,7 @@ const FileDial = (props) => {
             isOpen: true,
             title: "단어장 삭제",
             text: "정말 단어장을 삭제하시겠습니까?",
-            link: "http://localhost:3000/delete/delete_file",
+            link: `${url}/delete/delete_file`,
           },
         });
       },

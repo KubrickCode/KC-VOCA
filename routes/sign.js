@@ -10,6 +10,8 @@ db.connect();
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 
+const url = "/";
+
 router.get("/islogin", (req, res) => {
   res.send(req.user ? true : false);
 });
@@ -19,7 +21,7 @@ router.get("/logout", (req, res, next) => {
     if (err) {
       return next(err);
     }
-    res.redirect("http://localhost:5173/");
+    res.redirect(url);
   });
 });
 
@@ -102,8 +104,8 @@ router.post("/signup_process", async (req, res) => {
 router.post(
   "/login_process",
   passport.authenticate("local", {
-    successRedirect: "http://localhost:5173",
-    failureRedirect: "http://localhost:5173",
+    successRedirect: url,
+    failureRedirect: url,
     failureFlash: true,
   })
 );

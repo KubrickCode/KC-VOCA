@@ -1,4 +1,4 @@
-import { MyContext } from "../../Context";
+import { MyContext, ThemeContext } from "../../Context";
 import { useHandleOpen } from "./../../CustomHook";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -19,6 +19,7 @@ import KeyIcon from "@mui/icons-material/Key";
 
 const SetDialog = () => {
   const { state, dispatch } = useContext(MyContext);
+  const { url } = useContext(ThemeContext);
   const [, handleOpen] = useHandleOpen(false, () => {
     dispatch({ type: "setSetDialog", payload: { isOpen: false } });
   });
@@ -46,9 +47,7 @@ const SetDialog = () => {
         >
           <Button
             startIcon={<LogoutIcon />}
-            onClick={() =>
-              (window.location.href = "http://localhost:3000/signpage/logout")
-            }
+            onClick={() => (window.location.href = `${url}/signpage/logout`)}
           >
             로그아웃
           </Button>
@@ -61,7 +60,7 @@ const SetDialog = () => {
                   isOpen: true,
                   title: "닉네임 변경",
                   label: "변경할 닉네임",
-                  link: "http://localhost:3000/modify/nickname",
+                  link: `${url}/modify/nickname`,
                   content: "basic",
                 },
               });
@@ -78,7 +77,7 @@ const SetDialog = () => {
                   isOpen: true,
                   title: "비밀번호 변경",
                   label: "비밀번호",
-                  link: "http://localhost:3000/modify/password",
+                  link: `${url}/modify/password`,
                   content: "basic",
                 },
               });
@@ -96,7 +95,7 @@ const SetDialog = () => {
                   isOpen: true,
                   title: "정말 회원에서 탈퇴하시겠습니까?",
                   label: "비밀번호 확인",
-                  link: "http://localhost:3000/delete/user",
+                  link: `${url}/delete/user`,
                   content: "basic",
                 },
               });

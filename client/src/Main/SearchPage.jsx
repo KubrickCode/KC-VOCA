@@ -18,7 +18,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 const SearchPage = () => {
   const location = useLocation();
   const [data, setData] = useState([]);
-  const { theme } = useContext(ThemeContext);
+  const { theme, url } = useContext(ThemeContext);
   const isDark = theme === "dark";
   const matches2 = useMediaQuery("(max-width:1092px)");
   const matches3 = useMediaQuery("(max-width:554px)");
@@ -26,7 +26,7 @@ const SearchPage = () => {
   useEffect(() => {
     axios
       .post(
-        "http://localhost:3000/getdata/search",
+        `${url}/getdata/search`,
         {
           word: location.state.value,
         },
@@ -40,7 +40,7 @@ const SearchPage = () => {
   const onListen = (text) => {
     axios
       .post(
-        "http://localhost:3000/getdata/tts",
+        `${url}/getdata/tts`,
         {
           text,
         },

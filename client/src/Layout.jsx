@@ -40,7 +40,7 @@ import SetDialog from "./Main/Dialog/SetDialog";
 
 const PersistentDrawerLeft = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { theme, setTheme } = useContext(ThemeContext);
+  const { theme, setTheme, url } = useContext(ThemeContext);
   const [searchValue, setSearchValue] = useState("");
   const theme2 = useTheme();
   const navigate = useNavigate();
@@ -50,7 +50,7 @@ const PersistentDrawerLeft = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/getdata/user", {
+      .get(`${url}/getdata/user`, {
         withCredentials: true,
       })
       .then((res) =>
