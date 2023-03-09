@@ -104,8 +104,8 @@ router.post("/signup_process", async (req, res) => {
 router.post(
   "/login_process",
   passport.authenticate("local", {
-    successRedirect: url,
-    failureRedirect: url,
+    successRedirect: "/",
+    failureRedirect: "/",
     failureFlash: true,
   })
 );
