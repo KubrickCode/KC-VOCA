@@ -11,7 +11,7 @@ const App = () => {
     return savedTheme || "light";
   });
 
-  const url = "http://localhost:3000/api";
+  const url = "/api";
 
   useEffect(() => {
     const fetchIsLogin = async () => {
