@@ -138,7 +138,11 @@ const SignUp = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="xs">
+      <Container
+        component="main"
+        maxWidth="xs"
+        sx={{ backgroundColor: "white", borderRadius: "10px" }}
+      >
         <CssBaseline />
         <Box
           sx={{
@@ -146,6 +150,7 @@ const SignUp = () => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
+            padding: "20px",
           }}
         >
           <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
@@ -186,7 +191,7 @@ const SignUp = () => {
                   required
                   fullWidth
                   name="password"
-                  label="비밀번호"
+                  label="비밀번호(6~18자)"
                   type="password"
                   id="password"
                   autoComplete="new-password"
@@ -214,7 +219,7 @@ const SignUp = () => {
                   required
                   fullWidth
                   id="nickname"
-                  label="닉네임"
+                  label="닉네임(2~10자)"
                   error={formErrors.nickError && true}
                   helperText={formErrors.nickMsg}
                 />
