@@ -133,7 +133,7 @@ const SignInSide = () => {
                   (window.location.href = `${url}/signpage/google`)
                 }
               >
-                <img height="20px" src={"../public/google.png"} />
+                <img height="20px" src={"google.png"} />
                 <Typography
                   color="black"
                   sx={{ textTransform: "none", marginLeft: "10px" }}
@@ -153,7 +153,7 @@ const SignInSide = () => {
                 }}
                 onClick={() => (window.location.href = `${url}/signpage/kakao`)}
               >
-                <img height="20px" src={"../public/kakao.png"} />
+                <img height="20px" src={"kakao.png"} />
                 <Typography color="black" sx={{ marginLeft: "10px" }}>
                   카카오 로그인
                 </Typography>
