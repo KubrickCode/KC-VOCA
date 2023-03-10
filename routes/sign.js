@@ -9,8 +9,9 @@ db.connect();
 
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
+require("dotenv").config();
 
-const url = "/";
+const url = process.env.REDIRECT_ROOT;
 
 router.get("/islogin", (req, res) => {
   res.send(req.user ? true : false);
@@ -104,8 +105,8 @@ router.post("/signup_process", async (req, res) => {
 router.post(
   "/login_process",
   passport.authenticate("local", {
-    successRedirect: "/",
-    failureRedirect: "/",
+    successRedirect: url,
+    failureRedirect: url,
     failureFlash: true,
   })
 );
@@ -125,8 +126,8 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    successRedirect: "/",
-    failureRedirect: "/",
+    successRedirect: url,
+    failureRedirect: url,
   })
 );
 
@@ -135,7 +136,7 @@ router.get("/kakao", passport.authenticate("kakao"));
 router.get(
   "/kakao/callback",
   passport.authenticate("kakao", {
-    successRedirect: "/",
-    failureRedirect: "/",
+    successRedirect: url,
+    failureRedirect: url,
   })
 );

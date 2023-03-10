@@ -57,7 +57,7 @@ const VocaLoad = () => {
       )
       .then((res) => {
         setData(res.data[0]);
-        res.data[2] ? setShare(true) : setShare(false);
+        res.data[3] ? setShare(true) : setShare(false);
         setFileName(res.data[1][0].file_name);
         dispatch({
           type: "setSelectedFolder",

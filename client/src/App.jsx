@@ -4,6 +4,8 @@ import Layout from "./Layout";
 import Sign from "./Logoff/Sign";
 import { ThemeContext } from "./Context";
 
+const host = import.meta.env.VITE_SERVER_HOST;
+
 const App = () => {
   const [isLogin, setIsLogin] = useState(false);
   const [theme, setTheme] = useState(() => {
@@ -11,7 +13,7 @@ const App = () => {
     return savedTheme || "light";
   });
 
-  const url = "/api";
+  const url = host;
 
   useEffect(() => {
     const fetchIsLogin = async () => {

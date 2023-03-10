@@ -15,7 +15,7 @@ app.use(flash());
 
 require("dotenv").config();
 
-const link = "http://3.35.208.73/";
+const link = process.env.CORS_LINK;
 
 const cors = require("cors");
 app.use(
