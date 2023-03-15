@@ -228,7 +228,7 @@ const SignUp = () => {
             </Grid>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="/privacy_policy" variant="body2">
+                <Link href="/api/policy" variant="body2">
                   개인정보처리방침
                 </Link>
               </Grid>
