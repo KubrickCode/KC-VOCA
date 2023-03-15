@@ -10,19 +10,12 @@ const Alert = React.forwardRef((props, ref) => (
 
 const MySnackBar = () => {
   const { state, dispatch } = useContext(MyContext);
-  const handleSnackClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
+  const handleSnackClose = () => {
     dispatch({ type: "setSnackBar", payload: { isOpen: false } });
   };
 
   return (
-    <Snackbar
-      open={state.snackBar.isOpen}
-      autoHideDuration={5000}
-      onClose={handleSnackClose}
-    >
+    <Snackbar open={state.snackBar.isOpen} onClose={handleSnackClose}>
       <Alert
         onClose={handleSnackClose}
         severity={state.snackBar.type}

@@ -86,7 +86,7 @@ router.post("/signup_process", async (req, res) => {
         return res.status(500).send("err");
       }
       const body = `
-        <form name="direction" id="formid" action="/signpage/login_process" method="post">
+        <form name="direction" id="formid" action="/api/signpage/login_process" method="post">
           <input type='hidden' name='email' value='${email}' />
           <input type='hidden' name='password' value='${password}' />
         </form>

@@ -30,18 +30,16 @@ router.post("/delete_folder", (req, res) => {
   }
 });
 
-router.post("/delete_file", (req, res) => {
+router.post("/delete_file", async (req, res) => {
   const post = req.body;
-  db.query(
+  const data = await db.query(
     `
     DELETE FROM voca_data WHERE file_id=?;
     DELETE FROM voca_file WHERE file_id=?;
     `,
-    [post.file_id, post.file_id],
-    () => {
-      res.send(["단어장이 삭제되었습니다", "success", "file"]);
-    }
+    [post.file_id, post.file_id]
   );
+  res.send(["단어장이 삭제되었습니다", "success", "file"]);
 });
 
 router.post("/delete_data", (req, res) => {

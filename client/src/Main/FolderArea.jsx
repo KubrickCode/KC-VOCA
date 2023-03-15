@@ -77,16 +77,22 @@ const FolderArea = () => {
   const [folderData, setFolderData] = useState([]);
 
   const { state, dispatch } = useContext(MyContext);
-  const { url } = useContext(ThemeContext);
+  const { url, setLoad } = useContext(ThemeContext);
 
   useEffect(() => {
-    axios
-      .get(`${url}/getdata/get_folder`, {
-        withCredentials: true,
-      })
-      .then((res) => {
+    const useAxios = async () => {
+      setLoad(true);
+      try {
+        const res = await axios.get(`${url}/getdata/get_folder`, {
+          withCredentials: true,
+        });
         setFolderData(res.data);
-      });
+        setLoad(false);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    useAxios();
   }, [state.snackBar.folderState]);
 
   const buildTree = useCallback(

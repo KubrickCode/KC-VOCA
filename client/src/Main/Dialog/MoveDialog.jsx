@@ -1,4 +1,4 @@
-import { MyContext } from "../../Context";
+import { MyContext, ThemeContext } from "../../Context";
 import { useHandleOpen } from "./../../CustomHook";
 import FolderArea from "../FolderArea";
 import { useContext } from "react";
@@ -7,14 +7,16 @@ import axios from "axios";
 
 const MoveDial = () => {
   const { state, dispatch } = useContext(MyContext);
+  const { setLoad } = useContext(ThemeContext);
 
   const [, handleOpen] = useHandleOpen(false, () => {
     dispatch({ type: "setMoveDialog", payload: { isOpen: false } });
   });
 
-  const submitForm = () => {
-    axios
-      .post(
+  const submitForm = async () => {
+    setLoad(true);
+    try {
+      const res = await axios.post(
         state.moveDialog.link,
         {
           folder_id: state.selectedFolder,
@@ -22,22 +24,23 @@ const MoveDial = () => {
           parent_folder: state.moveSelectedFolder,
         },
         { withCredentials: true }
-      )
-      .then((res) => {
-        handleOpen();
-        const stateType =
-          res.data[2] === "folder" ? "folderState" : "fileState";
+      );
+      handleOpen();
+      const stateType = res.data[2] === "folder" ? "folderState" : "fileState";
 
-        dispatch({
-          type: "setSnackBar",
-          payload: {
-            isOpen: true,
-            text: res.data[0],
-            type: res.data[1],
-            [stateType]: state.snackBar[stateType] + 1,
-          },
-        });
+      dispatch({
+        type: "setSnackBar",
+        payload: {
+          isOpen: true,
+          text: res.data[0],
+          type: res.data[1],
+          [stateType]: state.snackBar[stateType] + 1,
+        },
       });
+      setLoad(false);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (

@@ -1,5 +1,5 @@
 import { useContext, useCallback } from "react";
-import { MyContext } from "../../Context";
+import { MyContext, ThemeContext } from "../../Context";
 import {
   Dialog,
   DialogTitle,
@@ -13,14 +13,16 @@ import { useHandleOpen } from "./../../CustomHook";
 
 const CheckDialog = () => {
   const { state, dispatch } = useContext(MyContext);
+  const { setLoad } = useContext(ThemeContext);
 
   const [, handleOpen] = useHandleOpen(false, () => {
     dispatch({ type: "setCheckDialog", payload: { isOpen: false } });
   });
 
-  const submitForm = useCallback(() => {
-    axios
-      .post(
+  const submitForm = async () => {
+    setLoad(true);
+    try {
+      const res = await axios.post(
         state.checkDialog.link,
         {
           folder_id: state.selectedFolder,
@@ -30,29 +32,30 @@ const CheckDialog = () => {
           data_id: state.selectedData.id,
         },
         { withCredentials: true }
-      )
-      .then((res) => {
-        handleOpen();
-        let stateType;
-        if (res.data[2] === "folder") {
-          stateType = "folderState";
-        } else if (res.data[2] === "file") {
-          stateType = "fileState";
-        } else {
-          stateType = "dataState";
-        }
-
-        dispatch({
-          type: "setSnackBar",
-          payload: {
-            isOpen: true,
-            text: res.data[0],
-            type: res.data[1],
-            [stateType]: state.snackBar[stateType] + 1,
-          },
-        });
+      );
+      let stateType;
+      if (res.data[2] === "folder") {
+        stateType = "folderState";
+      } else if (res.data[2] === "file") {
+        stateType = "fileState";
+      } else {
+        stateType = "dataState";
+      }
+      await dispatch({
+        type: "setSnackBar",
+        payload: {
+          [stateType]: state.snackBar[stateType] + 1,
+          isOpen: true,
+          text: res.data[0],
+          type: res.data[1],
+        },
       });
-  }, [state]);
+      await handleOpen();
+      setLoad(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <Dialog

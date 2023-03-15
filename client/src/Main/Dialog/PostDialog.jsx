@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from "react";
-import { MyContext } from "../../Context";
+import { MyContext, ThemeContext } from "../../Context";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -11,6 +11,7 @@ import { useHandleOpen } from "./../../CustomHook";
 
 const PostDialog = () => {
   const { state, dispatch } = useContext(MyContext);
+  const { setLoad } = useContext(ThemeContext);
   const [formData, setFormData] = useState({
     value1: "",
     value2: "",
@@ -64,9 +65,10 @@ const PostDialog = () => {
     dispatch({ type: "setPostDialog", payload: { isOpen: false } });
   });
 
-  const submitForm = () => {
-    axios
-      .post(
+  const submitForm = async () => {
+    setLoad(true);
+    try {
+      const res = await axios.post(
         state.postDialog.link,
         {
           formData: formData,
@@ -75,30 +77,32 @@ const PostDialog = () => {
           data_id: state.selectedData.id,
         },
         { withCredentials: true }
-      )
-      .then((res) => {
-        handleOpen();
-        let stateType;
-        if (res.data[2] === "folder") {
-          stateType = "folderState";
-        } else if (res.data[2] === "file") {
-          stateType = "fileState";
-        } else if (res.data[2] === "data") {
-          stateType = "dataState";
-        } else if (res.data[2] === "set") {
-          stateType = "setState";
-        }
+      );
+      await handleOpen();
+      let stateType;
+      if (res.data[2] === "folder") {
+        stateType = "folderState";
+      } else if (res.data[2] === "file") {
+        stateType = "fileState";
+      } else if (res.data[2] === "data") {
+        stateType = "dataState";
+      } else if (res.data[2] === "set") {
+        stateType = "setState";
+      }
 
-        dispatch({
-          type: "setSnackBar",
-          payload: {
-            isOpen: true,
-            text: res.data[0],
-            type: res.data[1],
-            [stateType]: state.snackBar[stateType] + 1,
-          },
-        });
+      await dispatch({
+        type: "setSnackBar",
+        payload: {
+          isOpen: true,
+          text: res.data[0],
+          type: res.data[1],
+          [stateType]: state.snackBar[stateType] + 1,
+        },
       });
+      setLoad(false);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const basicContent = () => {
@@ -152,6 +156,7 @@ const PostDialog = () => {
             setFormData({ ...formData, voca: e.target.value });
           }}
           inputProps={{ minLength: 1, maxLength: 100 }}
+          multiline={true}
         />
         <TextField
           margin="dense"
@@ -165,11 +170,12 @@ const PostDialog = () => {
             setFormData({ ...formData, voca_mean: e.target.value });
           }}
           inputProps={{ maxLength: 100 }}
+          multiline={true}
         />
         <TextField
           margin="dense"
           id="exam"
-          type="text"
+          type="textarea"
           label="예문"
           value={formData.exam}
           fullWidth
@@ -178,11 +184,12 @@ const PostDialog = () => {
             setFormData({ ...formData, exam: e.target.value });
           }}
           inputProps={{ maxLength: 1000 }}
+          multiline={true}
         />
         <TextField
           margin="dense"
           id="exam_mean"
-          type="text"
+          type="textarea"
           label="예문 뜻"
           value={formData.exam_mean}
           fullWidth
@@ -191,6 +198,7 @@ const PostDialog = () => {
             setFormData({ ...formData, exam_mean: e.target.value });
           }}
           inputProps={{ maxLength: 1000 }}
+          multiline={true}
         />
       </div>
     );

@@ -18,28 +18,35 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 const SearchPage = () => {
   const location = useLocation();
   const [data, setData] = useState([]);
-  const { theme, url } = useContext(ThemeContext);
+  const { theme, url, setLoad } = useContext(ThemeContext);
   const isDark = theme === "dark";
   const matches2 = useMediaQuery("(max-width:1092px)");
   const matches3 = useMediaQuery("(max-width:554px)");
 
   useEffect(() => {
-    axios
-      .post(
-        `${url}/getdata/search`,
-        {
-          word: location.state.value,
-        },
-        { withCredentials: true }
-      )
-      .then((res) => {
+    const useAxios = async () => {
+      setLoad(true);
+      try {
+        const res = await axios.post(
+          `${url}/getdata/search`,
+          {
+            word: location.state.value,
+          },
+          { withCredentials: true }
+        );
         setData(res.data);
-      });
+        setLoad(false);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    useAxios();
   }, [location.state.value]);
 
-  const onListen = (text) => {
-    axios
-      .post(
+  const onListen = async (text) => {
+    setLoad(true);
+    try {
+      const res = await axios.post(
         `${url}/getdata/tts`,
         {
           text,
@@ -47,16 +54,18 @@ const SearchPage = () => {
         {
           responseType: "arraybuffer",
         }
-      )
-      .then((res) => {
-        const context = new AudioContext();
-        context.decodeAudioData(res.data, (buffer) => {
-          const source = context.createBufferSource();
-          source.buffer = buffer;
-          source.connect(context.destination);
-          source.start(0);
-        });
+      );
+      const context = new AudioContext();
+      context.decodeAudioData(res.data, (buffer) => {
+        const source = context.createBufferSource();
+        source.buffer = buffer;
+        source.connect(context.destination);
+        source.start(0);
       });
+      setLoad(false);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const MyTableRow = ({ title, label }) => {

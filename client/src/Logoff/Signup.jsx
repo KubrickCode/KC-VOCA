@@ -34,7 +34,7 @@ const theme = createTheme();
 
 const SignUp = () => {
   const [btnState, setBtnState] = useState(true);
-  const { url } = useContext(ThemeContext);
+  const { url, setLoad } = useContext(ThemeContext);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -69,13 +69,14 @@ const SignUp = () => {
     const form = event.target;
     const email = form.email.value;
     const nickname = form.nickname.value;
-
+    setLoad(true);
     try {
       await axios.post(`${url}/signpage/check_duplicate`, {
         email,
         nickname,
       });
       form.submit();
+      setLoad(false);
     } catch (error) {
       const duplicates = error.response.data.duplicates;
       if (duplicates.email) {

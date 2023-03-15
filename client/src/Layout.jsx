@@ -40,7 +40,7 @@ import SetDialog from "./Main/Dialog/SetDialog";
 
 const PersistentDrawerLeft = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { theme, setTheme, url } = useContext(ThemeContext);
+  const { theme, setTheme, url, setLoad } = useContext(ThemeContext);
   const [searchValue, setSearchValue] = useState("");
   const theme2 = useTheme();
   const navigate = useNavigate();
@@ -49,16 +49,22 @@ const PersistentDrawerLeft = () => {
   });
 
   useEffect(() => {
-    axios
-      .get(`${url}/getdata/user`, {
-        withCredentials: true,
-      })
-      .then((res) =>
+    const useAxios = async () => {
+      setLoad(true);
+      try {
+        const res = await axios.get(`${url}/getdata/user`, {
+          withCredentials: true,
+        });
         dispatch({
           type: "setUser",
           payload: { email: res.data.email, nickname: res.data.nickname },
-        })
-      );
+        });
+        setLoad(false);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    useAxios();
   }, [state.snackBar.setState]);
 
   return (

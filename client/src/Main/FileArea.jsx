@@ -11,8 +11,7 @@ import { useHandleOpen } from "./../CustomHook";
 
 const FileArea = () => {
   const [files, setFiles] = useState([]);
-  const [setSort] = useState("");
-  const { theme, url } = useContext(ThemeContext);
+  const { theme, url, setLoad } = useContext(ThemeContext);
   const isDark = theme === "dark";
 
   const { state, dispatch } = useContext(MyContext);
@@ -22,31 +21,31 @@ const FileArea = () => {
   });
 
   useEffect(() => {
-    if (Number(state.selectedFolder)) {
-      axios
-        .post(`${url}/getdata/get_file`, {
-          folder_id: state.selectedFolder,
-        })
-        .then((res) => {
-          setFiles(res.data);
-        });
-    } else if (state.selectedFolder === "get_share_file") {
-      axios
-        .get(`${url}/getdata/${state.selectedFolder}`, {
-          withCredentials: true,
-        })
-        .then((res) => {
-          setFiles(res.data);
-        });
-    } else if (state.selectedFolder === "get_fave_file" || "get_recent_file") {
-      axios
-        .get(`${url}/getdata/${state.selectedFolder}`, {
-          withCredentials: true,
-        })
-        .then((res) => {
-          setFiles(res.data);
-        });
-    }
+    const fetchFiles = async () => {
+      setLoad(true);
+      try {
+        let res;
+        if (Number(state.selectedFolder)) {
+          res = await axios.post(`${url}/getdata/get_file`, {
+            folder_id: state.selectedFolder,
+          });
+        } else if (
+          ["get_share_file", "get_fav_file", "get_recent_file"].includes(
+            state.selectedFolder
+          )
+        ) {
+          res = await axios.get(`${url}/getdata/${state.selectedFolder}`, {
+            withCredentials: true,
+          });
+        }
+        setFiles(res.data);
+        setLoad(false);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchFiles();
   }, [
     state.selectedFolder,
     state.snackBar.fileState,

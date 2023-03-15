@@ -38,15 +38,17 @@ const theme = createTheme();
 
 const SignInSide = () => {
   const [errmsg, setErrMsg] = useState("");
-  const { url } = useContext(ThemeContext);
+  const { url, setLoad } = useContext(ThemeContext);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoad(true);
       try {
         const res = await axios.get(`${url}/signpage/login_process`, {
           withCredentials: true,
         });
         setErrMsg(res.data.feedback);
+        setLoad(false);
       } catch (err) {
         console.error("Error fetching data:", err);
       }

@@ -27,7 +27,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 
 const VocaLoad = () => {
   const { state, dispatch } = useContext(MyContext);
-  const { theme, url } = useContext(ThemeContext);
+  const { theme, url, setLoad } = useContext(ThemeContext);
   const viewMode = useLocation();
   const location = useParams();
   const [data, setData] = useState([]);
@@ -47,15 +47,16 @@ const VocaLoad = () => {
   const matches3 = useMediaQuery("(max-width:554px)");
 
   useEffect(() => {
-    axios
-      .post(
-        `${url}/getdata/get_data`,
-        {
-          file_id: location.id,
-        },
-        { withCredentials: true }
-      )
-      .then((res) => {
+    const useAxios = async () => {
+      setLoad(true);
+      try {
+        const res = await axios.post(
+          `${url}/getdata/get_data`,
+          {
+            file_id: location.id,
+          },
+          { withCredentials: true }
+        );
         setData(res.data[0]);
         res.data[3] ? setShare(true) : setShare(false);
         setFileName(res.data[1][0].file_name);
@@ -69,7 +70,12 @@ const VocaLoad = () => {
             id: res.data[1][0].file_id,
           },
         });
-      });
+        setLoad(false);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    useAxios();
   }, [state.snackBar.dataState]);
 
   useEffect(() => {
@@ -241,9 +247,10 @@ const VocaLoad = () => {
     );
   };
 
-  const onListen = (text) => {
-    axios
-      .post(
+  const onListen = async (text) => {
+    setLoad(true);
+    try {
+      const res = await axios.post(
         `${url}/getdata/tts`,
         {
           text,
@@ -251,16 +258,18 @@ const VocaLoad = () => {
         {
           responseType: "arraybuffer",
         }
-      )
-      .then((res) => {
-        const context = new AudioContext();
-        context.decodeAudioData(res.data, (buffer) => {
-          const source = context.createBufferSource();
-          source.buffer = buffer;
-          source.connect(context.destination);
-          source.start(0);
-        });
+      );
+      const context = new AudioContext();
+      context.decodeAudioData(res.data, (buffer) => {
+        const source = context.createBufferSource();
+        source.buffer = buffer;
+        source.connect(context.destination);
+        source.start(0);
       });
+      setLoad(false);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
