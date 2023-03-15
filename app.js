@@ -68,6 +68,10 @@ const createRouter = require("./routes/create");
 const modifyRouter = require("./routes/modify");
 const deleteRouter = require("./routes/delete");
 
+app.get("/api/policy", (req, res) => {
+  res.sendFile(__dirname + "/privacy_policy.html");
+});
+
 app.use("/api/", indexRouter);
 app.use("/api/signpage", signRouter);
 app.use("/api/getdata", getDataRouter);
