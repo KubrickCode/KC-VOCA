@@ -1,11 +1,34 @@
 import { useState, useEffect } from "react";
 import Layout from "./Layout";
 import Sign from "./Logoff/Sign";
-import { ThemeContext } from "./Context";
+import { GlobalContext } from "./Context";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useAxios } from "./Module";
 
-const host = import.meta.env.VITE_SERVER_HOST;
+const LoadingOverlay = () => (
+  <div
+    style={{
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      height: "100%",
+      width: "100%",
+      position: "fixed",
+      top: 0,
+      left: 0,
+      zIndex: 9999,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      pointerEvents: "auto",
+    }}
+  >
+    <CircularProgress
+      color="primary"
+      size={80}
+      thickness={5}
+      style={{ pointerEvents: "none" }}
+    />
+  </div>
+);
 
 const App = () => {
   const [isLogin, setIsLogin] = useState(false);
@@ -15,7 +38,7 @@ const App = () => {
   });
   const [load, setLoad] = useState(false);
 
-  const url = host;
+  const url = import.meta.env.VITE_SERVER_HOST;
 
   useEffect(() => {
     const fetchIsLogin = async () => {
@@ -38,30 +61,7 @@ const App = () => {
 
   return (
     <>
-      {load && (
-        <div
-          style={{
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            height: "100%",
-            width: "100%",
-            position: "fixed",
-            top: 0,
-            left: 0,
-            zIndex: 9999,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            pointerEvents: "auto",
-          }}
-        >
-          <CircularProgress
-            color="primary"
-            size={80}
-            thickness={5}
-            style={{ pointerEvents: "none" }}
-          />
-        </div>
-      )}
+      {load && <LoadingOverlay />}
       <div
         style={{
           position: "fixed",
@@ -73,9 +73,9 @@ const App = () => {
           pointerEvents: load ? "auto" : "none",
         }}
       />
-      <ThemeContext.Provider value={{ theme, setTheme, url, setLoad }}>
+      <GlobalContext.Provider value={{ theme, setTheme, url, setLoad }}>
         {isLogin ? <Layout /> : <Sign />}
-      </ThemeContext.Provider>
+      </GlobalContext.Provider>
     </>
   );
 };

@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from "react";
-import { MyContext, ThemeContext } from "../../Context";
+import { MainContext, GlobalContext } from "../../Context";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -10,8 +10,8 @@ import { useHandleOpen } from "./../../CustomHook";
 import { useAxios } from "../../Module";
 
 const PostDialog = () => {
-  const { state, dispatch } = useContext(MyContext);
-  const { setLoad } = useContext(ThemeContext);
+  const { state, dispatch } = useContext(MainContext);
+  const { setLoad } = useContext(GlobalContext);
   const [formData, setFormData] = useState({
     value1: "",
     value2: "",
@@ -55,8 +55,7 @@ const PostDialog = () => {
           break;
       }
     } else if (content === "data") {
-      console.log("hjio");
-      const isValid = voca.length > 0;
+      let isValid = voca.length > 0;
       setSubmitBtn(!isValid);
     }
   }, [formData]);
@@ -78,16 +77,7 @@ const PostDialog = () => {
       setLoad
     );
     handleOpen();
-    let stateType;
-    if (data[2] === "folder") {
-      stateType = "folderState";
-    } else if (data[2] === "file") {
-      stateType = "fileState";
-    } else if (data[2] === "data") {
-      stateType = "dataState";
-    } else if (data[2] === "set") {
-      stateType = "setState";
-    }
+    const stateType = data[2] + "State";
     dispatch({
       type: "setSnackBar",
       payload: {
@@ -110,7 +100,12 @@ const PostDialog = () => {
           autoFocus
           margin="dense"
           id="name"
-          type={pwdState ? "password" : "text"}
+          type={
+            pwdState ||
+            state.postDialog.title === "정말 회원에서 탈퇴하시겠습니까?"
+              ? "password"
+              : "text"
+          }
           label={state.postDialog.label}
           fullWidth
           variant="standard"

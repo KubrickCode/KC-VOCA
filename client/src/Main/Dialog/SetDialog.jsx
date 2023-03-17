@@ -1,4 +1,4 @@
-import { MyContext, ThemeContext } from "../../Context";
+import { MainContext, GlobalContext } from "../../Context";
 import { useHandleOpen } from "./../../CustomHook";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -18,11 +18,18 @@ import ModeIcon from "@mui/icons-material/Mode";
 import KeyIcon from "@mui/icons-material/Key";
 
 const SetDialog = () => {
-  const { state, dispatch } = useContext(MyContext);
-  const { url } = useContext(ThemeContext);
+  const { state, dispatch } = useContext(MainContext);
+  const { url } = useContext(GlobalContext);
   const [, handleOpen] = useHandleOpen(false, () => {
     dispatch({ type: "setSetDialog", payload: { isOpen: false } });
   });
+
+  const handleButtonClick = (title, label, link, content) => {
+    dispatch({
+      type: "setPostDialog",
+      payload: { isOpen: true, title, label, link, content },
+    });
+  };
 
   return (
     <Dialog open={state.setDialog.isOpen} onClose={handleOpen}>
@@ -53,53 +60,41 @@ const SetDialog = () => {
           </Button>
           <Button
             startIcon={<ModeIcon />}
-            onClick={() => {
-              dispatch({
-                type: "setPostDialog",
-                payload: {
-                  isOpen: true,
-                  title: "닉네임 변경",
-                  label: "변경할 닉네임",
-                  link: `${url}/modify/nickname`,
-                  content: "basic",
-                },
-              });
-            }}
+            onClick={() =>
+              handleButtonClick(
+                "닉네임 변경",
+                "변경할 닉네임",
+                `${url}/modify/nickname`,
+                "basic"
+              )
+            }
           >
             닉네임 변경
           </Button>
           <Button
             startIcon={<KeyIcon />}
-            onClick={() => {
-              dispatch({
-                type: "setPostDialog",
-                payload: {
-                  isOpen: true,
-                  title: "비밀번호 변경",
-                  label: "비밀번호",
-                  link: `${url}/modify/password`,
-                  content: "basic",
-                },
-              });
-            }}
+            onClick={() =>
+              handleButtonClick(
+                "비밀번호 변경",
+                "비밀번호",
+                `${url}/modify/password`,
+                "basic"
+              )
+            }
           >
             비밀번호 변경
           </Button>
           <Button
             color="warning"
             startIcon={<PersonOffIcon />}
-            onClick={() => {
-              dispatch({
-                type: "setPostDialog",
-                payload: {
-                  isOpen: true,
-                  title: "정말 회원에서 탈퇴하시겠습니까?",
-                  label: "비밀번호 확인",
-                  link: `${url}/delete/user`,
-                  content: "basic",
-                },
-              });
-            }}
+            onClick={() =>
+              handleButtonClick(
+                "정말 회원에서 탈퇴하시겠습니까?",
+                "비밀번호 확인",
+                `${url}/delete/user`,
+                "basic"
+              )
+            }
           >
             회원탈퇴
           </Button>

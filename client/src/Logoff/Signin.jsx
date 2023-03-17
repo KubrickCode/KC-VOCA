@@ -1,20 +1,21 @@
-import * as React from "react";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
-import Link from "@mui/material/Link";
-import Paper from "@mui/material/Paper";
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
+import React, { useState, useEffect, useContext } from "react";
+import { useAxios } from "../Module";
+import { GlobalContext } from "../Context";
+import {
+  Avatar,
+  Button,
+  CssBaseline,
+  TextField,
+  Link,
+  Paper,
+  Box,
+  Grid,
+  Typography,
+  Alert,
+} from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import Alert from "@mui/material/Alert";
-import axios from "axios";
-import { useState, useEffect, useContext } from "react";
 import "@fontsource/roboto/500.css";
-import { ThemeContext } from "../Context";
 
 const Copyright = (props) => {
   return (
@@ -38,21 +39,19 @@ const theme = createTheme();
 
 const SignInSide = () => {
   const [errmsg, setErrMsg] = useState("");
-  const { url, setLoad } = useContext(ThemeContext);
+  const { url, setLoad } = useContext(GlobalContext);
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoad(true);
-      try {
-        const res = await axios.get(`${url}/signpage/login_process`, {
-          withCredentials: true,
-        });
-        setErrMsg(res.data.feedback);
-        setLoad(false);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-      }
+      const data = await useAxios(
+        "get",
+        `${url}/signpage/login_process`,
+        null,
+        setLoad
+      );
+      setErrMsg(data.feedback);
     };
+
     fetchData();
   }, []);
 

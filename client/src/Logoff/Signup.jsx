@@ -13,7 +13,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import Alert from "@mui/material/Alert";
-import { ThemeContext } from "../Context";
+import { GlobalContext } from "../Context";
 
 const Copyright = (props) => {
   return (
@@ -37,7 +37,7 @@ const theme = createTheme();
 
 const SignUp = () => {
   const [btnState, setBtnState] = useState(true);
-  const { url, setLoad } = useContext(ThemeContext);
+  const { url, setLoad } = useContext(GlobalContext);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -68,11 +68,13 @@ const SignUp = () => {
   };
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
     const form = event.target;
     const email = form.email.value;
     const nickname = form.nickname.value;
+
+    event.preventDefault();
     setLoad(true);
+
     try {
       await axios.post(`${url}/signpage/check_duplicate`, {
         email,
@@ -99,6 +101,7 @@ const SignUp = () => {
     const formNick = RegExp(/^(?=.*[a-zA-Z0-9가-힣])[a-zA-Z0-9가-힣]{2,10}$/);
 
     setFormErrors({
+      ...formErrors,
       emailError: formData.email && !formEmail.test(formData.email),
       emailMsg:
         !formData.email || formEmail.test(formData.email)

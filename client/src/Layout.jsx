@@ -29,7 +29,7 @@ import MySnackBar from "./Main/Dialog/MySnackbar";
 import VocaLoad from "./Main/VocaLoad";
 import SearchPage from "./Main/SearchPage";
 import SharePage from "./Main/SharePage";
-import { MyContext, ThemeContext } from "./Context";
+import { MainContext, GlobalContext } from "./Context";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { initialState, reducer } from "./Reducer";
 import { useHandleOpen } from "./CustomHook";
@@ -40,7 +40,7 @@ import { useAxios } from "./Module";
 
 const PersistentDrawerLeft = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { theme, setTheme, url, setLoad } = useContext(ThemeContext);
+  const { theme, setTheme, url, setLoad } = useContext(GlobalContext);
   const [searchValue, setSearchValue] = useState("");
   const theme2 = useTheme();
   const navigate = useNavigate();
@@ -61,7 +61,7 @@ const PersistentDrawerLeft = () => {
   }, [state.snackBar.setState]);
 
   return (
-    <MyContext.Provider
+    <MainContext.Provider
       value={{
         state,
         dispatch,
@@ -177,7 +177,7 @@ const PersistentDrawerLeft = () => {
       <PostDialog />
       <CheckDialog />
       <SetDialog />
-    </MyContext.Provider>
+    </MainContext.Provider>
   );
 };
 

@@ -8,13 +8,13 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import WatchLaterIcon from "@mui/icons-material/WatchLater";
 import StarIcon from "@mui/icons-material/Star";
-import { MyContext, ThemeContext } from "../Context";
+import { MainContext, GlobalContext } from "../Context";
 import { StyledTreeItemRoot } from "../Style/MUIStyle";
 import { useAxios } from "../Module";
 
 const StyledTreeItem = (props) => {
-  const { theme } = useContext(ThemeContext);
-  const { state } = useContext(MyContext);
+  const { theme } = useContext(GlobalContext);
+  const { state } = useContext(MainContext);
   const {
     bgColor,
     color,
@@ -76,8 +76,8 @@ StyledTreeItem.propTypes = {
 const FolderArea = () => {
   const [folderData, setFolderData] = useState([]);
 
-  const { state, dispatch } = useContext(MyContext);
-  const { url, setLoad } = useContext(ThemeContext);
+  const { state, dispatch } = useContext(MainContext);
+  const { url, setLoad } = useContext(GlobalContext);
 
   useEffect(() => {
     const fetchFolders = async () => {
@@ -136,6 +136,10 @@ const FolderArea = () => {
     [folderData]
   );
 
+  const folderDisplay = {
+    display: !state.moveDialog.isOpen ? "block" : "none",
+  };
+
   return (
     <TreeView
       defaultExpanded={["1"]}
@@ -155,9 +159,7 @@ const FolderArea = () => {
         onClick={() => {
           dispatch({ type: "setSelectedFolder", payload: "get_recent_file" });
         }}
-        sx={{
-          display: !state.moveDialog.isOpen ? "block" : "none",
-        }}
+        sx={folderDisplay}
       />
       <StyledTreeItem
         nodeId="0-1"
@@ -166,7 +168,7 @@ const FolderArea = () => {
         onClick={() => {
           dispatch({ type: "setSelectedFolder", payload: "get_fav_file" });
         }}
-        sx={{ display: !state.moveDialog.isOpen ? "block" : "none" }}
+        sx={folderDisplay}
       />
       {buildTree(folderData, "0")}
     </TreeView>

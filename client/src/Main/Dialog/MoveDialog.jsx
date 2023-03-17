@@ -1,14 +1,13 @@
-import { MyContext, ThemeContext } from "../../Context";
+import { MainContext, GlobalContext } from "../../Context";
 import { useHandleOpen } from "./../../CustomHook";
 import FolderArea from "../FolderArea";
 import { useContext } from "react";
 import { Dialog, DialogTitle, DialogActions, Button } from "@mui/material";
 import { useAxios } from "../../Module";
-import axios from "axios";
 
 const MoveDial = () => {
-  const { state, dispatch } = useContext(MyContext);
-  const { setLoad } = useContext(ThemeContext);
+  const { state, dispatch } = useContext(MainContext);
+  const { setLoad } = useContext(GlobalContext);
 
   const [, handleOpen] = useHandleOpen(false, () => {
     dispatch({ type: "setMoveDialog", payload: { isOpen: false } });
@@ -26,7 +25,7 @@ const MoveDial = () => {
       setLoad
     );
     handleOpen();
-    const stateType = data[2] === "folder" ? "folderState" : "fileState";
+    const stateType = data[2] + "State";
     dispatch({
       type: "setSnackBar",
       payload: {

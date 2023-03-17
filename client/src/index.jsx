@@ -4,6 +4,8 @@ import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
+
+// root 엘리먼트에 <BrowserRouter>와 <App> 컴포넌트를 렌더링합니다.
 root.render(
   <BrowserRouter>
     <App />

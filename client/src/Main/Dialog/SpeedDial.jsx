@@ -8,12 +8,12 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
 import DriveFileMoveIcon from "@mui/icons-material/DriveFileMove";
 import { useContext, useMemo } from "react";
-import { MyContext, ThemeContext } from "../../Context";
+import { MainContext, GlobalContext } from "../../Context";
 import { useHandleOpen } from "./../../CustomHook";
 
 const SpeedDialComp = () => {
-  const { state, dispatch } = useContext(MyContext);
-  const { url } = useContext(ThemeContext);
+  const { state, dispatch } = useContext(MainContext);
+  const { url } = useContext(GlobalContext);
 
   const [open, handleOpen, setOpen] = useHandleOpen(false, () => {
     setOpen(!open);

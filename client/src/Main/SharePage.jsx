@@ -1,11 +1,11 @@
 import { useEffect, useContext } from "react";
-import { MyContext, ThemeContext } from "../Context";
+import { MainContext, GlobalContext } from "../Context";
 import FileArea from "./FileArea";
 import Typography from "@mui/material/Typography";
 
 const SharePage = () => {
-  const { dispatch } = useContext(MyContext);
-  const { theme } = useContext(ThemeContext);
+  const { dispatch } = useContext(MainContext);
+  const { theme } = useContext(GlobalContext);
 
   useEffect(() => {
     dispatch({ type: "setSelectedFolder", payload: "get_share_file" });

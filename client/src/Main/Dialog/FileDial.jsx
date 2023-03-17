@@ -1,5 +1,5 @@
-import { useEffect, useState, useContext, memo } from "react";
-import { MyContext, ThemeContext } from "../../Context";
+import { useEffect, useState, useContext, useMemo, memo } from "react";
+import { MainContext, GlobalContext } from "../../Context";
 import Avatar from "@mui/material/Avatar";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -18,8 +18,8 @@ import { useHandleOpen } from "./../../CustomHook";
 import { useNavigate } from "react-router-dom";
 
 const FileDial = (props) => {
-  const { state, dispatch } = useContext(MyContext);
-  const { url } = useContext(ThemeContext);
+  const { state, dispatch } = useContext(MainContext);
+  const { url } = useContext(GlobalContext);
   const navigate = useNavigate();
   const [favObject, setFavObject] = useState({
     title: "",
@@ -37,30 +37,24 @@ const FileDial = (props) => {
 
   useEffect(() => {
     setOpen(props.open);
-    const favTitle =
-      state.selectedFile.fav == 0 ? "즐겨찾기 등록" : "즐겨찾기 해제";
-    const favText =
-      state.selectedFile.fav == 0
-        ? "단어장을 즐겨찾기에 등록하시겠습니까?"
-        : "단어장을 즐겨찾기에서 해제하시겠습니까?";
-    const favColor = state.selectedFile.fav == 0 ? "skyblue" : "yellow";
+
     setFavObject({
       ...favObject,
-      title: favTitle,
-      text: favText,
-      color: favColor,
+      title: state.selectedFile.fav === 0 ? "즐겨찾기 등록" : "즐겨찾기 해제",
+      text:
+        state.selectedFile.fav === 0
+          ? "단어장을 즐겨찾기에 등록하시겠습니까?"
+          : "단어장을 즐겨찾기에서 해제하시겠습니까?",
+      color: state.selectedFile.fav === 0 ? "skyblue" : "yellow",
     });
 
-    const shaTitle =
-      state.selectedFile.sha == 0 ? "단어장 공유" : "단어장 공유 해제";
-    const shaText =
-      state.selectedFile.sha == 0
-        ? "단어장을 다른 회원들과 공유하시겠습니까?"
-        : "단어장을 공유 해제하시겠습니까?";
     setShaObject({
       ...shaObject,
-      title: shaTitle,
-      text: shaText,
+      title: state.selectedFile.sha === 0 ? "단어장 공유" : "단어장 공유 해제",
+      text:
+        state.selectedFile.sha === 0
+          ? "단어장을 다른 회원들과 공유하시겠습니까?"
+          : "단어장을 공유 해제하시겠습니까?",
     });
   }, [props.open]);
 

@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { MyContext, ThemeContext } from "../../Context";
+import { MainContext, GlobalContext } from "../../Context";
 import {
   Dialog,
   DialogTitle,
@@ -12,8 +12,8 @@ import { useHandleOpen } from "./../../CustomHook";
 import { useAxios } from "../../Module";
 
 const CheckDialog = () => {
-  const { state, dispatch } = useContext(MyContext);
-  const { setLoad } = useContext(ThemeContext);
+  const { state, dispatch } = useContext(MainContext);
+  const { setLoad } = useContext(GlobalContext);
 
   const [, handleOpen] = useHandleOpen(false, () => {
     dispatch({ type: "setCheckDialog", payload: { isOpen: false } });
@@ -32,14 +32,9 @@ const CheckDialog = () => {
       },
       setLoad
     );
-    let stateType;
-    if (data[2] === "folder") {
-      stateType = "folderState";
-    } else if (data[2] === "file") {
-      stateType = "fileState";
-    } else {
-      stateType = "dataState";
-    }
+
+    const stateType = data[2] + "State";
+
     dispatch({
       type: "setSnackBar",
       payload: {

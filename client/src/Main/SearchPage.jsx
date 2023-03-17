@@ -11,14 +11,14 @@ import TableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
 import VolumeMuteIcon from "@mui/icons-material/VolumeMute";
 import { StyledTableRow } from "../Style/MUIStyle";
-import { ThemeContext } from "./../Context";
+import { GlobalContext } from "./../Context";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useAxios } from "../Module";
 
 const SearchPage = () => {
   const location = useLocation();
   const [data, setData] = useState([]);
-  const { theme, url, setLoad } = useContext(ThemeContext);
+  const { theme, url, setLoad } = useContext(GlobalContext);
   const isDark = theme === "dark";
   const matches2 = useMediaQuery("(max-width:1092px)");
   const matches3 = useMediaQuery("(max-width:554px)");
@@ -60,20 +60,24 @@ const SearchPage = () => {
     });
   };
 
+  const bgColor = { backgroundColor: isDark && "hsl(0, 0%, 30%)" };
+  const textColor = { color: isDark && "lightgray" };
+
   const MyTableRow = ({ title, label }) => {
     const width = matches3 ? "35%" : matches2 ? "20%" : "10%";
+
     return (
       <StyledTableRow>
         <TableCell
           component="th"
           scope="row"
           sx={{
+            ...bgColor,
+            ...textColor,
             width: width,
             borderRight: 1,
             borderRightColor: "grey.300",
             padding: "0 15px",
-            backgroundColor: isDark && "hsl(0, 0%, 30%)",
-            color: isDark && "lightgray",
           }}
         >
           <Typography sx={{ display: "inline" }}>{title}</Typography>
@@ -82,9 +86,9 @@ const SearchPage = () => {
               onListen(label);
             }}
             sx={{
+              ...textColor,
               float: "right",
               padding: 0,
-              color: isDark && "lightgray",
             }}
           >
             <VolumeMuteIcon />
@@ -93,14 +97,14 @@ const SearchPage = () => {
         <TableCell
           align="left"
           sx={{
-            backgroundColor: isDark && "hsl(0, 0%, 30%)",
+            ...bgColor,
             wordBreak: "break-all",
           }}
         >
           <Typography
             sx={{
+              ...textColor,
               fontSize: 17,
-              color: isDark && "lightgray",
             }}
           >
             {label}
@@ -115,8 +119,8 @@ const SearchPage = () => {
       <Stack direction="row" spacing={2} mb={2} mt={10}>
         <IconButton
           sx={{
+            ...textColor,
             border: "1px solid lightgray",
-            color: isDark && "lightgray",
             "&:hover": {
               backgroundColor: isDark ? "hsl(0, 0%, 45%)" : "lightgray",
             },
@@ -127,11 +131,7 @@ const SearchPage = () => {
         >
           <HomeIcon />
         </IconButton>
-        <Typography
-          fontSize={"18px"}
-          pt={"7px"}
-          sx={{ color: isDark && "lightgray" }}
-        >
+        <Typography fontSize={"18px"} pt={"7px"} sx={textColor}>
           검색 키워드 : {location.state.value}
         </Typography>
       </Stack>

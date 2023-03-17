@@ -6,33 +6,26 @@ import FileArea from "./FileArea";
 import FolderArea from "./FolderArea";
 import { Item } from "../Style/MUIStyle";
 import MoveDial from "./Dialog/MoveDialog";
-import { ThemeContext } from "../Context";
+import { GlobalContext } from "../Context";
 import { useContext } from "react";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 const Content = () => {
-  const { theme } = useContext(ThemeContext);
+  const { theme } = useContext(GlobalContext);
   const isDark = theme === "dark";
   const matches = useMediaQuery("(max-width:768px)");
+  const bgColor = { backgroundColor: isDark ? "hsl(0, 0%, 30%)" : "white" };
 
   return (
     <>
       <Grid container spacing={2} mt={10}>
         <Grid xs={matches ? 12 : 3}>
-          <Item
-            sx={{
-              backgroundColor: isDark ? "hsl(0, 0%, 30%)" : "white",
-            }}
-          >
+          <Item sx={bgColor}>
             <FolderArea />
           </Item>
         </Grid>
         <Grid xs={matches ? 12 : 9}>
-          <Item
-            sx={{
-              backgroundColor: isDark ? "hsl(0, 0%, 30%)" : "white",
-            }}
-          >
+          <Item sx={bgColor}>
             <FileArea />
           </Item>
         </Grid>

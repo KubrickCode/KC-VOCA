@@ -3,7 +3,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Grid from "@mui/material/Unstable_Grid2";
 import Typography from "@mui/material/Typography";
 import { useEffect, useState, useContext } from "react";
-import { MyContext, ThemeContext } from "../Context";
+import { MainContext, GlobalContext } from "../Context";
 import { Item } from "../Style/MUIStyle";
 import FileDial from "./Dialog/FileDial";
 import { useHandleOpen } from "./../CustomHook";
@@ -11,10 +11,10 @@ import { useAxios } from "../Module";
 
 const FileArea = () => {
   const [files, setFiles] = useState([]);
-  const { theme, url, setLoad } = useContext(ThemeContext);
+  const { theme, url, setLoad } = useContext(GlobalContext);
   const isDark = theme === "dark";
 
-  const { state, dispatch } = useContext(MyContext);
+  const { state, dispatch } = useContext(MainContext);
 
   const [open, handleOpen, setOpen] = useHandleOpen(false, () => {
     setOpen(!open);
