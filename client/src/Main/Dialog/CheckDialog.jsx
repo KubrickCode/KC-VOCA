@@ -44,10 +44,13 @@ const CheckDialog = () => {
       type: "setSnackBar",
       payload: {
         [stateType]: state.snackBar[stateType] + 1,
-        isOpen: true,
         text: data[0],
         type: data[1],
       },
+    });
+    dispatch({
+      type: "setSnackBarOpen",
+      payload: true,
     });
     handleOpen();
   };

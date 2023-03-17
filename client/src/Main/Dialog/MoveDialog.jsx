@@ -30,11 +30,14 @@ const MoveDial = () => {
     dispatch({
       type: "setSnackBar",
       payload: {
-        isOpen: true,
         text: data[0],
         type: data[1],
         [stateType]: state.snackBar[stateType] + 1,
       },
+    });
+    dispatch({
+      type: "setSnackBarOpen",
+      payload: true,
     });
   };
 

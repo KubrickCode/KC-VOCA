@@ -1,6 +1,6 @@
 export const initialState = {
+  snackBarOpen: false,
   snackBar: {
-    isOpen: false,
     text: "",
     type: "",
     folderState: 0,
@@ -50,6 +50,8 @@ export const initialState = {
 
 export const reducer = (state, action) => {
   switch (action.type) {
+    case "setSnackBarOpen":
+      return { ...state, snackBarOpen: action.payload };
     case "setSnackBar":
       return { ...state, snackBar: action.payload };
     case "setPostDialog":
