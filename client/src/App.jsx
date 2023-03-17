@@ -1,9 +1,9 @@
-import axios from "axios";
 import { useState, useEffect } from "react";
 import Layout from "./Layout";
 import Sign from "./Logoff/Sign";
 import { ThemeContext } from "./Context";
 import CircularProgress from "@mui/material/CircularProgress";
+import { useAxios } from "./Module";
 
 const host = import.meta.env.VITE_SERVER_HOST;
 
@@ -18,19 +18,15 @@ const App = () => {
   const url = host;
 
   useEffect(() => {
-    setLoad(true);
     const fetchIsLogin = async () => {
-      try {
-        const res = await axios.get(`${url}/signpage/islogin`, {
-          withCredentials: true,
-        });
-        setIsLogin(res.data);
-        setLoad(false);
-      } catch (err) {
-        console.error("Error fetching data: ", err);
-      }
+      const data = await useAxios(
+        "get",
+        `${url}/signpage/islogin`,
+        null,
+        setLoad
+      );
+      setIsLogin(data);
     };
-
     fetchIsLogin();
   }, []);
 

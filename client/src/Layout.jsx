@@ -35,8 +35,8 @@ import { initialState, reducer } from "./Reducer";
 import { useHandleOpen } from "./CustomHook";
 import { darkTheme, DrawerHeader } from "./Style/MUIStyle";
 import AppBar from "@mui/material/AppBar";
-import axios from "axios";
 import SetDialog from "./Main/Dialog/SetDialog";
+import { useAxios } from "./Module";
 
 const PersistentDrawerLeft = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -49,22 +49,15 @@ const PersistentDrawerLeft = () => {
   });
 
   useEffect(() => {
-    const useAxios = async () => {
-      setLoad(true);
-      try {
-        const res = await axios.get(`${url}/getdata/user`, {
-          withCredentials: true,
-        });
-        dispatch({
-          type: "setUser",
-          payload: { email: res.data.email, nickname: res.data.nickname },
-        });
-        setLoad(false);
-      } catch (err) {
-        console.error(err);
-      }
+    const fetchUser = async () => {
+      const data = await useAxios("get", `${url}/getdata/user`, null, setLoad);
+      dispatch({
+        type: "setUser",
+        payload: { email: data.email, nickname: data.nickname },
+      });
     };
-    useAxios();
+
+    fetchUser();
   }, [state.snackBar.setState]);
 
   return (

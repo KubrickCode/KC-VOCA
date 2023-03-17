@@ -8,9 +8,9 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import WatchLaterIcon from "@mui/icons-material/WatchLater";
 import StarIcon from "@mui/icons-material/Star";
-import axios from "axios";
 import { MyContext, ThemeContext } from "../Context";
 import { StyledTreeItemRoot } from "../Style/MUIStyle";
+import { useAxios } from "../Module";
 
 const StyledTreeItem = (props) => {
   const { theme } = useContext(ThemeContext);
@@ -80,19 +80,17 @@ const FolderArea = () => {
   const { url, setLoad } = useContext(ThemeContext);
 
   useEffect(() => {
-    const useAxios = async () => {
-      setLoad(true);
-      try {
-        const res = await axios.get(`${url}/getdata/get_folder`, {
-          withCredentials: true,
-        });
-        setFolderData(res.data);
-        setLoad(false);
-      } catch (err) {
-        console.error(err);
-      }
+    const fetchFolders = async () => {
+      const data = await useAxios(
+        "get",
+        `${url}/getdata/get_folder`,
+        null,
+        setLoad
+      );
+      setFolderData(data);
     };
-    useAxios();
+
+    fetchFolders();
   }, [state.snackBar.folderState]);
 
   const buildTree = useCallback(

@@ -2,12 +2,12 @@ import TextSnippetIcon from "@mui/icons-material/TextSnippet";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Grid from "@mui/material/Unstable_Grid2";
 import Typography from "@mui/material/Typography";
-import axios from "axios";
 import { useEffect, useState, useContext } from "react";
 import { MyContext, ThemeContext } from "../Context";
 import { Item } from "../Style/MUIStyle";
 import FileDial from "./Dialog/FileDial";
 import { useHandleOpen } from "./../CustomHook";
+import { useAxios } from "../Module";
 
 const FileArea = () => {
   const [files, setFiles] = useState([]);
@@ -22,27 +22,24 @@ const FileArea = () => {
 
   useEffect(() => {
     const fetchFiles = async () => {
-      setLoad(true);
-      try {
-        let res;
-        if (Number(state.selectedFolder)) {
-          res = await axios.post(`${url}/getdata/get_file`, {
-            folder_id: state.selectedFolder,
-          });
-        } else if (
-          ["get_share_file", "get_fav_file", "get_recent_file"].includes(
-            state.selectedFolder
-          )
-        ) {
-          res = await axios.get(`${url}/getdata/${state.selectedFolder}`, {
-            withCredentials: true,
-          });
-        }
-        setFiles(res.data);
-        setLoad(false);
-      } catch (err) {
-        console.error(err);
+      let method;
+      let action;
+      let body = null;
+      if (Number(state.selectedFolder)) {
+        method = "post";
+        action = `${url}/getdata/get_file`;
+        body = { folder_id: state.selectedFolder };
+      } else if (
+        ["get_share_file", "get_fav_file", "get_recent_file"].includes(
+          state.selectedFolder
+        )
+      ) {
+        method = "get";
+        action = `${url}/getdata/${state.selectedFolder}`;
       }
+
+      const data = await useAxios(method, action, body, setLoad);
+      setFiles(data);
     };
 
     fetchFiles();

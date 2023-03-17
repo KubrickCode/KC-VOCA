@@ -1,4 +1,4 @@
-import { useContext, useCallback } from "react";
+import { useContext } from "react";
 import { MyContext, ThemeContext } from "../../Context";
 import {
   Dialog,
@@ -8,8 +8,8 @@ import {
   DialogContentText,
   Button,
 } from "@mui/material";
-import axios from "axios";
 import { useHandleOpen } from "./../../CustomHook";
+import { useAxios } from "../../Module";
 
 const CheckDialog = () => {
   const { state, dispatch } = useContext(MyContext);
@@ -20,41 +20,36 @@ const CheckDialog = () => {
   });
 
   const submitForm = async () => {
-    setLoad(true);
-    try {
-      const res = await axios.post(
-        state.checkDialog.link,
-        {
-          folder_id: state.selectedFolder,
-          file_id: state.selectedFile.id,
-          file_favorites: state.selectedFile.fav,
-          file_shared: state.selectedFile.sha,
-          data_id: state.selectedData.id,
-        },
-        { withCredentials: true }
-      );
-      let stateType;
-      if (res.data[2] === "folder") {
-        stateType = "folderState";
-      } else if (res.data[2] === "file") {
-        stateType = "fileState";
-      } else {
-        stateType = "dataState";
-      }
-      await dispatch({
-        type: "setSnackBar",
-        payload: {
-          [stateType]: state.snackBar[stateType] + 1,
-          isOpen: true,
-          text: res.data[0],
-          type: res.data[1],
-        },
-      });
-      await handleOpen();
-      setLoad(false);
-    } catch (err) {
-      console.error(err);
+    const data = await useAxios(
+      "post",
+      state.checkDialog.link,
+      {
+        folder_id: state.selectedFolder,
+        file_id: state.selectedFile.id,
+        file_favorites: state.selectedFile.fav,
+        file_shared: state.selectedFile.sha,
+        data_id: state.selectedData.id,
+      },
+      setLoad
+    );
+    let stateType;
+    if (data[2] === "folder") {
+      stateType = "folderState";
+    } else if (data[2] === "file") {
+      stateType = "fileState";
+    } else {
+      stateType = "dataState";
     }
+    dispatch({
+      type: "setSnackBar",
+      payload: {
+        [stateType]: state.snackBar[stateType] + 1,
+        isOpen: true,
+        text: data[0],
+        type: data[1],
+      },
+    });
+    handleOpen();
   };
 
   return (

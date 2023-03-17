@@ -6,8 +6,8 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import Button from "@mui/material/Button";
-import axios from "axios";
 import { useHandleOpen } from "./../../CustomHook";
+import { useAxios } from "../../Module";
 
 const PostDialog = () => {
   const { state, dispatch } = useContext(MyContext);
@@ -66,43 +66,37 @@ const PostDialog = () => {
   });
 
   const submitForm = async () => {
-    setLoad(true);
-    try {
-      const res = await axios.post(
-        state.postDialog.link,
-        {
-          formData: formData,
-          folder_id: state.selectedFolder,
-          file_id: state.selectedFile.id,
-          data_id: state.selectedData.id,
-        },
-        { withCredentials: true }
-      );
-      await handleOpen();
-      let stateType;
-      if (res.data[2] === "folder") {
-        stateType = "folderState";
-      } else if (res.data[2] === "file") {
-        stateType = "fileState";
-      } else if (res.data[2] === "data") {
-        stateType = "dataState";
-      } else if (res.data[2] === "set") {
-        stateType = "setState";
-      }
-
-      await dispatch({
-        type: "setSnackBar",
-        payload: {
-          isOpen: true,
-          text: res.data[0],
-          type: res.data[1],
-          [stateType]: state.snackBar[stateType] + 1,
-        },
-      });
-      setLoad(false);
-    } catch (err) {
-      console.error(err);
+    const data = await useAxios(
+      "post",
+      state.postDialog.link,
+      {
+        formData: formData,
+        folder_id: state.selectedFolder,
+        file_id: state.selectedFile.id,
+        data_id: state.selectedData.id,
+      },
+      setLoad
+    );
+    handleOpen();
+    let stateType;
+    if (data[2] === "folder") {
+      stateType = "folderState";
+    } else if (data[2] === "file") {
+      stateType = "fileState";
+    } else if (data[2] === "data") {
+      stateType = "dataState";
+    } else if (data[2] === "set") {
+      stateType = "setState";
     }
+    dispatch({
+      type: "setSnackBar",
+      payload: {
+        isOpen: true,
+        text: data[0],
+        type: data[1],
+        [stateType]: state.snackBar[stateType] + 1,
+      },
+    });
   };
 
   const basicContent = () => {

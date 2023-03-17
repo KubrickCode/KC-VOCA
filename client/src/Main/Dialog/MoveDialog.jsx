@@ -3,6 +3,7 @@ import { useHandleOpen } from "./../../CustomHook";
 import FolderArea from "../FolderArea";
 import { useContext } from "react";
 import { Dialog, DialogTitle, DialogActions, Button } from "@mui/material";
+import { useAxios } from "../../Module";
 import axios from "axios";
 
 const MoveDial = () => {
@@ -14,33 +15,27 @@ const MoveDial = () => {
   });
 
   const submitForm = async () => {
-    setLoad(true);
-    try {
-      const res = await axios.post(
-        state.moveDialog.link,
-        {
-          folder_id: state.selectedFolder,
-          file_id: state.selectedFile.id,
-          parent_folder: state.moveSelectedFolder,
-        },
-        { withCredentials: true }
-      );
-      handleOpen();
-      const stateType = res.data[2] === "folder" ? "folderState" : "fileState";
-
-      dispatch({
-        type: "setSnackBar",
-        payload: {
-          isOpen: true,
-          text: res.data[0],
-          type: res.data[1],
-          [stateType]: state.snackBar[stateType] + 1,
-        },
-      });
-      setLoad(false);
-    } catch (err) {
-      console.error(err);
-    }
+    const data = await useAxios(
+      "post",
+      state.moveDialog.link,
+      {
+        folder_id: state.selectedFolder,
+        file_id: state.selectedFile.id,
+        parent_folder: state.moveSelectedFolder,
+      },
+      setLoad
+    );
+    handleOpen();
+    const stateType = data[2] === "folder" ? "folderState" : "fileState";
+    dispatch({
+      type: "setSnackBar",
+      payload: {
+        isOpen: true,
+        text: data[0],
+        type: data[1],
+        [stateType]: state.snackBar[stateType] + 1,
+      },
+    });
   };
 
   return (

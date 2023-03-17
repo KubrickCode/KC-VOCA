@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useState, useEffect, useContext } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import Table from "@mui/material/Table";
@@ -24,6 +23,7 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VolumeMuteIcon from "@mui/icons-material/VolumeMute";
 import { StyledTableRow } from "../Style/MUIStyle";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { useAxios } from "../Module";
 
 const VocaLoad = () => {
   const { state, dispatch } = useContext(MyContext);
@@ -47,35 +47,30 @@ const VocaLoad = () => {
   const matches3 = useMediaQuery("(max-width:554px)");
 
   useEffect(() => {
-    const useAxios = async () => {
-      setLoad(true);
-      try {
-        const res = await axios.post(
-          `${url}/getdata/get_data`,
-          {
-            file_id: location.id,
-          },
-          { withCredentials: true }
-        );
-        setData(res.data[0]);
-        res.data[3] ? setShare(true) : setShare(false);
-        setFileName(res.data[1][0].file_name);
-        dispatch({
-          type: "setSelectedFolder",
-          payload: String(res.data[1][0].folder_id),
-        });
-        dispatch({
-          type: "setSelectedFile",
-          payload: {
-            id: res.data[1][0].file_id,
-          },
-        });
-        setLoad(false);
-      } catch (err) {
-        console.error(err);
-      }
+    const fetchData = async () => {
+      const data = await useAxios(
+        "post",
+        `${url}/getdata/get_data`,
+        {
+          file_id: location.id,
+        },
+        setLoad
+      );
+      setData(data[0]);
+      data[3] ? setShare(true) : setShare(false);
+      setFileName(data[1][0].file_name);
+      dispatch({
+        type: "setSelectedFolder",
+        payload: String(data[1][0].folder_id),
+      });
+      dispatch({
+        type: "setSelectedFile",
+        payload: {
+          id: data[1][0].file_id,
+        },
+      });
     };
-    useAxios();
+    fetchData();
   }, [state.snackBar.dataState]);
 
   useEffect(() => {
@@ -248,28 +243,24 @@ const VocaLoad = () => {
   };
 
   const onListen = async (text) => {
-    setLoad(true);
-    try {
-      const res = await axios.post(
-        `${url}/getdata/tts`,
-        {
-          text,
-        },
-        {
-          responseType: "arraybuffer",
-        }
-      );
-      const context = new AudioContext();
-      context.decodeAudioData(res.data, (buffer) => {
-        const source = context.createBufferSource();
-        source.buffer = buffer;
-        source.connect(context.destination);
-        source.start(0);
-      });
-      setLoad(false);
-    } catch (err) {
-      console.error(err);
-    }
+    const data = await useAxios(
+      "post",
+      `${url}/getdata/tts`,
+      {
+        text,
+      },
+      setLoad,
+      {
+        responseType: "arraybuffer",
+      }
+    );
+    const context = new AudioContext();
+    context.decodeAudioData(data, (buffer) => {
+      const source = context.createBufferSource();
+      source.buffer = buffer;
+      source.connect(context.destination);
+      source.start(0);
+    });
   };
 
   return (

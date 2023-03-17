@@ -1,7 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import { useLocation } from "react-router-dom";
 import Typography from "@mui/material/Typography";
-import axios from "axios";
 import IconButton from "@mui/material/IconButton";
 import HomeIcon from "@mui/icons-material/Home";
 import Stack from "@mui/material/Stack";
@@ -14,6 +13,7 @@ import VolumeMuteIcon from "@mui/icons-material/VolumeMute";
 import { StyledTableRow } from "../Style/MUIStyle";
 import { ThemeContext } from "./../Context";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { useAxios } from "../Module";
 
 const SearchPage = () => {
   const location = useLocation();
@@ -24,48 +24,40 @@ const SearchPage = () => {
   const matches3 = useMediaQuery("(max-width:554px)");
 
   useEffect(() => {
-    const useAxios = async () => {
-      setLoad(true);
-      try {
-        const res = await axios.post(
-          `${url}/getdata/search`,
-          {
-            word: location.state.value,
-          },
-          { withCredentials: true }
-        );
-        setData(res.data);
-        setLoad(false);
-      } catch (err) {
-        console.error(err);
-      }
+    const fetchData = async () => {
+      const data = await useAxios(
+        "post",
+        `${url}/getdata/search`,
+        {
+          word: location.state.value,
+        },
+        setLoad
+      );
+      setData(data);
     };
-    useAxios();
+
+    fetchData();
   }, [location.state.value]);
 
   const onListen = async (text) => {
-    setLoad(true);
-    try {
-      const res = await axios.post(
-        `${url}/getdata/tts`,
-        {
-          text,
-        },
-        {
-          responseType: "arraybuffer",
-        }
-      );
-      const context = new AudioContext();
-      context.decodeAudioData(res.data, (buffer) => {
-        const source = context.createBufferSource();
-        source.buffer = buffer;
-        source.connect(context.destination);
-        source.start(0);
-      });
-      setLoad(false);
-    } catch (err) {
-      console.error(err);
-    }
+    const data = await useAxios(
+      "post",
+      `${url}/getdata/tts`,
+      {
+        text,
+      },
+      setLoad,
+      {
+        responseType: "arraybuffer",
+      }
+    );
+    const context = new AudioContext();
+    context.decodeAudioData(data, (buffer) => {
+      const source = context.createBufferSource();
+      source.buffer = buffer;
+      source.connect(context.destination);
+      source.start(0);
+    });
   };
 
   const MyTableRow = ({ title, label }) => {
