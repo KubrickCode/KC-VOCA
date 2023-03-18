@@ -13,7 +13,7 @@ export const useAxios = async (
     if (method === "get") {
       res = await axios.get(url, { withCredentials: true });
     } else {
-      res = await axios.post(url, data, { ...resType, withCredentials: true });
+      res = await axios.post(url, data, { withCredentials: true, ...resType });
     }
     setLoad && setLoad(false);
     return res.data;

@@ -9,7 +9,9 @@ db.connect();
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 
-const url = "/";
+require("dotenv").config();
+
+const url = process.env.REDIRECT_ROOT;
 
 router.post("/delete_folder", (req, res) => {
   const post = req.body;
@@ -64,23 +66,23 @@ router.post("/user", (req, res) => {
     (err, result) => {
       bcrypt.compare(password, result[0].password, (err, results) => {
         if (results) {
-          req.logout((err) => {
-            if (err) {
-              return next(err);
-            }
-            db.query(
-              `
-          DELETE FROM voca_data WHERE user_id=?;
-          DELETE FROM voca_file WHERE user_id=?;
-          DELETE FROM voca_folder WHERE user_id=?;
-          DELETE FROM localuser WHERE user_id=?;
-          `,
-              [user_id, user_id, user_id, user_id, user_id],
-              (err, result) => {
+          db.query(
+            `
+        DELETE FROM voca_data WHERE user_id=?;
+        DELETE FROM voca_file WHERE user_id=?;
+        DELETE FROM voca_folder WHERE user_id=?;
+        DELETE FROM localuser WHERE user_id=?;
+        `,
+            [user_id, user_id, user_id, user_id, user_id],
+            (err, result) => {
+              req.logout((err) => {
+                if (err) {
+                  return next(err);
+                }
                 res.redirect(url);
-              }
-            );
-          });
+              });
+            }
+          );
         } else {
           res.send(["비밀번호가 일치하지 않습니다", "warning", "set"]);
         }

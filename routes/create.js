@@ -10,16 +10,13 @@ router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 
 router.post("/create_folder", async (req, res) => {
-  const post = req.body;
-  const result = await myModule.checkFolderName2(
-    post.folder_id,
-    post.formData.value1
-  );
+  const { folder_id, formData } = req.body;
+  const result = await myModule.checkFolderName2(folder_id, formData.value1);
   if (result) {
     db.query(
       `INSERT INTO voca_folder(user_id,parent_id,folder_name) VALUES(?,?,?)
       `,
-      [req.user[0].user_id, post.folder_id, post.formData.value1],
+      [req.user[0].user_id, folder_id, formData.value1],
       () => {
         res.send(["폴더가 생성되었습니다", "success", "folder"]);
       }
@@ -34,16 +31,13 @@ router.post("/create_folder", async (req, res) => {
 });
 
 router.post("/create_file", async (req, res) => {
-  const post = req.body;
-  const result = await myModule.checkFileName(
-    post.folder_id,
-    post.formData.value1
-  );
+  const { folder_id, formData } = req.body;
+  const result = await myModule.checkFileName(folder_id, formData.value1);
   if (result) {
     db.query(
       `INSERT INTO voca_file(user_id,folder_id,file_name) VALUES(?,?,?)
       `,
-      [req.user[0].user_id, post.folder_id, post.formData.value1],
+      [req.user[0].user_id, folder_id, formData.value1],
       () => {
         res.send(["단어장이 생성되었습니다", "success", "file"]);
       }
@@ -58,22 +52,13 @@ router.post("/create_file", async (req, res) => {
 });
 
 router.post("/create_data", (req, res) => {
-  const post = req.body;
-  const user = req.user[0];
-  console.log(post);
+  const { folder_id, file_id } = req.body;
+  const { voca, voca_mean, exam, exam_mean } = req.body.formData;
   db.query(
     `
       INSERT INTO voca_data(user_id,folder_id,file_id,voca,voca_mean,exam,exam_mean) VALUES(?,?,?,?,?,?,?)
       `,
-    [
-      user.user_id,
-      post.folder_id,
-      post.file_id,
-      post.formData.voca,
-      post.formData.voca_mean,
-      post.formData.exam,
-      post.formData.exam_mean,
-    ],
+    [req.user[0].user_id, folder_id, file_id, voca, voca_mean, exam, exam_mean],
     () => {
       res.send(["데이터가 추가되었습니다", "success", "data"]);
     }
