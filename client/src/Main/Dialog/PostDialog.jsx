@@ -8,6 +8,7 @@ import DialogContent from "@mui/material/DialogContent";
 import Button from "@mui/material/Button";
 import { useHandleOpen } from "./../../CustomHook";
 import { useAxios } from "../../Module";
+import { useNavigate } from "react-router-dom";
 
 const PostDialog = () => {
   const { state, dispatch } = useContext(MainContext);
@@ -21,6 +22,7 @@ const PostDialog = () => {
     exam_mean: "",
   });
   const [submitBtn, setSubmitBtn] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setFormData({
@@ -76,6 +78,9 @@ const PostDialog = () => {
       },
       setLoad
     );
+    if (state.postDialog.title === "정말 회원에서 탈퇴하시겠습니까?") {
+      location.reload();
+    }
     handleOpen();
     const stateType = data[2] + "State";
     dispatch({

@@ -79,7 +79,7 @@ router.post("/user", (req, res) => {
           `,
               [user_id, user_id, user_id, user_id, user_id],
               (err, result) => {
-                res.redirect(url);
+                res.send(true);
               }
             );
           });
