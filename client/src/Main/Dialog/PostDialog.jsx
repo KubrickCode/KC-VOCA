@@ -78,7 +78,10 @@ const PostDialog = () => {
       },
       setLoad
     );
-    if (state.postDialog.title === "정말 회원에서 탈퇴하시겠습니까?") {
+    if (
+      state.postDialog.title === "정말 회원에서 탈퇴하시겠습니까?" &&
+      data === "success"
+    ) {
       location.reload();
     }
     handleOpen();

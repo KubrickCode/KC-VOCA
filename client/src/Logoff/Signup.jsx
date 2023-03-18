@@ -81,7 +81,6 @@ const SignUp = () => {
         nickname,
       });
       form.submit();
-      setLoad(false);
     } catch (error) {
       const duplicates = error.response.data.duplicates;
       if (duplicates.email) {
@@ -91,6 +90,7 @@ const SignUp = () => {
         setErrMsg("이미 존재하는 닉네임입니다");
       }
     }
+    setLoad(false);
   };
 
   useEffect(() => {
@@ -141,7 +141,7 @@ const SignUp = () => {
     } else {
       setBtnState(true);
     }
-  }, [formData]);
+  }, [formData, formErrors, setBtnState]);
 
   return (
     <ThemeProvider theme={theme}>

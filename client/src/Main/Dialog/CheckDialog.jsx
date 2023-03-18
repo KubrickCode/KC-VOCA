@@ -47,6 +47,13 @@ const CheckDialog = () => {
       type: "setSnackBarOpen",
       payload: true,
     });
+    if (data[3]) {
+      dispatch({
+        type: "setSelectedFolder",
+        payload: data[3],
+      });
+    }
+
     handleOpen();
   };
 

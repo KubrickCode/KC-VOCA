@@ -8,7 +8,7 @@
     "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\""
   },
   "dependencies": {
-    "aws-sdk": "^2.1328.0",
+    "aws-sdk": "^2.1338.0",
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.2",
     "concurrently": "^7.6.0",
@@ -21,9 +21,10 @@
     "express-mysql-session": "^2.1.8",
     "express-session": "^1.17.3",
     "http-errors": "~1.6.3",
-    "jade": "^1.11.0",
+    "jade": "^0.29.0",
     "morgan": "~1.9.1",
     "mysql": "^2.18.1",
+    "mysql2": "^3.2.0",
     "nodemon": "^2.0.20",
     "passport": "^0.6.0",
     "passport-google-oauth2": "^0.2.0",

@@ -32,6 +32,7 @@ const LoadingOverlay = () => (
 
 const App = () => {
   const [isLogin, setIsLogin] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
   const [theme, setTheme] = useState(() => {
     const savedTheme = window.localStorage.getItem("kcvoca_theme");
     return savedTheme || "light";
@@ -49,6 +50,7 @@ const App = () => {
         setLoad
       );
       setIsLogin(data);
+      setIsFetching(false);
     };
     fetchIsLogin();
   }, []);
@@ -74,7 +76,7 @@ const App = () => {
         }}
       />
       <GlobalContext.Provider value={{ theme, setTheme, url, setLoad }}>
-        {isLogin ? <Layout /> : <Sign />}
+        {isFetching ? <LoadingOverlay /> : isLogin ? <Layout /> : <Sign />}
       </GlobalContext.Provider>
     </>
   );
