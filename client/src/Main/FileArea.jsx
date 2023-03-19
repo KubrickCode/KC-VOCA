@@ -43,11 +43,7 @@ const FileArea = () => {
     };
 
     fetchFiles();
-  }, [
-    state.selectedFolder,
-    state.snackBar.fileState,
-    state.snackBar.folderState,
-  ]);
+  }, [state.selectedFolder, state.fileState, state.folderState]);
 
   if (files.length > 0) {
     return (

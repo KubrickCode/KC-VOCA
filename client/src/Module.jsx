@@ -9,6 +9,7 @@ export const useAxios = async (
 ) => {
   try {
     setLoad && setLoad(true);
+
     let res;
     if (method === "get") {
       res = await axios.get(url, { withCredentials: true });
@@ -16,6 +17,7 @@ export const useAxios = async (
       res = await axios.post(url, data, { withCredentials: true, ...resType });
     }
     setLoad && setLoad(false);
+
     return res.data;
   } catch (err) {
     console.error(err);

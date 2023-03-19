@@ -1,12 +1,12 @@
 export const initialState = {
   snackBarOpen: false,
+  folderState: 0,
+  fileState: 0,
+  dataState: 0,
+  setState: 0,
   snackBar: {
     text: "",
     type: "",
-    folderState: 0,
-    fileState: 0,
-    dataState: 0,
-    setState: 0,
   },
   postDialog: {
     isOpen: false,
@@ -72,6 +72,14 @@ export const reducer = (state, action) => {
       return { ...state, setDialog: action.payload };
     case "setUser":
       return { ...state, user: action.payload };
+    case "folderState":
+      return { ...state, folderState: action.payload };
+    case "fileState":
+      return { ...state, fileState: action.payload };
+    case "dataState":
+      return { ...state, dataState: action.payload };
+    case "setState":
+      return { ...state, setState: action.payload };
     default:
       throw new Error("Invalid action type");
   }

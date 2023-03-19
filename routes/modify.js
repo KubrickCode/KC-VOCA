@@ -4,30 +4,30 @@ const bodyParser = require("body-parser");
 const mysql = require("mysql2/promise");
 const bcrypt = require("bcrypt");
 const db = mysql.createPool(require("../lib/config").user);
+const myModule = require("../lib/module");
 
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 
 router.post("/rename_folder", async (req, res) => {
   const { folder_id, formData } = req.body;
+  const query = [
+    `SELECT parent_id from voca_folder WHERE folder_id=?`,
+    `UPDATE voca_folder SET folder_name=? WHERE folder_id=?`,
+  ];
+  const target = [[folder_id], [formData.value1, folder_id]];
   try {
-    const parent = await db.query(
-      `SELECT parent_id from voca_folder WHERE folder_id=?`,
-      [folder_id]
-    );
-    const result = await db.query(
-      `SELECT folder_name from voca_folder WHERE parent_id=? AND folder_name=?
-    `,
-      [parent[0][0].parent_id, formData.value1]
+    const parent = await db.query(query[0], target[0]);
+    const result = await myModule.checkDuplicate(
+      "folder",
+      parent[0][0].parent_id,
+      formData.value1
     );
 
     if (folder_id === "1") {
       res.send(["Home 폴더명은 변경하실 수 없습니다", "error", "folder"]);
     } else if (!Boolean(result[0][0])) {
-      await db.query(`UPDATE voca_folder SET folder_name=? WHERE folder_id=?`, [
-        formData.value1,
-        folder_id,
-      ]);
+      await db.query(query[1], target[1]);
       res.send(["폴더명이 변경되었습니다", "success", "folder"]);
     } else {
       res.send([
@@ -44,17 +44,17 @@ router.post("/rename_folder", async (req, res) => {
 
 router.post("/rename_file", async (req, res) => {
   const { folder_id, formData, file_id } = req.body;
+  const query = `UPDATE voca_file SET file_name=? WHERE file_id=?`;
+  const target = [formData.value1, file_id];
   try {
-    const result = await db.query(
-      `SELECT file_name from voca_file WHERE folder_id=? AND file_name=?`,
-      [folder_id, formData.value1]
+    const result = await myModule.checkDuplicate(
+      "file",
+      folder_id,
+      formData.value1
     );
 
     if (!Boolean(result[0][0])) {
-      await db.query(`UPDATE voca_file SET file_name=? WHERE file_id=?`, [
-        formData.value1,
-        file_id,
-      ]);
+      await db.query(query, target);
       res.send(["단어장명이 변경되었습니다", "success", "file"]);
     } else {
       res.send([
@@ -70,18 +70,18 @@ router.post("/rename_file", async (req, res) => {
 });
 
 router.post("/favorites", async (req, res) => {
-  const post = req.body;
+  const { file_id, file_favorites } = req.body;
+  const query = `UPDATE voca_file SET favorites=? WHERE file_id=?`;
+
   try {
-    const isFavorite = post.file_favorites == 0;
+    const isFavorite = file_favorites == 0;
     const fav = isFavorite ? 1 : 0;
+    const target = [fav, file_id];
     const msg = isFavorite
       ? "단어장이 즐겨찾기에 등록되었습니다"
       : "단어장이 즐겨찾기에서 해제되었습니다";
 
-    await db.query(`UPDATE voca_file SET favorites=? WHERE file_id=?`, [
-      fav,
-      post.file_id,
-    ]);
+    await db.query(query, target);
     res.send([msg, "success", "file"]);
   } catch (err) {
     console.error(err);
@@ -91,45 +91,40 @@ router.post("/favorites", async (req, res) => {
 
 router.post("/shared", async (req, res) => {
   const { file_id, file_shared } = req.body;
+  const query = `UPDATE voca_file SET shared=? WHERE file_id=?`;
   try {
     const isShared = file_shared == 0;
     const sha = isShared ? 1 : 0;
+    const target = [sha, file_id];
     const msg = isShared
       ? "단어장이 공유되었습니다"
       : "단어장이 공유 해제되었습니다";
 
-    await db.query(
-      `UPDATE voca_file SET shared=? WHERE file_id=?
-    `,
-      [sha, file_id]
-    );
+    await db.query(query, target);
 
     res.send([msg, "success", "file"]);
   } catch (err) {
     console.error(err);
+    res.status(500).send("Internal server error");
   }
 });
 
 router.post("/move_folder", async (req, res) => {
-  const post = req.body;
+  const { folder_id, parent_folder } = req.body;
+  const query = [
+    `SELECT parent_id FROM voca_folder WHERE folder_id=?`,
+    `UPDATE voca_folder SET parent_id=? WHERE folder_id=?`,
+  ];
+  const target = [[folder_id], [parent_folder, folder_id]];
   try {
-    const [rows] = await db.query(
-      `SELECT parent_id FROM voca_folder WHERE folder_id=?`,
-      [post.folder_id]
-    );
+    const [rows] = await db.query(query[0], target[0]);
     const parent_id = rows[0].parent_id;
     if (parent_id === "0") {
       res.send(["Home 폴더는 이동할 수 없습니다", "error", "folder"]);
-    } else if (
-      parent_id == post.parent_folder ||
-      post.parent_folder == post.folder_id
-    ) {
+    } else if (parent_id == parent_folder || parent_folder == folder_id) {
       res.send(["해당 위치로 이동할 수 없습니다", "error", "folder"]);
     } else {
-      await db.query(`UPDATE voca_folder SET parent_id=? WHERE folder_id=?`, [
-        post.parent_folder,
-        post.folder_id,
-      ]);
+      await db.query(query[1], target[1]);
       res.send(["폴더가 이동되었습니다", "success", "folder"]);
     }
   } catch (err) {
@@ -139,12 +134,11 @@ router.post("/move_folder", async (req, res) => {
 });
 
 router.post("/move_file", async (req, res) => {
-  const post = req.body;
+  const { parent_folder, file_id } = req.body;
+  const query = `UPDATE voca_file SET folder_id=? WHERE file_id=?`;
+  const target = [parent_folder, file_id];
   try {
-    await db.query(`UPDATE voca_file SET folder_id=? WHERE file_id=?`, [
-      post.parent_folder,
-      post.file_id,
-    ]);
+    await db.query(query, target);
     res.send(["단어장이 이동되었습니다", "success", "file"]);
   } catch (err) {
     console.error(err);
@@ -152,24 +146,18 @@ router.post("/move_file", async (req, res) => {
   }
 });
 
-router.post("/modify_data", (req, res) => {
-  const post = req.body;
-  const formData = post.formData;
-  db.query(
-    `
-  UPDATE voca_data SET voca=?, voca_mean=?, exam=?, exam_mean=? WHERE data_id=?
-  `,
-    [
-      formData.voca,
-      formData.voca_mean,
-      formData.exam,
-      formData.exam_mean,
-      post.data_id,
-    ],
-    (err, result) => {
-      res.send(["데이터가 수정되었습니다", "success", "data"]);
-    }
-  );
+router.post("/modify_data", async (req, res) => {
+  const { data_id } = req.body;
+  const { voca, voca_mean, exam, exam_mean } = req.body.formData;
+  const query = `UPDATE voca_data SET voca=?, voca_mean=?, exam=?, exam_mean=? WHERE data_id=?`;
+  const target = [voca, voca_mean, exam, exam_mean, data_id];
+  try {
+    await db.query(query, target);
+    res.send(["데이터가 수정되었습니다", "success", "data"]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal server error");
+  }
 });
 
 router.post("/nickname", async (req, res) => {
@@ -177,24 +165,23 @@ router.post("/nickname", async (req, res) => {
     formData: { value1: nickname },
   } = req.body;
   const { user_id } = req.user[0];
+  const query = [
+    "SELECT nickname FROM localuser WHERE nickname=?",
+    "UPDATE localuser SET nickname=? WHERE user_id=?",
+  ];
+  const target = [[nickname], [nickname, user_id]];
   try {
-    const [result] = await db.query(
-      "SELECT nickname FROM localuser WHERE nickname=?",
-      [nickname]
-    );
+    const [result] = await db.query(query[0], target[0]);
 
     if (result[0] && result[0].nickname) {
       res.send(["같은 닉네임이 존재합니다", "warning", "set"]);
     } else {
-      await db.query("UPDATE localuser SET nickname=? WHERE user_id=?", [
-        nickname,
-        user_id,
-      ]);
+      await db.query(query[1], target[1]);
       res.send(["닉네임이 변경되었습니다", "success", "set"]);
     }
   } catch (err) {
     console.error(err);
-    res.send(["An error occurred", "error", "unset"]);
+    res.status(500).send("Internal server error");
   }
 });
 
@@ -203,19 +190,19 @@ router.post("/password", async (req, res) => {
     formData: { value1: password, value2: password2 },
   } = req.body;
   const { user_id } = req.user[0];
+  const query = [
+    "SELECT password FROM localuser WHERE user_id=?",
+    "UPDATE localuser SET password=? WHERE user_id=?",
+  ];
+  const target = [user_id];
   try {
-    const [result] = await db.query(
-      "SELECT password FROM localuser WHERE user_id=?",
-      [user_id]
-    );
+    const [result] = await db.query(query[0], target);
     const isPasswordMatch = await bcrypt.compare(password, result[0].password);
 
     if (isPasswordMatch) {
       const hash = await bcrypt.hash(password2, 10);
-      await db.query("UPDATE localuser SET password=? WHERE user_id=?", [
-        hash,
-        user_id,
-      ]);
+      const tartget2 = [hash, user_id];
+      await db.query(query[1], tartget2);
       res.send(["비밀번호가 변경되었습니다", "success", "set"]);
     } else {
       res.send(["기존 비밀번호가 일치하지 않습니다", "warning", "set"]);

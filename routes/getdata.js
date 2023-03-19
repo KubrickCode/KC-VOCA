@@ -17,11 +17,11 @@ router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 
 router.get("/get_folder", async (req, res) => {
+  const { user_id } = req.user[0];
+  const query = `SELECT * FROM voca_folder WHERE user_id=?`;
+  const target = [user_id];
   try {
-    const [result] = await db.query(
-      `SELECT * FROM voca_folder WHERE user_id=?`,
-      [req.user[0].user_id]
-    );
+    const [result] = await db.query(query, target);
     res.json(result);
   } catch (err) {
     console.error(err);
@@ -30,12 +30,11 @@ router.get("/get_folder", async (req, res) => {
 });
 
 router.post("/get_file", async (req, res) => {
-  const post = req.body;
+  const { folder_id } = req.body;
+  const query = `SELECT * FROM voca_file WHERE folder_id=?`;
+  const target = [folder_id];
   try {
-    const [result] = await db.query(
-      `SELECT * FROM voca_file WHERE folder_id=?`,
-      [post.folder_id]
-    );
+    const [result] = await db.query(query, target);
     res.json(result);
   } catch (err) {
     console.error(err);
@@ -44,11 +43,11 @@ router.post("/get_file", async (req, res) => {
 });
 
 router.get("/get_fav_file", async (req, res) => {
+  const { user_id } = req.user[0];
+  const query = `SELECT * FROM voca_file WHERE favorites=1 AND user_id=?`;
+  const target = [user_id];
   try {
-    const [result] = await db.query(
-      `SELECT * FROM voca_file WHERE favorites=1 AND user_id=?`,
-      [req.user[0].user_id]
-    );
+    const [result] = await db.query(query, target);
     res.json(result);
   } catch (err) {
     console.error(err);
@@ -57,11 +56,11 @@ router.get("/get_fav_file", async (req, res) => {
 });
 
 router.get("/get_recent_file", async (req, res) => {
+  const { user_id } = req.user[0];
+  const query = `SELECT * FROM voca_file WHERE user_id=? ORDER BY current DESC;`;
+  const target = [user_id];
   try {
-    const [result] = await db.query(
-      `SELECT * FROM voca_file WHERE user_id=? ORDER BY current DESC;`,
-      [req.user[0].user_id]
-    );
+    const [result] = await db.query(query, target);
     res.json(result.slice(0, 10));
   } catch (err) {
     console.error(err);
@@ -70,13 +69,12 @@ router.get("/get_recent_file", async (req, res) => {
 });
 
 router.get("/get_share_file", async (req, res) => {
+  const query = `SELECT v.*, u.nickname
+  FROM voca_file v
+  JOIN localuser u ON v.user_id = u.user_id
+  WHERE v.shared = 1;`;
   try {
-    const [result] = await db.query(`
-      SELECT v.*, u.nickname
-      FROM voca_file v
-      JOIN localuser u ON v.user_id = u.user_id
-      WHERE v.shared = 1;
-    `);
+    const [result] = await db.query(query);
     res.json(result);
   } catch (err) {
     console.error(err);
@@ -86,18 +84,21 @@ router.get("/get_share_file", async (req, res) => {
 
 router.post("/get_data", async (req, res) => {
   const { file_id } = req.body;
-  const user_id = req.user[0].user_id;
+  const { user_id } = req.user[0];
+  const query = [
+    "SELECT * FROM voca_data WHERE file_id=?",
+    "SELECT * FROM voca_file WHERE file_id=?",
+    "UPDATE voca_file SET current=CURRENT_TIMESTAMP WHERE file_id=?",
+  ];
+  const target = [file_id];
 
   try {
     const [data, file] = await Promise.all([
-      db.query("SELECT * FROM voca_data WHERE file_id=?", [file_id]),
-      db.query("SELECT * FROM voca_file WHERE file_id=?", [file_id]),
+      db.query(query[0], target),
+      db.query(query[1], target),
     ]);
 
-    await db.query(
-      "UPDATE voca_file SET current=CURRENT_TIMESTAMP WHERE file_id=?",
-      [file_id]
-    );
+    await db.query(query[2], target);
 
     if (file[0][0] && file[0][0].user_id !== user_id) {
       file[0].push(true);
@@ -111,11 +112,11 @@ router.post("/get_data", async (req, res) => {
 });
 
 router.get("/user", async (req, res) => {
-  const user = req.user[0];
+  const { user_id } = req.user[0];
+  const query = `SELECT * FROM localuser WHERE user_id=?`;
+  const target = [user_id];
   try {
-    const [result] = await db.query(`SELECT * FROM localuser WHERE user_id=?`, [
-      user.user_id,
-    ]);
+    const [result] = await db.query(query, target);
     res.send(result[0]);
   } catch (err) {
     console.error(err);
@@ -124,9 +125,9 @@ router.get("/user", async (req, res) => {
 });
 
 router.post("/tts", async (req, res) => {
-  const post = req.body;
+  const { text } = req.body;
   const params = {
-    Text: post.text,
+    Text: text,
     OutputFormat: "mp3",
     VoiceId: "Matthew",
   };
@@ -143,15 +144,12 @@ router.post("/tts", async (req, res) => {
 });
 
 router.post("/search", async (req, res) => {
-  const post = req.body;
-  const user = req.user[0];
+  const { word } = req.body;
+  const { user_id } = req.user[0];
+  const query = `SELECT * FROM voca_data WHERE voca REGEXP ? AND voca_data.user_id=? OR voca_mean REGEXP ? AND voca_data.user_id=?`;
+  const target = [word, user_id, word, user_id];
   try {
-    const [result] = await db.query(
-      `
-      SELECT * FROM voca_data WHERE voca REGEXP ? AND voca_data.user_id=? OR voca_mean REGEXP ? AND voca_data.user_id=?;
-    `,
-      [post.word, user.user_id, post.word, user.user_id]
-    );
+    const [result] = await db.query(query, target);
     res.send(result);
   } catch (err) {
     console.error(err);

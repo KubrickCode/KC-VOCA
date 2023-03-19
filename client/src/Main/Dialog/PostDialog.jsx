@@ -91,8 +91,11 @@ const PostDialog = () => {
       payload: {
         text: data[0],
         type: data[1],
-        [stateType]: state.snackBar[stateType] + 1,
       },
+    });
+    dispatch({
+      type: stateType,
+      payload: state[stateType] + 1,
     });
     dispatch({
       type: "setSnackBarOpen",

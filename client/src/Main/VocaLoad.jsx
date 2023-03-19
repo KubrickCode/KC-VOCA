@@ -71,7 +71,7 @@ const VocaLoad = () => {
       });
     };
     fetchData();
-  }, [state.snackBar.dataState]);
+  }, [state.dataState]);
 
   useEffect(() => {
     view.state

@@ -58,7 +58,7 @@ const PersistentDrawerLeft = () => {
     };
 
     fetchUser();
-  }, [state.snackBar.setState]);
+  }, [state.setState]);
 
   return (
     <MainContext.Provider

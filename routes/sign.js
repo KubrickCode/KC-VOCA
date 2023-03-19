@@ -12,26 +12,35 @@ const url = process.env.REDIRECT_ROOT;
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 
-router.get("/islogin", (req, res) => {
-  res.send(req.user ? true : false);
+router.get("/islogin", async (req, res) => {
+  try {
+    res.send(req.user ? true : false);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal server error");
+  }
 });
 
-router.get("/logout", (req, res, next) => {
-  req.logout((err) => {
-    if (err) {
-      return next(err);
-    }
-    res.redirect(url);
-  });
+router.get("/logout", async (req, res, next) => {
+  try {
+    req.logout((err) => {
+      if (err) {
+        return next(err);
+      }
+      res.redirect(url);
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal server error");
+  }
 });
 
 router.post("/check_duplicate", async (req, res) => {
   const { email, nickname } = req.body;
+  const query = `SELECT * FROM localuser WHERE email = ? OR nickname = ?`;
+  const target = [email, nickname];
   try {
-    const [results] = await db.query(
-      "SELECT * FROM localuser WHERE email = ? OR nickname = ?",
-      [email, nickname]
-    );
+    const [results] = await db.query(query, target);
 
     if (results.length > 0) {
       const duplicates = { email: false, nickname: false };
@@ -56,20 +65,17 @@ router.post("/check_duplicate", async (req, res) => {
 router.post("/signup_process", async (req, res) => {
   const { email, password, nickname } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
+  const query = [
+    `INSERT INTO localuser(email, password, nickname) VALUES(?,?,?)`,
+    `SELECT user_id FROM localuser WHERE email=?`,
+    'INSERT INTO voca_folder(user_id,folder_name,parent_id) VALUES(?,"Home",0)',
+  ];
+  const target = [[email, hashedPassword, nickname], [email]];
   try {
-    await db.query(
-      `INSERT INTO localuser(email, password, nickname) VALUES(?,?,?)`,
-      [email, hashedPassword, nickname]
-    );
+    await db.query(query[0], target[0]);
 
-    const [result] = await db.query(
-      `SELECT user_id FROM localuser WHERE email=?`,
-      [email]
-    );
-    await db.query(
-      'INSERT INTO voca_folder(user_id,folder_name,parent_id) VALUES(?,"Home",0)',
-      [result[0].user_id]
-    );
+    const [result] = await db.query(query[1], target[1]);
+    await db.query(query[2], [result[0].user_id]);
 
     req.login({ email, password, nickname }, (err) => {
       if (err) {
@@ -93,10 +99,15 @@ router.post(
   })
 );
 
-router.get("/login_process", (req, res) => {
+router.get("/login_process", async (req, res) => {
   const fmsg = req.flash();
   const feedback = fmsg.error ? fmsg.error[0] : "";
-  res.json({ feedback });
+  try {
+    res.json({ feedback });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal server error");
+  }
 });
 module.exports = router;
 

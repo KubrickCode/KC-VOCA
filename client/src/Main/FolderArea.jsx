@@ -90,7 +90,7 @@ const FolderArea = () => {
     };
 
     fetchFolders();
-  }, [state.snackBar.folderState]);
+  }, [state.folderState]);
 
   const buildTree = useCallback(
     (folderData, parent_id) => {
