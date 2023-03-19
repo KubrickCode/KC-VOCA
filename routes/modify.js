@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const bodyParser = require("body-parser");
-const myModule = require("../lib/myModule");
 const mysql = require("mysql2/promise");
 const bcrypt = require("bcrypt");
 const db = mysql.createPool(require("../lib/config").user);
@@ -10,19 +9,24 @@ router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 
 router.post("/rename_folder", async (req, res) => {
-  const post = req.body;
+  const { folder_id, formData } = req.body;
   try {
-    const result = await myModule.checkFolderName(
-      post.folder_id,
-      post.formData.value1
+    const parent = await db.query(
+      `SELECT parent_id from voca_folder WHERE folder_id=?`,
+      [folder_id]
+    );
+    const result = await db.query(
+      `SELECT folder_name from voca_folder WHERE parent_id=? AND folder_name=?
+    `,
+      [parent[0][0].parent_id, formData.value1]
     );
 
-    if (post.folder_id === "1") {
+    if (folder_id === "1") {
       res.send(["Home 폴더명은 변경하실 수 없습니다", "error", "folder"]);
-    } else if (result) {
+    } else if (!Boolean(result[0][0])) {
       await db.query(`UPDATE voca_folder SET folder_name=? WHERE folder_id=?`, [
-        post.formData.value1,
-        post.folder_id,
+        formData.value1,
+        folder_id,
       ]);
       res.send(["폴더명이 변경되었습니다", "success", "folder"]);
     } else {
@@ -39,17 +43,17 @@ router.post("/rename_folder", async (req, res) => {
 });
 
 router.post("/rename_file", async (req, res) => {
-  const post = req.body;
+  const { folder_id, formData, file_id } = req.body;
   try {
-    const result = await myModule.checkFileName(
-      post.folder_id,
-      post.formData.value1
+    const result = await db.query(
+      `SELECT file_name from voca_file WHERE folder_id=? AND file_name=?`,
+      [folder_id, formData.value1]
     );
 
-    if (result) {
+    if (!Boolean(result[0][0])) {
       await db.query(`UPDATE voca_file SET file_name=? WHERE file_id=?`, [
-        post.formData.value1,
-        post.file_id,
+        formData.value1,
+        file_id,
       ]);
       res.send(["단어장명이 변경되었습니다", "success", "file"]);
     } else {
