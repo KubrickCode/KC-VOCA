@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { useAxios } from "../Module";
 import { GlobalContext } from "../Context";
 import {
@@ -10,6 +10,11 @@ import {
   Grid,
   Typography,
   Alert,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
@@ -35,6 +40,7 @@ const Copyright = (props) => {
 
 const SignIn = () => {
   const [errmsg, setErrMsg] = useState("");
+  const [open, setOpen] = useState(false);
   const { url, setLoad } = useContext(GlobalContext);
 
   useEffect(() => {
@@ -126,7 +132,13 @@ const SignIn = () => {
         </Button>
         <Grid container justifyContent="flex-end" sx={{ marginTop: "10px" }}>
           <Grid item>
-            <Link href="#" variant="body2">
+            <Link
+              href="#"
+              variant="body2"
+              onClick={() => {
+                setOpen(true);
+              }}
+            >
               비밀번호 찾기
             </Link>
           </Grid>
@@ -134,8 +146,75 @@ const SignIn = () => {
 
         <Copyright sx={{ mt: 5 }} />
       </Box>
+      <FormDialog open={open} setOpen={setOpen} url={url} setLoad={setLoad} />
     </>
   );
+};
+
+const FormDialog = ({ open, setOpen, url, setLoad }) => {
+  const emailRef = useRef();
+  const [emailState, setEmailState] = useState({
+    open: false,
+    type: "warning",
+    text: "abc",
+  });
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const submitForm = () => {
+    const fetchData = async () => {
+      const data = await useAxios(
+        "post",
+        `${url}/getdata/find_password`,
+        { email: emailRef.current.value },
+        setLoad
+      );
+      const newState = {
+        ...emailState,
+        open: true,
+        type: data ? "success" : "warning",
+        text: data ? "이메일이 전송되었습니다." : "존재하지 않는 이메일입니다.",
+      };
+
+      setEmailState(newState);
+    };
+
+    fetchData();
+  };
+
+  return (
+    <div>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>비밀번호 찾기</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            입력하신 이메일로 임시 비밀번호가 전송됩니다.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="이메일 주소"
+            type="email"
+            fullWidth
+            variant="standard"
+            inputRef={emailRef}
+          />
+          {emailState.open && (
+            <EmailAlert type={emailState.type} text={emailState.text} />
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>닫기</Button>
+          <Button onClick={submitForm}>확인</Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
+};
+
+const EmailAlert = ({ type, text }) => {
+  return <Alert severity={type}>{text}</Alert>;
 };
 
 export default SignIn;

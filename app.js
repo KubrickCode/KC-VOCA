@@ -15,7 +15,7 @@ app.use(flash());
 
 require("dotenv").config();
 
-const link = process.env.CORS_LINK;
+const link = process.env.REDIRECT_ROOT;
 
 const cors = require("cors");
 app.use(

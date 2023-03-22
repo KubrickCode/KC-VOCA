@@ -5,6 +5,7 @@ const mysql = require("mysql2/promise");
 const db = mysql.createPool(require("../lib/config").user);
 const AWS = require("aws-sdk");
 const aws_info = require("../lib/config").aws;
+const bcrypt = require("bcrypt");
 
 const Polly = new AWS.Polly({
   accessKeyId: aws_info.accessKeyId,
@@ -12,6 +13,14 @@ const Polly = new AWS.Polly({
   signatureVersion: aws_info.signatureVersion,
   region: aws_info.region,
 });
+
+const SES_CONFIG = {
+  accessKeyId: aws_info.accessKeyId,
+  secretAccessKey: aws_info.secretAccessKey,
+  region: aws_info.k_region,
+};
+
+const AWS_SES = new AWS.SES(SES_CONFIG);
 
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
@@ -154,6 +163,49 @@ router.post("/search", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).send("Internal server error");
+  }
+});
+
+router.post("/find_password", async (req, res) => {
+  const { email } = req.body;
+  const query = [
+    "SELECT email FROM localuser WHERE email=?",
+    "UPDATE localuser SET password=? WHERE email=?",
+  ];
+  try {
+    const isExist = await db.query(query[0], [email]);
+    if (Boolean(isExist[0][0].email)) {
+      const newPassword = Math.random().toString(36).slice(2);
+      const hash = await bcrypt.hash(newPassword, 10);
+      await db.query(query[1], [hash, email]);
+      let params = {
+        Source: "kcvoca2023@gmail.com",
+        Destination: {
+          ToAddresses: [email],
+        },
+        ReplyToAddresses: [],
+        Message: {
+          Body: {
+            Html: {
+              Charset: "UTF-8",
+              Data: `
+            새로 발급된 임시비밀번호 : ' ${newPassword} '
+            로그인 후 비밀번호를 꼭 변경해주세요.
+            `,
+            },
+          },
+          Subject: {
+            Charset: "UTF-8",
+            Data: `kcvoca에서의 새 비밀번호를 확인해 주세요`,
+          },
+        },
+      };
+      AWS_SES.sendEmail(params).promise();
+      res.send(true);
+    }
+  } catch (err) {
+    console.error(err);
+    res.send(false);
   }
 });
 

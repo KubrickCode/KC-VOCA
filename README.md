@@ -53,9 +53,6 @@ GOOGLE_SECRET = 구글 로그인 API 암호
 GOOGLE_CALLBACK = http://localhost:3000/api/signpage/google/callback (배포 시에는 내 도메인/api/signpage/google/callback)
 KAKAO_ID = 카카오 로그인 API ID
 KAKAO_CALLBACK = http://localhost:3000/api/signpage/kakao/callback (배포 시에는 내 도메인/api/signpage/kakao/callback)
-MAIL = 메일서비스에서 이용하는 내 메일
-MAILPWD = 메일서비스 암호
-CORS_LINK = http://localhost:5173
 REDIRECT_ROOT = http://localhost:5173 (배포 시에는 /)
 ```
 
