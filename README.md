@@ -16,6 +16,7 @@ KC VOCA APP
 3. [프로젝트 참여](#프로젝트-참여)
 4. [저작권](#저작권)
 5. [연락 정보](#연락-정보)
+6. [폴더 트리](#폴더-트리)
 
 ## 시작하기
 
@@ -93,3 +94,73 @@ MIT 라이선스에 따라 배포됩니다. 자세한 내용은 '라이센스'�
 kubrick code - kubrickcode@gmail.com
 
 Project Link: https://github.com/kubrickcode/KC-VOCA
+
+## 폴더 트리
+
+```
+kcvoca
+├─ .vscode
+│  └─ settings.json
+├─ app.js
+├─ client
+│  ├─ .gitignore
+│  ├─ index.html
+│  ├─ package-lock.json
+│  ├─ package.json
+│  ├─ public
+│  │  ├─ google.png
+│  │  ├─ kakao.png
+│  │  ├─ kcvoca_logo.png
+│  │  └─ vite.svg
+│  ├─ src
+│  │  ├─ App.jsx
+│  │  ├─ assets
+│  │  │  └─ react.svg
+│  │  ├─ Context.jsx
+│  │  ├─ CustomHook.jsx
+│  │  ├─ index.jsx
+│  │  ├─ Logoff
+│  │  │  ├─ Sign.jsx
+│  │  │  ├─ Signin.jsx
+│  │  │  └─ Signup.jsx
+│  │  ├─ Main
+│  │  │  ├─ Content.jsx
+│  │  │  ├─ Dialog
+│  │  │  │  ├─ CheckDialog.jsx
+│  │  │  │  ├─ FileDial.jsx
+│  │  │  │  ├─ MoveDialog.jsx
+│  │  │  │  ├─ MySnackbar.jsx
+│  │  │  │  ├─ PostDialog.jsx
+│  │  │  │  ├─ SetDialog.jsx
+│  │  │  │  ├─ SpeedDial.jsx
+│  │  │  │  └─ workspace.code-workspace
+│  │  │  ├─ FileArea.jsx
+│  │  │  ├─ FolderArea.jsx
+│  │  │  ├─ SearchPage.jsx
+│  │  │  ├─ SharePage.jsx
+│  │  │  └─ VocaLoad.jsx
+│  │  ├─ Module.jsx
+│  │  ├─ Reducer.jsx
+│  │  └─ Style
+│  │     └─ MUIStyle.jsx
+│  └─ vite.config.js
+├─ lib
+│  ├─ config.js
+│  ├─ module.js
+│  └─ passport.js
+├─ LICENSE
+├─ package-lock.json
+├─ package.json
+├─ privacy_policy.html
+├─ public
+│  ├─ images
+│  ├─ javascripts
+│  └─ stylesheets
+│     └─ style.css
+├─ README.md
+├─ views
+│  ├─ error.jade
+│  └─ index.jade
+└─ www
+
+```

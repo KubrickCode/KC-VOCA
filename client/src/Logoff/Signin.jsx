@@ -173,7 +173,9 @@ const FormDialog = ({ open, setOpen, url, setLoad }) => {
         ...emailState,
         open: true,
         type: data ? "success" : "warning",
-        text: data ? "이메일이 전송되었습니다." : "존재하지 않는 이메일입니다.",
+        text: data
+          ? "이메일이 전송되었습니다."
+          : "존재하지 않는 이메일 입니다.",
       };
 
       setEmailState(newState);
