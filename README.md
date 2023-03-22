@@ -1,4 +1,5 @@
 # KC-VOCA
+
 KC VOCA APP
 
 이 프로젝트는 사용자들이 외국어 단어나 표현(혹은 외우고 싶은 어떠한 것)을 배우고 연습하는 것을 돕는 웹 애플리케이션인 어휘 프로젝트 입니다. 이 프로젝트는 프론트 엔드에 React, 개발 환경에 Vite, 백엔드 서버에 Express, 데이터베이스로 MySQL을 사용합니다.
@@ -6,12 +7,11 @@ KC VOCA APP
 회원 인증 구현으로는 passport-local, passport-google-oauth2, passport-kakao 를 사용하여, 로컬회원, 구글로그인, 카카오로그인 등을 구현하였습니다.
 그리고 AWS의 IAM 자격증명으로 API를 사용하여, AWS Polly로 TTS 서비스를 구현하고, AWS SES를 통해 메일 서비스를 구현하였습니다.
 
-
 ## 컨텐츠 목록
 
 1. [시작하기](#시작하기)
-    - [필수요건](#필수요건)
-    - [설치](#설치)
+   - [필수요건](#필수요건)
+   - [설치](#설치)
 2. [사용법](#사용법)
 3. [프로젝트 참여](#프로젝트-참여)
 4. [저작권](#저작권)
@@ -34,7 +34,8 @@ KC VOCA APP
 3. 프로젝트 폴더에서 npm install, 그리고 client 폴더에서 npm install을 각각 실행하여 종속성 설치.
 
 4. 프로젝트의 루트 디렉터리에 .env 파일을 생성하고 환경 변수를 구성하세요. 다음 형식을 참조로 사용합니다
-```
+
+```ini
 DB_host = 데이터베이스 엔드포인트
 DB_user = 데이터베이스 유저
 DB_password = 데이터베이스 비밀번호
@@ -57,10 +58,13 @@ MAILPWD = 메일서비스 암호
 CORS_LINK = http://localhost:5173
 REDIRECT_ROOT = http://localhost:5173 (배포 시에는 /)
 ```
+
 client 폴더 내에도 .env 파일을 생성하고 다음과 같이 작성합니다
-```
+
+```ini
 VITE_SERVER_HOST = http://localhost:3000/api (배포 시에는 /api)
 ```
+
 5. npm run dev 시, localhost:3000에 백엔드 서버, localhost:5173에 클라이언트 서버가 동시에 실행됩니다.
 
 ## 사용법

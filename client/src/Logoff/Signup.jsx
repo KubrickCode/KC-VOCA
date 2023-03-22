@@ -1,15 +1,12 @@
 import * as React from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import Alert from "@mui/material/Alert";
@@ -32,8 +29,6 @@ const Copyright = (props) => {
     </Typography>
   );
 };
-
-const theme = createTheme();
 
 const SignUp = () => {
   const [btnState, setBtnState] = useState(true);
@@ -94,11 +89,11 @@ const SignUp = () => {
   };
 
   useEffect(() => {
-    const formEmail = RegExp(
-      /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/
+    const formEmail = RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
+    const formPwd = RegExp(
+      /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,18}$/
     );
-    const formPwd = RegExp(/^[a-zA-Z0-9]{6,18}$/);
-    const formNick = RegExp(/^(?=.*[a-zA-Z0-9가-힣])[a-zA-Z0-9가-힣]{2,10}$/);
+    const formNick = RegExp(/^[a-zA-Z0-9가-힣]{2,10}$/);
 
     setFormErrors({
       ...formErrors,
@@ -144,124 +139,98 @@ const SignUp = () => {
   }, [formData, formErrors, setBtnState]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <Container
-        component="main"
-        maxWidth="xs"
-        sx={{ backgroundColor: "white", borderRadius: "10px" }}
+    <>
+      <Avatar sx={{ m: 3, bgcolor: "secondary.main" }}>
+        <LockOutlinedIcon />
+      </Avatar>
+      <Typography component="h1" variant="h5">
+        회원가입
+      </Typography>
+
+      <Box
+        component="form"
+        noValidate
+        onSubmit={handleSubmit}
+        sx={{ mt: 3 }}
+        action={`${url}/signpage/signup_process`}
+        method="post"
+        onChange={handleChange}
       >
-        <CssBaseline />
-        <Box
-          sx={{
-            marginTop: 8,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            padding: "20px",
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            회원가입
-          </Typography>
-
-          <Box
-            component="form"
-            noValidate
-            onSubmit={handleSubmit}
-            sx={{ mt: 3 }}
-            action={`${url}/signpage/signup_process`}
-            method="post"
-            onChange={handleChange}
-          >
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                {errMsg && <Alert severity="warning">{errMsg}</Alert>}
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  id="email"
-                  label="이메일 주소"
-                  name="email"
-                  autoComplete="email"
-                  autoFocus
-                  error={formErrors.emailError && true}
-                  helperText={formErrors.emailMsg}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="password"
-                  label="비밀번호(6~18자)"
-                  type="password"
-                  id="password"
-                  autoComplete="new-password"
-                  error={formErrors.pwdError && true}
-                  helperText={formErrors.pwdMsg}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="password2"
-                  label="비밀번호 확인"
-                  type="password"
-                  id="password2"
-                  autoComplete="new-password"
-                  error={formErrors.pwdError2 && true}
-                  helperText={formErrors.pwdMsg2}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  autoComplete="given-name"
-                  name="nickname"
-                  required
-                  fullWidth
-                  id="nickname"
-                  label="닉네임(2~10자)"
-                  error={formErrors.nickError && true}
-                  helperText={formErrors.nickMsg}
-                />
-              </Grid>
-            </Grid>
-            <Grid container justifyContent="flex-end">
-              <Grid item>
-                <Link href="/api/policy" variant="body2">
-                  개인정보처리방침
-                </Link>
-              </Grid>
-            </Grid>
-
-            <Button
-              type="submit"
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            {errMsg && <Alert severity="warning">{errMsg}</Alert>}
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              required
               fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-              disabled={btnState}
-            >
-              회원가입
-            </Button>
+              id="email"
+              label="이메일 주소"
+              name="email"
+              autoComplete="email"
+              error={formErrors.emailError && true}
+              helperText={formErrors.emailMsg}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              required
+              fullWidth
+              name="password"
+              label="비밀번호(6~18자 영문+숫자+특수문자)"
+              type="password"
+              id="password"
+              autoComplete="new-password"
+              error={formErrors.pwdError && true}
+              helperText={formErrors.pwdMsg}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              required
+              fullWidth
+              name="password2"
+              label="비밀번호 확인"
+              type="password"
+              id="password2"
+              autoComplete="new-password"
+              error={formErrors.pwdError2 && true}
+              helperText={formErrors.pwdMsg2}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              autoComplete="given-name"
+              name="nickname"
+              required
+              fullWidth
+              id="nickname"
+              label="닉네임(2~10자 한글,영문,숫자 가능)"
+              error={formErrors.nickError && true}
+              helperText={formErrors.nickMsg}
+            />
+          </Grid>
+        </Grid>
+        <Grid container justifyContent="flex-end" sx={{ marginTop: "10px" }}>
+          <Grid item>
+            <Link href="/api/policy" variant="body2">
+              개인정보처리방침
+            </Link>
+          </Grid>
+        </Grid>
 
-            <Grid container justifyContent="flex-end">
-              <Grid item>
-                <Link href="/" variant="body2">
-                  이미 계정이 있으신가요? 로그인 하러 가기
-                </Link>
-              </Grid>
-            </Grid>
-          </Box>
-        </Box>
-        <Copyright sx={{ mt: 5 }} />
-      </Container>
-    </ThemeProvider>
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          sx={{ mt: 3, mb: 2 }}
+          disabled={btnState}
+        >
+          회원가입
+        </Button>
+      </Box>
+      <Copyright sx={{ mt: 5 }} />
+    </>
   );
 };
 
