@@ -8,7 +8,6 @@ import DialogContent from "@mui/material/DialogContent";
 import Button from "@mui/material/Button";
 import { useHandleOpen } from "./../../CustomHook";
 import { useAxios } from "../../Module";
-import { useNavigate } from "react-router-dom";
 
 const PostDialog = () => {
   const { state, dispatch } = useContext(MainContext);
@@ -22,7 +21,6 @@ const PostDialog = () => {
     exam_mean: "",
   });
   const [submitBtn, setSubmitBtn] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     setFormData({
@@ -39,16 +37,21 @@ const PostDialog = () => {
   useEffect(() => {
     const { content, title } = state.postDialog;
     const { value1, value2, voca } = formData;
+    const formPwd = RegExp(
+      /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,18}$/
+    );
+    const formNick = RegExp(/^[a-zA-Z0-9가-힣]{2,10}$/);
 
     if (content === "basic") {
       let isValid;
       switch (title) {
         case "비밀번호 변경":
-          isValid = value1.length > 5 && value2.length > 5;
+          isValid =
+            value1.length > 5 && value2.length > 5 && formPwd.test(value2);
           setSubmitBtn(!isValid);
           break;
         case "닉네임 변경":
-          isValid = value1.length > 1;
+          isValid = value1.length > 1 && formNick.test(value1);
           setSubmitBtn(!isValid);
           break;
         default:
@@ -117,7 +120,9 @@ const PostDialog = () => {
               ? "password"
               : "text"
           }
-          label={state.postDialog.label}
+          label={
+            pwdState ? "기존 " + state.postDialog.label : state.postDialog.label
+          }
           fullWidth
           variant="standard"
           onChange={(e) => {
@@ -130,7 +135,9 @@ const PostDialog = () => {
             margin="dense"
             id="name2"
             type="password"
-            label={"새 " + state.postDialog.label}
+            label={
+              "새 " + state.postDialog.label + "(6~18자 영문+숫자+특수문자)"
+            }
             fullWidth
             variant="standard"
             onChange={(e) => {
