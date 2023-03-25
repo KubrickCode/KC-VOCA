@@ -38,7 +38,6 @@ const App = () => {
     return savedTheme || "light";
   });
   const [load, setLoad] = useState(false);
-
   const url = import.meta.env.VITE_SERVER_HOST;
 
   useEffect(() => {

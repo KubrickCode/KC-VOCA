@@ -1,5 +1,4 @@
-import * as React from "react";
-import { useReducer, useState, useEffect, useContext } from "react";
+import { useReducer, useState, useEffect, useContext, useMemo } from "react";
 import { useTheme } from "@mui/material/styles";
 import { ThemeProvider } from "@mui/material/styles";
 import Drawer from "@mui/material/Drawer";
@@ -47,6 +46,33 @@ const PersistentDrawerLeft = () => {
   const [open, handleOpen, setOpen] = useHandleOpen(false, () => {
     setOpen(!open);
   });
+
+  const {
+    postDialog: { isOpen: isPostDialogOpen },
+    checkDialog: { isOpen: isCheckDialogOpen },
+    setDialog: { isOpen: isSetDialogOpen },
+    snackBarOpen,
+  } = state;
+
+  const renderSnack = useMemo(
+    () => snackBarOpen && <MySnackBar key="MySnackBar" />,
+    [snackBarOpen]
+  );
+
+  const renderPostDial = useMemo(
+    () => isPostDialogOpen && <PostDialog key="PostDialog" />,
+    [isPostDialogOpen]
+  );
+
+  const renderCheckDial = useMemo(
+    () => isCheckDialogOpen && <CheckDialog key="CheckDialog" />,
+    [isCheckDialogOpen]
+  );
+
+  const renderSetDial = useMemo(
+    () => isSetDialogOpen && <SetDialog key="SetDialog" />,
+    [isSetDialogOpen]
+  );
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -140,7 +166,7 @@ const PersistentDrawerLeft = () => {
           <ListItem disablePadding>
             <ListItemButton
               onClick={() => {
-                theme === "dark" ? setTheme("light") : setTheme("dark");
+                setTheme(theme === "dark" ? "light" : "dark");
               }}
             >
               <ListItemIcon>
@@ -172,11 +198,7 @@ const PersistentDrawerLeft = () => {
           </ListItem>
         </List>
       </Drawer>
-
-      <MySnackBar />
-      <PostDialog />
-      <CheckDialog />
-      <SetDialog />
+      {[renderPostDial, renderCheckDial, renderSnack, renderSetDial]}
     </MainContext.Provider>
   );
 };

@@ -7,14 +7,21 @@ import FolderArea from "./FolderArea";
 import { Item } from "../Style/MUIStyle";
 import MoveDial from "./Dialog/MoveDialog";
 import { GlobalContext } from "../Context";
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { MainContext } from "./../Context";
 
 const Content = () => {
   const { theme } = useContext(GlobalContext);
+  const { state } = useContext(MainContext);
   const isDark = theme === "dark";
   const matches = useMediaQuery("(max-width:768px)");
   const bgColor = { backgroundColor: isDark ? "hsl(0, 0%, 30%)" : "white" };
+
+  const renderMove = useMemo(
+    () => state.moveDialog.isOpen && <MoveDial />,
+    [state.moveDialog.isOpen]
+  );
 
   return (
     <>
@@ -41,7 +48,7 @@ const Content = () => {
         }}
       >
         <MySpeedDial />
-        <MoveDial />
+        {renderMove}
       </Box>
     </>
   );

@@ -25,9 +25,10 @@ const Sign = () => {
   const handleChange = (e, newValue) => {
     setValue(newValue);
   };
-  const renderForm = useMemo(() => {
-    return value === 0 ? <Signin /> : <Signup />;
-  }, [value]);
+  const renderForm = useMemo(
+    () => (value === 0 ? <Signin /> : <Signup />),
+    [value]
+  );
 
   return (
     <ThemeProvider theme={theme}>

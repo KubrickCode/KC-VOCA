@@ -72,7 +72,7 @@ app.get("/api/policy", (req, res) => {
   res.sendFile(__dirname + "/privacy_policy.html");
 });
 
-app.use("/api/", indexRouter);
+app.use("/", indexRouter);
 app.use("/api/signpage", signRouter);
 app.use("/api/getdata", getDataRouter);
 app.use("/api/create", createRouter);
