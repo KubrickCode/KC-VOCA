@@ -2,26 +2,53 @@ import { useEffect, useContext } from "react";
 import { MainContext, GlobalContext } from "../Context";
 import FileArea from "./FileArea";
 import Typography from "@mui/material/Typography";
+import { IconButton, Stack } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import HomeIcon from "@mui/icons-material/Home";
 
 const SharePage = () => {
   const { dispatch } = useContext(MainContext);
   const { theme } = useContext(GlobalContext);
+  const isDark = theme === "dark";
+  const textColor = { color: isDark && "lightgray" };
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch({ type: "setSelectedFolder", payload: "get_share_file" });
   }, []);
 
   return (
-    <>
-      <Typography
-        variant="h5"
-        mb={3}
-        sx={{ color: theme === "dark" && "lightgray" }}
-      >
-        공유마당
-      </Typography>
-      <FileArea />
-    </>
+    <div style={{ marginLeft: "20px", marginTop: "100px" }}>
+      <Stack direction="row" spacing={2} mb={2}>
+        <IconButton
+          sx={{
+            ...textColor,
+            border: "1px solid lightgray",
+            "&:hover": {
+              backgroundColor: isDark ? "hsl(0, 0%, 45%)" : "lightgray",
+            },
+          }}
+          onClick={() => {
+            navigate("/");
+            dispatch({
+              type: "setSelectedFolder",
+              payload: "get_recent_file",
+            });
+          }}
+        >
+          <HomeIcon />
+        </IconButton>
+        <Typography
+          variant="h5"
+          sx={{ color: theme === "dark" && "lightgray" }}
+          pt={1}
+        >
+          공유마당
+        </Typography>
+      </Stack>
+
+      <FileArea ml={2} />
+    </div>
   );
 };
 

@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import HomeIcon from "@mui/icons-material/Home";
@@ -11,17 +11,18 @@ import TableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
 import VolumeMuteIcon from "@mui/icons-material/VolumeMute";
 import { StyledTableRow } from "../Style/MUIStyle";
-import { GlobalContext } from "./../Context";
+import { GlobalContext, MainContext } from "./../Context";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useAxios } from "../Module";
-
 const SearchPage = () => {
   const location = useLocation();
   const [data, setData] = useState([]);
+  const { dispatch } = useContext(MainContext);
   const { theme, url, setLoad } = useContext(GlobalContext);
   const isDark = theme === "dark";
   const matches2 = useMediaQuery("(max-width:1092px)");
   const matches3 = useMediaQuery("(max-width:554px)");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -126,7 +127,11 @@ const SearchPage = () => {
             },
           }}
           onClick={() => {
-            window.location.href = "/";
+            navigate("/");
+            dispatch({
+              type: "setSelectedFolder",
+              payload: "get_recent_file",
+            });
           }}
         >
           <HomeIcon />

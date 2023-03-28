@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "server": "nodemon www",
-    "client": "cd client && npm run dev",
-    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\""
+    "client": "cd client && yarn run dev",
+    "dev": "concurrently --kill-others-on-fail \"yarn run server\" \"yarn run client\""
   },
   "dependencies": {
     "aws-sdk": "^2.1338.0",

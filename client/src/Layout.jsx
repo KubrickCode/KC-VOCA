@@ -11,7 +11,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { Stack } from "@mui/material";
+import { Link, Stack } from "@mui/material";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
@@ -107,9 +107,11 @@ const PersistentDrawerLeft = () => {
             <Typography
               variant="h6"
               noWrap
-              component="div"
-              onClick={() => (window.location.href = "/")}
               sx={{ cursor: "pointer" }}
+              component={Link}
+              href={"/"}
+              underline={"none"}
+              color={"inherit"}
             >
               KC VOCA
             </Typography>
@@ -156,7 +158,7 @@ const PersistentDrawerLeft = () => {
             </ListItemButton>
           </ListItem>
           <ListItem disablePadding>
-            <ListItemButton onClick={() => (window.location.href = "/share")}>
+            <ListItemButton onClick={() => navigate("/share")}>
               <ListItemIcon>
                 <ShareIcon />
               </ListItemIcon>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext, useMemo } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -41,6 +41,7 @@ const VocaLoad = () => {
   });
   const [share, setShare] = useState(false);
   const isDark = theme === "dark";
+  const navigate = useNavigate();
 
   const matches = useMediaQuery("(max-width:830px)");
   const matches2 = useMediaQuery("(max-width:1092px)");
@@ -140,7 +141,11 @@ const VocaLoad = () => {
               },
             }}
             onClick={() => {
-              window.location.href = "/";
+              navigate("/");
+              dispatch({
+                type: "setSelectedFolder",
+                payload: "get_recent_file",
+              });
             }}
           >
             <HomeIcon />

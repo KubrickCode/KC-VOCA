@@ -76,9 +76,9 @@ const SignIn = () => {
           margin="normal"
           required
           fullWidth
-          id="email"
-          label="이메일 주소"
           name="email"
+          label="이메일 주소"
+          type="email"
           autoComplete="email"
         />
         <TextField
@@ -88,7 +88,6 @@ const SignIn = () => {
           name="password"
           label="비밀번호"
           type="password"
-          id="password"
           autoComplete="current-password"
         />
         {errmsg && <Alert severity="warning">{errmsg}</Alert>}
@@ -103,7 +102,8 @@ const SignIn = () => {
         <Button
           fullWidth
           sx={{ boxShadow: 1, marginBottom: "10px" }}
-          onClick={() => (window.location.href = `${url}/signpage/google`)}
+          component={Link}
+          href={`${url}/signpage/google`}
         >
           <img height="20px" src={"google.png"} />
           <Typography
@@ -123,7 +123,8 @@ const SignIn = () => {
               backgroundColor: "	#EDD70F",
             },
           }}
-          onClick={() => (window.location.href = `${url}/signpage/kakao`)}
+          component={Link}
+          href={`${url}/signpage/kakao`}
         >
           <img height="20px" src={"kakao.png"} />
           <Typography color="black" sx={{ marginLeft: "10px" }}>
