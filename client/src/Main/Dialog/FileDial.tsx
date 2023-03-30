@@ -14,10 +14,14 @@ import DriveFileMoveIcon from "@mui/icons-material/DriveFileMove";
 import ShareIcon from "@mui/icons-material/Share";
 import DeleteIcon from "@mui/icons-material/Delete";
 import StarIcon from "@mui/icons-material/Star";
-import { useHandleOpen } from "./../../CustomHook";
 import { useNavigate } from "react-router-dom";
 
-const FileDial = (props) => {
+interface FileDialProps {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}
+
+const FileDial = ({ open, setOpen }: FileDialProps) => {
   const { state, dispatch } = useContext(MainContext);
   const { url } = useContext(GlobalContext);
   const navigate = useNavigate();
@@ -31,12 +35,8 @@ const FileDial = (props) => {
     text: "",
   });
 
-  const [open, , setOpen] = useHandleOpen(false, () => {
-    setOpen(props.open);
-  });
-
   useEffect(() => {
-    setOpen(props.open);
+    setOpen(open);
 
     setFavObject({
       ...favObject,
@@ -56,7 +56,7 @@ const FileDial = (props) => {
           ? "단어장을 다른 회원들과 공유하시겠습니까?"
           : "단어장을 공유 해제하시겠습니까?",
     });
-  }, [props.open]);
+  }, [open]);
 
   const newfileOptions = [
     {
@@ -72,7 +72,7 @@ const FileDial = (props) => {
       icon: <ChangeCircleIcon />,
       name: "단어장명 변경",
       click: () => {
-        props.handleOpen();
+        setOpen(!open);
         dispatch({
           type: "setPostDialog",
           payload: {
@@ -89,7 +89,7 @@ const FileDial = (props) => {
       icon: <DriveFileMoveIcon />,
       name: "단어장 이동",
       click: () => {
-        props.handleOpen();
+        setOpen(!open);
         dispatch({
           type: "setMoveDialog",
           payload: {
@@ -103,7 +103,7 @@ const FileDial = (props) => {
       icon: <StarIcon sx={{ color: favObject.color }} />,
       name: favObject.title,
       click: () => {
-        props.handleOpen();
+        setOpen(!open);
         dispatch({
           type: "setCheckDialog",
           payload: {
@@ -119,7 +119,7 @@ const FileDial = (props) => {
       icon: <ShareIcon />,
       name: shaObject.title,
       click: () => {
-        props.handleOpen();
+        setOpen(!open);
         dispatch({
           type: "setCheckDialog",
           payload: {
@@ -135,7 +135,7 @@ const FileDial = (props) => {
       icon: <DeleteIcon />,
       name: "단어장 삭제",
       click: () => {
-        props.handleOpen();
+        setOpen(!open);
         dispatch({
           type: "setCheckDialog",
           payload: {
@@ -151,7 +151,7 @@ const FileDial = (props) => {
 
   return (
     <>
-      <Dialog onClose={props.handleOpen} open={open}>
+      <Dialog onClose={() => setOpen(!open)} open={open}>
         <List sx={{ pt: 0 }}>
           {newfileOptions.map((option) => (
             <ListItem disableGutters key={option.name}>

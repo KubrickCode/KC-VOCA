@@ -8,16 +8,15 @@ import {
   DialogContentText,
   Button,
 } from "@mui/material";
-import { useHandleOpen } from "./../../CustomHook";
 import { useAxios } from "../../Module";
 
 const CheckDialog = () => {
   const { state, dispatch } = useContext(MainContext);
   const { setLoad } = useContext(GlobalContext);
 
-  const [, handleOpen] = useHandleOpen(false, () => {
+  const handleOpen = () => {
     dispatch({ type: "setCheckDialog", payload: { isOpen: false } });
-  });
+  };
 
   const submitForm = async () => {
     const data = await useAxios(
@@ -34,6 +33,14 @@ const CheckDialog = () => {
     );
 
     const stateType = data[2] + "State";
+    let payload;
+    if (data[2] === "folder") {
+      payload = state.folderState + 1;
+    } else if (data[2] === "file") {
+      payload = state.fileState + 1;
+    } else {
+      payload = state.dataState + 1;
+    }
 
     dispatch({
       type: "setSnackBar",
@@ -44,7 +51,7 @@ const CheckDialog = () => {
     });
     dispatch({
       type: stateType,
-      payload: state[stateType] + 1,
+      payload,
     });
     dispatch({
       type: "setSnackBarOpen",
@@ -56,7 +63,6 @@ const CheckDialog = () => {
         payload: data[3],
       });
     }
-
     handleOpen();
   };
 

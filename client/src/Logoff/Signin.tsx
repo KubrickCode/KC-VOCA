@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { useAxios } from "../Module";
 import { GlobalContext } from "../Context";
 import {
@@ -10,6 +10,7 @@ import {
   Grid,
   Typography,
   Alert,
+  AlertColor,
   Dialog,
   DialogActions,
   DialogContent,
@@ -19,14 +20,13 @@ import {
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 import "@fontsource/roboto/500.css";
-
-const Copyright = (props) => {
+const Copyright = () => {
   return (
     <Typography
       variant="body2"
       color="text.secondary"
       align="center"
-      {...props}
+      sx={{ mt: 5 }}
     >
       {"Copyright © "}
       <Link color="inherit" href="/">
@@ -40,7 +40,7 @@ const Copyright = (props) => {
 
 const SignIn = () => {
   const [errmsg, setErrMsg] = useState("");
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<boolean>(false);
   const { url, setLoad } = useContext(GlobalContext);
 
   useEffect(() => {
@@ -145,19 +145,26 @@ const SignIn = () => {
           </Grid>
         </Grid>
 
-        <Copyright sx={{ mt: 5 }} />
+        <Copyright />
       </Box>
       <FormDialog open={open} setOpen={setOpen} url={url} setLoad={setLoad} />
     </>
   );
 };
 
-const FormDialog = ({ open, setOpen, url, setLoad }) => {
-  const emailRef = useRef();
+interface FormDialogProps {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  url: string;
+  setLoad: (load: boolean) => void;
+}
+
+const FormDialog = ({ open, setOpen, url, setLoad }: FormDialogProps) => {
+  const emailRef = useRef<HTMLInputElement>();
   const [emailState, setEmailState] = useState({
     open: false,
-    type: "warning",
-    text: "abc",
+    type: "warning" as AlertColor,
+    text: "",
   });
   const handleClose = () => {
     setOpen(false);
@@ -167,13 +174,13 @@ const FormDialog = ({ open, setOpen, url, setLoad }) => {
       const data = await useAxios(
         "post",
         `${url}/getdata/find_password`,
-        { email: emailRef.current.value },
+        { email: emailRef.current!.value },
         setLoad
       );
       const newState = {
         ...emailState,
         open: true,
-        type: data ? "success" : "warning",
+        type: data ? "success" : ("warning" as AlertColor),
         text: data
           ? "이메일이 전송되었습니다."
           : "존재하지 않는 이메일 입니다.",
@@ -216,7 +223,12 @@ const FormDialog = ({ open, setOpen, url, setLoad }) => {
   );
 };
 
-const EmailAlert = ({ type, text }) => {
+interface EmailAlertProps {
+  type: AlertColor;
+  text: string;
+}
+
+const EmailAlert = ({ type, text }: EmailAlertProps) => {
   return <Alert severity={type}>{text}</Alert>;
 };
 

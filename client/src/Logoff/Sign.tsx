@@ -7,7 +7,12 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import { useState, useMemo } from "react";
 
-const CenteredTabs = ({ value, handleChange }) => {
+interface CenteredTabsProps {
+  value: number;
+  handleChange: (e: any, newvalue: number) => void;
+}
+
+const CenteredTabs = ({ value, handleChange }: CenteredTabsProps) => {
   return (
     <Box sx={{ width: "100%", bgcolor: "background.paper" }}>
       <Tabs value={value} onChange={handleChange} variant="fullWidth">
@@ -22,7 +27,7 @@ const theme = createTheme();
 
 const Sign = () => {
   const [value, setValue] = useState(0);
-  const handleChange = (e, newValue) => {
+  const handleChange = (e: any, newValue: number) => {
     setValue(newValue);
   };
   const renderForm = useMemo(

@@ -1,16 +1,24 @@
 import axios from "axios";
 
-export const useAxios = async (
+type UseAxiosFunc = (
+  method: string,
+  url: string,
+  data?: object | null,
+  setLoad?: (a: boolean) => void,
+  resType?: object
+) => Promise<any>;
+
+export const useAxios: UseAxiosFunc = async (
   method,
   url,
-  data = null,
-  setLoad = null,
-  resType = null
+  data,
+  setLoad,
+  resType
 ) => {
   try {
     setLoad && setLoad(true);
 
-    let res;
+    let res: { data: {} };
     if (method === "get") {
       res = await axios.get(url, { withCredentials: true });
     } else {

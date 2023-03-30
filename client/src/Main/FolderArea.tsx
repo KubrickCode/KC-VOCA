@@ -1,5 +1,4 @@
 import { useEffect, useContext, useState, useCallback } from "react";
-import PropTypes from "prop-types";
 import FolderIcon from "@mui/icons-material/Folder";
 import TreeView from "@mui/lab/TreeView";
 import Box from "@mui/material/Box";
@@ -11,13 +10,28 @@ import StarIcon from "@mui/icons-material/Star";
 import { MainContext, GlobalContext } from "../Context";
 import { StyledTreeItemRoot } from "../Style/MUIStyle";
 import { useAxios } from "../Module";
+import { TreeItemProps } from "@mui/lab/TreeItem";
 
-const StyledTreeItem = (props) => {
+interface StyledTreeItemProps extends Omit<TreeItemProps, "onClick"> {
+  bgColor?: string;
+  color?: string;
+  key?: number;
+  nodeId: string;
+  labelInfo?: string;
+  labelText: string;
+  labelIcon: React.ElementType;
+  onClick: React.MouseEventHandler<HTMLLIElement> &
+    ((folder_id: number) => void);
+  children?: React.ReactNode;
+  sx?: object;
+}
+
+const StyledTreeItem = (props: StyledTreeItemProps) => {
   const { theme } = useContext(GlobalContext);
   const { state } = useContext(MainContext);
   const {
     bgColor,
-    color,
+    color = "inherit",
     labelIcon: LabelIcon,
     labelInfo,
     labelText,
@@ -34,9 +48,9 @@ const StyledTreeItem = (props) => {
             p: 0.5,
             pr: 0,
             color:
-              theme === "dark" &&
-              state.moveDialog.isOpen === false &&
-              "lightgray",
+              theme === "dark" && state.moveDialog.isOpen === false
+                ? "lightgray"
+                : "inherit",
           }}
         >
           <Box component={LabelIcon} color="inherit" sx={{ mr: 1 }} />
@@ -64,16 +78,14 @@ const StyledTreeItem = (props) => {
   );
 };
 
-StyledTreeItem.propTypes = {
-  bgColor: PropTypes.string,
-  color: PropTypes.string,
-  labelIcon: PropTypes.elementType.isRequired,
-  labelInfo: PropTypes.string,
-  labelText: PropTypes.string.isRequired,
-};
+interface Folder {
+  folder_id: number;
+  folder_name: string;
+  parent_id: number;
+}
 
 const FolderArea = () => {
-  const [folderData, setFolderData] = useState([]);
+  const [folderData, setFolderData] = useState<Folder[]>([]);
 
   const { state, dispatch } = useContext(MainContext);
   const { url, setLoad } = useContext(GlobalContext);
@@ -93,9 +105,9 @@ const FolderArea = () => {
   }, [state.folderState]);
 
   const buildTree = useCallback(
-    (folderData, parent_id) => {
-      let tree = [];
-      const clickFolder = (id) => {
+    (folderData: Folder[], parent_id: number) => {
+      let tree: React.ReactNode[] = [];
+      const clickFolder = (id: number) => {
         if (!state.moveDialog.isOpen) {
           dispatch({
             type: "setSelectedFolder",
@@ -111,7 +123,7 @@ const FolderArea = () => {
       folderData.forEach((folder) => {
         if (
           folder.parent_id === parent_id ||
-          (parent_id === "0" && !folder.parent_id)
+          (parent_id === 0 && !folder.parent_id)
         ) {
           const children = buildTree(folderData, folder.folder_id);
           const node = (
@@ -123,9 +135,8 @@ const FolderArea = () => {
               onClick={() => {
                 clickFolder(folder.folder_id);
               }}
-            >
-              {children}
-            </StyledTreeItem>
+              children={children}
+            />
           );
           tree.push(node);
         }
@@ -169,7 +180,7 @@ const FolderArea = () => {
         }}
         sx={folderDisplay}
       />
-      {buildTree(folderData, "0")}
+      {buildTree(folderData, 0)}
     </TreeView>
   );
 };

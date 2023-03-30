@@ -1,4 +1,3 @@
-import * as React from "react";
 import SpeedDial from "@mui/material/SpeedDial";
 import SpeedDialIcon from "@mui/material/SpeedDialIcon";
 import SpeedDialAction from "@mui/material/SpeedDialAction";
@@ -7,17 +6,15 @@ import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
 import DriveFileMoveIcon from "@mui/icons-material/DriveFileMove";
-import { useContext, useMemo } from "react";
+import { useContext, useMemo, useState } from "react";
 import { MainContext, GlobalContext } from "../../Context";
-import { useHandleOpen } from "./../../CustomHook";
 
 const SpeedDialComp = () => {
   const { state, dispatch } = useContext(MainContext);
   const { url } = useContext(GlobalContext);
+  const [open, setOpen] = useState(false);
 
-  const [open, handleOpen, setOpen] = useHandleOpen(false, () => {
-    setOpen(!open);
-  });
+  const handleOpen = () => setOpen(!open);
 
   const speedDialActions = useMemo(() => {
     return [

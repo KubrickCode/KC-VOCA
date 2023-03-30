@@ -11,9 +11,10 @@ import TableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
 import VolumeMuteIcon from "@mui/icons-material/VolumeMute";
 import { StyledTableRow } from "../Style/MUIStyle";
-import { GlobalContext, MainContext } from "./../Context";
+import { GlobalContext, MainContext } from "../Context";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useAxios } from "../Module";
+
 const SearchPage = () => {
   const location = useLocation();
   const [data, setData] = useState([]);
@@ -40,7 +41,7 @@ const SearchPage = () => {
     fetchData();
   }, [location.state.value]);
 
-  const onListen = async (text) => {
+  const onListen = async (text: string) => {
     const data = await useAxios(
       "post",
       `${url}/getdata/tts`,
@@ -61,10 +62,15 @@ const SearchPage = () => {
     });
   };
 
-  const bgColor = { backgroundColor: isDark && "hsl(0, 0%, 30%)" };
-  const textColor = { color: isDark && "lightgray" };
+  const bgColor = { backgroundColor: isDark ? "hsl(0, 0%, 30%)" : "inherit" };
+  const textColor = { color: isDark ? "lightgray" : "inherit" };
 
-  const MyTableRow = ({ title, label }) => {
+  interface MyTableRowProps {
+    title: string;
+    label: string;
+  }
+
+  const MyTableRow = ({ title, label }: MyTableRowProps) => {
     const width = matches3 ? "35%" : matches2 ? "20%" : "10%";
 
     return (
@@ -115,6 +121,14 @@ const SearchPage = () => {
     );
   };
 
+  interface dataItem {
+    data_id: number;
+    voca: string;
+    voca_mean: string;
+    exam: string;
+    exam_mean: string;
+  }
+
   return (
     <>
       <Stack direction="row" spacing={2} mb={2} mt={10}>
@@ -140,7 +154,7 @@ const SearchPage = () => {
           검색 키워드 : {location.state.value}
         </Typography>
       </Stack>
-      {data.map((item) => {
+      {data.map((item: dataItem) => {
         return (
           <TableContainer
             component={Paper}

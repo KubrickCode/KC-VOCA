@@ -12,13 +12,13 @@ import axios from "axios";
 import Alert from "@mui/material/Alert";
 import { GlobalContext } from "../Context";
 
-const Copyright = (props) => {
+const Copyright = () => {
   return (
     <Typography
       variant="body2"
       color="text.secondary"
       align="center"
-      {...props}
+      sx={{ mt: 5 }}
     >
       {"Copyright © "}
       <Link color="inherit" href="/">
@@ -31,12 +31,12 @@ const Copyright = (props) => {
 };
 
 const SignUp = () => {
-  const emailInput = useRef();
-  const passwordInput = useRef();
-  const password2Input = useRef();
-  const nicknameInput = useRef();
+  const emailInput = useRef<HTMLInputElement>();
+  const passwordInput = useRef<HTMLInputElement>();
+  const password2Input = useRef<HTMLInputElement>();
+  const nicknameInput = useRef<HTMLInputElement>();
   const [btnState, setBtnState] = useState(true);
-  const [formField, setFormField] = useState();
+  const [formField, setFormField] = useState(true);
   const { url, setLoad } = useContext(GlobalContext);
 
   const [formErrors, setFormErrors] = useState({
@@ -52,7 +52,7 @@ const SignUp = () => {
 
   const [errMsg, setErrMsg] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
     const form = e.target;
     const email = form.email.value;
     const nickname = form.nickname.value;
@@ -66,7 +66,7 @@ const SignUp = () => {
         nickname,
       });
       form.submit();
-    } catch (error) {
+    } catch (error: any) {
       const duplicates = error.response.data.duplicates;
       setErrMsg(
         duplicates.email
@@ -86,10 +86,10 @@ const SignUp = () => {
     );
     const regNickname = RegExp(/^[a-zA-Z0-9가-힣]{2,10}$/);
 
-    const email = emailInput.current.value;
-    const password = passwordInput.current.value;
-    const password2 = password2Input.current.value;
-    const nickname = nicknameInput.current.value;
+    const email = emailInput.current!.value;
+    const password = passwordInput.current!.value;
+    const password2 = password2Input.current!.value;
+    const nickname = nicknameInput.current!.value;
 
     const testEmail = regEmail.test(email);
     const testPassword = regPassword.test(password);
@@ -131,7 +131,7 @@ const SignUp = () => {
         sx={{ mt: 3 }}
         action={`${url}/signpage/signup_process`}
         method="post"
-        onInput={setFormField}
+        onInput={() => setFormField(!formField)}
       >
         <Grid container spacing={2}>
           <Grid item xs={12}>
@@ -210,7 +210,7 @@ const SignUp = () => {
           회원가입
         </Button>
       </Box>
-      <Copyright sx={{ mt: 5 }} />
+      <Copyright />
     </>
   );
 };

@@ -12,7 +12,7 @@ import Typography from "@mui/material/Typography";
 import PlusOneIcon from "@mui/icons-material/PlusOne";
 import IconButton from "@mui/material/IconButton";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import { MainContext, GlobalContext } from "./../Context";
+import { MainContext, GlobalContext } from "../Context";
 import HomeIcon from "@mui/icons-material/Home";
 import AddIcon from "@mui/icons-material/Add";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
@@ -25,6 +25,14 @@ import { StyledTableRow } from "../Style/MUIStyle";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useAxios } from "../Module";
 
+type CheckedState = {
+  [key: string]: boolean;
+};
+
+type CountState = {
+  [key: string]: number;
+};
+
 const VocaLoad = () => {
   const { state, dispatch } = useContext(MainContext);
   const { theme, url, setLoad } = useContext(GlobalContext);
@@ -32,8 +40,8 @@ const VocaLoad = () => {
   const location = useParams();
   const [data, setData] = useState([]);
   const [fileName, setFileName] = useState("");
-  const [checked, setChecked] = useState({});
-  const [count, setCount] = useState({});
+  const [checked, setChecked] = useState<CheckedState>({});
+  const [count, setCount] = useState<CountState>({});
   const [view, setView] = useState({
     state: viewMode.state?.viewState ? false : true,
     toggleBtn: <AutoStoriesIcon />,
@@ -99,8 +107,28 @@ const VocaLoad = () => {
     []
   );
 
-  const handleData = (type, id, voca, voca_mean, exam, exam_mean) => {
-    const { title, link, text } = options[type];
+  const handleData = (
+    type: string,
+    id: number | null,
+    voca: string,
+    voca_mean: string,
+    exam: string,
+    exam_mean: string
+  ) => {
+    let typeData: { title: string; link: string; text?: string } = {
+      title: "",
+      link: "",
+    };
+
+    if (type === "modify") {
+      typeData = options.modify;
+    } else if (type === "create") {
+      typeData = options.create;
+    } else if (type === "delete") {
+      typeData = options.delete;
+    }
+
+    const { title, link, text } = typeData;
 
     dispatch({
       type: type === "delete" ? "setCheckDialog" : "setPostDialog",
@@ -116,7 +144,7 @@ const VocaLoad = () => {
     dispatch({
       type: "setSelectedData",
       payload: {
-        id: id || "",
+        id: id || null,
         voca: voca || "",
         voca_mean: voca_mean || "",
         exam: exam || "",
@@ -125,8 +153,8 @@ const VocaLoad = () => {
     });
   };
 
-  const bgColor = { backgroundColor: isDark && "hsl(0, 0%, 30%)" };
-  const textColor = { color: isDark && "lightgray" };
+  const bgColor = { backgroundColor: isDark ? "hsl(0, 0%, 30%)" : "inherit" };
+  const textColor = { color: isDark ? "lightgray" : "inherit" };
 
   const MyHeader = () => {
     return (
@@ -165,7 +193,7 @@ const VocaLoad = () => {
             variant={isDark ? "contained" : "outlined"}
             endIcon={<AddIcon />}
             onClick={() => {
-              handleData("create");
+              handleData("create", null, "", "", "", "");
             }}
             sx={{ display: share ? "none" : "inlineBlock" }}
           >
@@ -187,7 +215,14 @@ const VocaLoad = () => {
     );
   };
 
-  const MyTableRow = ({ title, label, checked, onChange }) => {
+  interface MyTableRowProps {
+    title: string;
+    label: string;
+    checked: boolean;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  }
+
+  const MyTableRow = ({ title, label, checked, onChange }: MyTableRowProps) => {
     const width = matches3 ? "35%" : matches2 ? "20%" : "10%";
     return (
       <StyledTableRow>
@@ -253,7 +288,7 @@ const VocaLoad = () => {
     );
   };
 
-  const onListen = async (text) => {
+  const onListen = async (text: string) => {
     const data = await useAxios(
       "post",
       `${url}/getdata/tts`,
@@ -274,10 +309,18 @@ const VocaLoad = () => {
     });
   };
 
+  interface dataItem {
+    data_id: number;
+    voca: string;
+    voca_mean: string;
+    exam: string;
+    exam_mean: string;
+  }
+
   return (
     <div>
       <MyHeader />
-      {data.map((item, index) => {
+      {data.map((item: dataItem, index) => {
         return (
           <TableContainer
             component={Paper}

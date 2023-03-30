@@ -1,4 +1,54 @@
-export const initialState = {
+export interface StateType {
+  snackBarOpen: boolean;
+  folderState: number;
+  fileState: number;
+  dataState: number;
+  setState: number;
+  snackBar: {
+    text: string;
+    type: string;
+  };
+  postDialog: {
+    isOpen: boolean;
+    title: string;
+    label: string;
+    link: string;
+    content: string;
+  };
+  checkDialog: {
+    isOpen: boolean;
+    title: string;
+    text: string;
+    link: string;
+  };
+  moveDialog: {
+    isOpen: boolean;
+    link: string;
+  };
+  setDialog: {
+    isOpen: boolean;
+  };
+  selectedFolder: string;
+  moveSelectedFolder: string;
+  selectedFile: {
+    id: null | number;
+    fav: number;
+    sha: number;
+  };
+  selectedData: {
+    id: null | number;
+    voca: string;
+    voca_mean: string;
+    exam: string;
+    exam_mean: string;
+  };
+  user: {
+    email: string;
+    nickname: string;
+  };
+}
+
+export const initialState: StateType = {
   snackBarOpen: false,
   folderState: 0,
   fileState: 0,
@@ -32,8 +82,8 @@ export const initialState = {
   moveSelectedFolder: "",
   selectedFile: {
     id: null,
-    fav: null,
-    sha: null,
+    fav: 0,
+    sha: 0,
   },
   selectedData: {
     id: null,
@@ -48,7 +98,12 @@ export const initialState = {
   },
 };
 
-export const reducer = (state, action) => {
+export interface ActionType {
+  type: string;
+  payload: any;
+}
+
+export const reducer = (state: StateType, action: ActionType) => {
   switch (action.type) {
     case "setSnackBarOpen":
       return { ...state, snackBarOpen: action.payload };

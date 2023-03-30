@@ -9,7 +9,7 @@ import MoveDial from "./Dialog/MoveDialog";
 import { GlobalContext } from "../Context";
 import { useContext, useMemo } from "react";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { MainContext } from "./../Context";
+import { MainContext } from "../Context";
 
 const Content = () => {
   const { theme } = useContext(GlobalContext);

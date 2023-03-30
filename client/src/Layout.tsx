@@ -30,8 +30,7 @@ import SearchPage from "./Main/SearchPage";
 import SharePage from "./Main/SharePage";
 import { MainContext, GlobalContext } from "./Context";
 import { Route, Routes, useNavigate } from "react-router-dom";
-import { initialState, reducer } from "./Reducer";
-import { useHandleOpen } from "./CustomHook";
+import { reducer, initialState } from "./Reducer";
 import { darkTheme, DrawerHeader } from "./Style/MUIStyle";
 import AppBar from "@mui/material/AppBar";
 import SetDialog from "./Main/Dialog/SetDialog";
@@ -43,9 +42,9 @@ const PersistentDrawerLeft = () => {
   const [searchValue, setSearchValue] = useState("");
   const theme2 = useTheme();
   const navigate = useNavigate();
-  const [open, handleOpen, setOpen] = useHandleOpen(false, () => {
-    setOpen(!open);
-  });
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => setOpen(!open);
 
   const {
     postDialog: { isOpen: isPostDialogOpen },

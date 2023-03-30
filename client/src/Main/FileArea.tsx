@@ -6,25 +6,30 @@ import { useEffect, useState, useContext } from "react";
 import { MainContext, GlobalContext } from "../Context";
 import { Item } from "../Style/MUIStyle";
 import FileDial from "./Dialog/FileDial";
-import { useHandleOpen } from "./../CustomHook";
 import { useAxios } from "../Module";
 
+interface File {
+  file_id: number;
+  file_name: string;
+  nickname: string;
+  favorites: number;
+  shared: number;
+}
+
 const FileArea = () => {
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState<File[]>([]);
   const { theme, url, setLoad } = useContext(GlobalContext);
   const isDark = theme === "dark";
 
   const { state, dispatch } = useContext(MainContext);
 
-  const [open, handleOpen, setOpen] = useHandleOpen(false, () => {
-    setOpen(!open);
-  });
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
+    let method: string;
+    let action: string;
+    let body: object;
     const fetchFiles = async () => {
-      let method;
-      let action;
-      let body = null;
       if (Number(state.selectedFolder)) {
         method = "post";
         action = `${url}/getdata/get_file`;
@@ -75,9 +80,9 @@ const FileArea = () => {
                       ? "230px"
                       : "200px",
                   backgroundColor: isDark ? "hsl(0, 0%, 35%)" : "white",
-                  color: isDark && "lightgray",
+                  color: isDark ? "lightgray" : "inherit",
+                  textAlign: "center",
                 }}
-                align="center"
                 onClick={() => {
                   location.href = `/load/${file.file_id}`;
                 }}
@@ -94,7 +99,7 @@ const FileArea = () => {
                     {file.file_name}
                   </Typography>
                   <Typography
-                    variant="h7"
+                    variant="h6"
                     gutterBottom
                     sx={{
                       display:
@@ -112,7 +117,7 @@ const FileArea = () => {
                   position: "absolute",
                   right: 10,
                   top: 15,
-                  color: isDark && "lightgray",
+                  color: isDark ? "lightgray" : "inherit",
                   display:
                     state.selectedFolder === "get_share_file"
                       ? "none"
@@ -131,10 +136,10 @@ const FileArea = () => {
                       sha: file.shared,
                     },
                   });
-                  setOpen(true);
+                  setOpen(!open);
                 }}
               />
-              <FileDial open={open} handleOpen={handleOpen} />
+              <FileDial open={open} setOpen={setOpen} />
             </Grid>
           ))}
         </Grid>

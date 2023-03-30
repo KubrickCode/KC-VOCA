@@ -1,5 +1,4 @@
 import { MainContext, GlobalContext } from "../../Context";
-import { useHandleOpen } from "./../../CustomHook";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogActions from "@mui/material/DialogActions";
@@ -20,11 +19,17 @@ import KeyIcon from "@mui/icons-material/Key";
 const SetDialog = () => {
   const { state, dispatch } = useContext(MainContext);
   const { url } = useContext(GlobalContext);
-  const [, handleOpen] = useHandleOpen(false, () => {
-    dispatch({ type: "setSetDialog", payload: { isOpen: false } });
-  });
 
-  const handleButtonClick = (title, label, link, content) => {
+  const handleOpen = () => {
+    dispatch({ type: "setSetDialog", payload: { isOpen: false } });
+  };
+
+  const handleButtonClick = (
+    title: string,
+    label: string,
+    link: string,
+    content: string
+  ) => {
     dispatch({
       type: "setPostDialog",
       payload: { isOpen: true, title, label, link, content },

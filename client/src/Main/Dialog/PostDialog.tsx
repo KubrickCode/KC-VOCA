@@ -6,7 +6,6 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import Button from "@mui/material/Button";
-import { useHandleOpen } from "./../../CustomHook";
 import { useAxios } from "../../Module";
 
 const PostDialog = () => {
@@ -65,9 +64,9 @@ const PostDialog = () => {
     }
   }, [formData]);
 
-  const [, handleOpen] = useHandleOpen(false, () => {
+  const handleOpen = () => {
     dispatch({ type: "setPostDialog", payload: { isOpen: false } });
-  });
+  };
 
   const submitForm = async () => {
     const data = await useAxios(
@@ -89,6 +88,14 @@ const PostDialog = () => {
     }
     handleOpen();
     const stateType = data[2] + "State";
+    let payload;
+    if (data[2] === "folder") {
+      payload = state.folderState + 1;
+    } else if (data[2] === "file") {
+      payload = state.fileState + 1;
+    } else {
+      payload = state.dataState + 1;
+    }
     dispatch({
       type: "setSnackBar",
       payload: {
@@ -98,7 +105,7 @@ const PostDialog = () => {
     });
     dispatch({
       type: stateType,
-      payload: state[stateType] + 1,
+      payload,
     });
     dispatch({
       type: "setSnackBarOpen",

@@ -1,5 +1,4 @@
 import { MainContext, GlobalContext } from "../../Context";
-import { useHandleOpen } from "./../../CustomHook";
 import FolderArea from "../FolderArea";
 import { useContext } from "react";
 import { Dialog, DialogTitle, DialogActions, Button } from "@mui/material";
@@ -9,9 +8,9 @@ const MoveDial = () => {
   const { state, dispatch } = useContext(MainContext);
   const { setLoad } = useContext(GlobalContext);
 
-  const [, handleOpen] = useHandleOpen(false, () => {
+  const handleOpen = () => {
     dispatch({ type: "setMoveDialog", payload: { isOpen: false } });
-  });
+  };
 
   const submitForm = async () => {
     const data = await useAxios(
@@ -26,6 +25,15 @@ const MoveDial = () => {
     );
     handleOpen();
     const stateType = data[2] + "State";
+    let payload;
+    if (data[2] === "folder") {
+      payload = state.folderState + 1;
+    } else if (data[2] === "file") {
+      payload = state.fileState + 1;
+    } else {
+      payload = state.dataState + 1;
+    }
+
     dispatch({
       type: "setSnackBar",
       payload: {
@@ -35,7 +43,7 @@ const MoveDial = () => {
     });
     dispatch({
       type: stateType,
-      payload: state[stateType] + 1,
+      payload,
     });
     dispatch({
       type: "setSnackBarOpen",

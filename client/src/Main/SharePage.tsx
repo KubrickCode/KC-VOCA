@@ -10,7 +10,7 @@ const SharePage = () => {
   const { dispatch } = useContext(MainContext);
   const { theme } = useContext(GlobalContext);
   const isDark = theme === "dark";
-  const textColor = { color: isDark && "lightgray" };
+  const textColor = { color: isDark ? "lightgray" : "inherit" };
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,16 +38,12 @@ const SharePage = () => {
         >
           <HomeIcon />
         </IconButton>
-        <Typography
-          variant="h5"
-          sx={{ color: theme === "dark" && "lightgray" }}
-          pt={1}
-        >
+        <Typography variant="h5" sx={textColor} pt={1}>
           공유마당
         </Typography>
       </Stack>
 
-      <FileArea ml={2} />
+      <FileArea />
     </div>
   );
 };
