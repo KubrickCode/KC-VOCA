@@ -68,10 +68,6 @@ import createRouter from "./routes/create";
 import modifyRouter from "./routes/modify";
 import deleteRouter from "./routes/delete";
 
-app.get("/api/policy", (req, res) => {
-  res.sendFile(__dirname + "/privacy_policy.html");
-});
-
 app.use("/", indexRouter);
 app.use("/api/signpage", signRouter);
 app.use("/api/getdata", getDataRouter);

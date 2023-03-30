@@ -57,9 +57,6 @@ const getdata_1 = __importDefault(require("./routes/getdata"));
 const create_1 = __importDefault(require("./routes/create"));
 const modify_1 = __importDefault(require("./routes/modify"));
 const delete_1 = __importDefault(require("./routes/delete"));
-app.get("/api/policy", (req, res) => {
-    res.sendFile(__dirname + "/privacy_policy.html");
-});
 app.use("/", index_1.default);
 app.use("/api/signpage", sign_1.default);
 app.use("/api/getdata", getdata_1.default);
