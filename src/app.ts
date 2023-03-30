@@ -1,23 +1,21 @@
-const createError = require("http-errors");
-const express = require("express");
+import createError from "http-errors";
+import express, { Request, Response, NextFunction } from "express";
+import path from "path";
+import cookieParser from "cookie-parser";
+import logger from "morgan";
+import session from "express-session";
+import { sessionstore } from "./lib/config";
+import passport from "passport";
+import flash from "connect-flash";
+import dotenv from "dotenv";
+dotenv.config();
+const MySQLStoreFactory = require("express-mysql-session");
+const MySQLStore = MySQLStoreFactory(session);
 const app = express();
-const path = require("path");
-const cookieParser = require("cookie-parser");
-const logger = require("morgan");
-
-const session = require("express-session");
-const sessionStore = require("./lib/config").sessionstore;
-const MySQLStore = require("express-mysql-session")(session);
-const passport = require("passport");
-
-const flash = require("connect-flash");
-app.use(flash());
-
-require("dotenv").config();
 
 const link = process.env.REDIRECT_ROOT;
 
-const cors = require("cors");
+import cors from "cors";
 app.use(
   cors({
     origin: link,
@@ -33,9 +31,10 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", link);
-  res.header("Access-Control-Allow-Credentials", true);
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", link as string);
+  res.header("Access-Control-Allow-Credentials", "true");
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
   res.header(
     "Access-Control-Allow-Headers",
@@ -46,8 +45,8 @@ app.use(function (req, res, next) {
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
-    store: new MySQLStore(sessionStore),
+    secret: process.env.SESSION_SECRET as string,
+    store: new MySQLStore(sessionstore),
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -60,13 +59,14 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(flash());
 
-const indexRouter = require("./routes/index");
-const signRouter = require("./routes/sign");
-const getDataRouter = require("./routes/getdata");
-const createRouter = require("./routes/create");
-const modifyRouter = require("./routes/modify");
-const deleteRouter = require("./routes/delete");
+import indexRouter from "./routes/index";
+import signRouter from "./routes/sign";
+import getDataRouter from "./routes/getdata";
+import createRouter from "./routes/create";
+import modifyRouter from "./routes/modify";
+import deleteRouter from "./routes/delete";
 
 app.get("/api/policy", (req, res) => {
   res.sendFile(__dirname + "/privacy_policy.html");
@@ -80,12 +80,12 @@ app.use("/api/modify", modifyRouter);
 app.use("/api/delete", deleteRouter);
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
   next(createError(404));
 });
 
 // error handler
-app.use(function (err, req, res, next) {
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
@@ -95,4 +95,4 @@ app.use(function (err, req, res, next) {
   res.render("error.jade");
 });
 
-module.exports = app;
+export default app;

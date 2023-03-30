@@ -1,7 +1,8 @@
-const express = require("express");
+import express from "express";
+import bodyParser from "body-parser";
+import mysql, { RowDataPacket } from "mysql2/promise";
+
 const router = express.Router();
-const bodyParser = require("body-parser");
-const mysql = require("mysql2/promise");
 const db = mysql.createPool(require("../lib/config").user);
 const AWS = require("aws-sdk");
 const aws_info = require("../lib/config").aws;
@@ -26,7 +27,7 @@ router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 
 router.get("/get_folder", async (req, res) => {
-  const { user_id } = req.user[0];
+  const { user_id } = (req.user as { user_id: number }[])[0];
   const query = `SELECT * FROM voca_folder WHERE user_id=?`;
   const target = [user_id];
   try {
@@ -52,7 +53,7 @@ router.post("/get_file", async (req, res) => {
 });
 
 router.get("/get_fav_file", async (req, res) => {
-  const { user_id } = req.user[0];
+  const { user_id } = (req.user as { user_id: number }[])[0];
   const query = `SELECT * FROM voca_file WHERE favorites=1 AND user_id=?`;
   const target = [user_id];
   try {
@@ -65,11 +66,11 @@ router.get("/get_fav_file", async (req, res) => {
 });
 
 router.get("/get_recent_file", async (req, res) => {
-  const { user_id } = req.user[0];
+  const { user_id } = (req.user as { user_id: number }[])[0];
   const query = `SELECT * FROM voca_file WHERE user_id=? ORDER BY current DESC;`;
   const target = [user_id];
   try {
-    const [result] = await db.query(query, target);
+    const [result] = await db.query<RowDataPacket[]>(query, target);
     res.json(result.slice(0, 10));
   } catch (err) {
     console.error(err);
@@ -93,7 +94,7 @@ router.get("/get_share_file", async (req, res) => {
 
 router.post("/get_data", async (req, res) => {
   const { file_id } = req.body;
-  const { user_id } = req.user[0];
+  const { user_id } = (req.user as { user_id: number }[])[0];
   const query = [
     "SELECT * FROM voca_data WHERE file_id=?",
     "SELECT * FROM voca_file WHERE file_id=?",
@@ -103,17 +104,17 @@ router.post("/get_data", async (req, res) => {
 
   try {
     const [data, file] = await Promise.all([
-      db.query(query[0], target),
-      db.query(query[1], target),
+      db.query<RowDataPacket[]>(query[0], target),
+      db.query<RowDataPacket[]>(query[1], target),
     ]);
 
     await db.query(query[2], target);
 
     if (file[0][0] && file[0][0].user_id !== user_id) {
-      file[0].push(true);
+      res.json([data[0], file[0], true]);
+    } else {
+      res.json(file[0][0] ? [data[0], file[0]] : false);
     }
-
-    res.json(file[0][0] ? [data[0], file[0]] : false);
   } catch (err) {
     console.error(err);
     res.status(500).send("Internal server error");
@@ -121,11 +122,11 @@ router.post("/get_data", async (req, res) => {
 });
 
 router.get("/user", async (req, res) => {
-  const { user_id } = req.user[0];
+  const { user_id } = (req.user as { user_id: number }[])[0];
   const query = `SELECT * FROM localuser WHERE user_id=?`;
   const target = [user_id];
   try {
-    const [result] = await db.query(query, target);
+    const [result] = await db.query<RowDataPacket[]>(query, target);
     res.send(result[0]);
   } catch (err) {
     console.error(err);
@@ -146,7 +147,7 @@ router.post("/tts", async (req, res) => {
     if (data?.AudioStream instanceof Buffer) {
       res.send(data.AudioStream);
     }
-  } catch (err) {
+  } catch (err: any) {
     console.log(err.code);
     res.status(500).send("Internal server error");
   }
@@ -154,7 +155,7 @@ router.post("/tts", async (req, res) => {
 
 router.post("/search", async (req, res) => {
   const { word } = req.body;
-  const { user_id } = req.user[0];
+  const { user_id } = (req.user as { user_id: number }[])[0];
   const query = `SELECT * FROM voca_data WHERE voca REGEXP ? AND voca_data.user_id=? OR voca_mean REGEXP ? AND voca_data.user_id=?`;
   const target = [word, user_id, word, user_id];
   try {
@@ -173,7 +174,7 @@ router.post("/find_password", async (req, res) => {
     "UPDATE localuser SET password=? WHERE email=?",
   ];
   try {
-    const isExist = await db.query(query[0], [email]);
+    const isExist = await db.query<RowDataPacket[]>(query[0], [email]);
     if (Boolean(isExist[0][0].email)) {
       const newPassword = Math.random().toString(36).slice(2);
       const hash = await bcrypt.hash(newPassword, 10);
@@ -209,4 +210,4 @@ router.post("/find_password", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

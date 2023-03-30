@@ -1,13 +1,14 @@
-const express = require("express");
+import express from "express";
+import bodyParser from "body-parser";
+import mysql, { RowDataPacket } from "mysql2/promise";
+
 const router = express.Router();
-const bodyParser = require("body-parser");
-const mysql = require("mysql2/promise");
 const bcrypt = require("bcrypt");
 const passport = require("../lib/passport")();
 const db = mysql.createPool(require("../lib/config").user);
 require("dotenv").config();
 
-const url = process.env.REDIRECT_ROOT;
+const url: string = process.env.REDIRECT_ROOT ?? "/";
 
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
@@ -40,7 +41,7 @@ router.post("/check_duplicate", async (req, res) => {
   const query = `SELECT * FROM localuser WHERE email = ? OR nickname = ?`;
   const target = [email, nickname];
   try {
-    const [results] = await db.query(query, target);
+    const [results] = await db.query<RowDataPacket[]>(query, target);
 
     if (results.length > 0) {
       const duplicates = { email: false, nickname: false };
@@ -74,7 +75,7 @@ router.post("/signup_process", async (req, res) => {
   try {
     await db.query(query[0], target[0]);
 
-    const [result] = await db.query(query[1], target[1]);
+    const [result] = await db.query<RowDataPacket[]>(query[1], target[1]);
     await db.query(query[2], [result[0].user_id]);
 
     req.login({ email, password, nickname }, (err) => {
@@ -109,7 +110,6 @@ router.get("/login_process", async (req, res) => {
     res.status(500).send("Internal server error");
   }
 });
-module.exports = router;
 
 router.get(
   "/google",
@@ -133,3 +133,5 @@ router.get(
     failureRedirect: url,
   })
 );
+
+export default router;

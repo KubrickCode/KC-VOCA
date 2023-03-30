@@ -1,10 +1,11 @@
-const express = require("express");
+import express from "express";
+import bodyParser from "body-parser";
+import mysql, { RowDataPacket } from "mysql2/promise";
+import checkDuplicate from "../lib/module";
+import bcrypt from "bcrypt";
+
 const router = express.Router();
-const bodyParser = require("body-parser");
-const mysql = require("mysql2/promise");
-const bcrypt = require("bcrypt");
 const db = mysql.createPool(require("../lib/config").user);
-const myModule = require("../lib/module");
 
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
@@ -17,8 +18,8 @@ router.post("/rename_folder", async (req, res) => {
   ];
   const target = [[folder_id], [formData.value1, folder_id]];
   try {
-    const parent = await db.query(query[0], target[0]);
-    const result = await myModule.checkDuplicate(
+    const parent = await db.query<RowDataPacket[]>(query[0], target[0]);
+    const result = await checkDuplicate(
       "folder",
       parent[0][0].parent_id,
       formData.value1
@@ -26,7 +27,7 @@ router.post("/rename_folder", async (req, res) => {
 
     if (folder_id === "1") {
       res.send(["Home 폴더명은 변경하실 수 없습니다", "error", "folder"]);
-    } else if (!Boolean(result[0][0])) {
+    } else if (!Boolean(result[0])) {
       await db.query(query[1], target[1]);
       res.send(["폴더명이 변경되었습니다", "success", "folder"]);
     } else {
@@ -47,13 +48,9 @@ router.post("/rename_file", async (req, res) => {
   const query = `UPDATE voca_file SET file_name=? WHERE file_id=?`;
   const target = [formData.value1, file_id];
   try {
-    const result = await myModule.checkDuplicate(
-      "file",
-      folder_id,
-      formData.value1
-    );
+    const result = await checkDuplicate("file", folder_id, formData.value1);
 
-    if (!Boolean(result[0][0])) {
+    if (!Boolean(result[0])) {
       await db.query(query, target);
       res.send(["단어장명이 변경되었습니다", "success", "file"]);
     } else {
@@ -117,9 +114,9 @@ router.post("/move_folder", async (req, res) => {
   ];
   const target = [[folder_id], [parent_folder, folder_id]];
   try {
-    const [rows] = await db.query(query[0], target[0]);
+    const [rows] = await db.query<RowDataPacket[]>(query[0], target[0]);
     const parent_id = rows[0].parent_id;
-    if (parent_id === "0") {
+    if (parent_id === 0) {
       res.send(["Home 폴더는 이동할 수 없습니다", "error", "folder"]);
     } else if (parent_id == parent_folder || parent_folder == folder_id) {
       res.send(["해당 위치로 이동할 수 없습니다", "error", "folder"]);
@@ -164,14 +161,14 @@ router.post("/nickname", async (req, res) => {
   const {
     formData: { value1: nickname },
   } = req.body;
-  const { user_id } = req.user[0];
+  const { user_id } = (req.user as { user_id: number }[])[0];
   const query = [
     "SELECT nickname FROM localuser WHERE nickname=?",
     "UPDATE localuser SET nickname=? WHERE user_id=?",
   ];
   const target = [[nickname], [nickname, user_id]];
   try {
-    const [result] = await db.query(query[0], target[0]);
+    const [result] = await db.query<RowDataPacket[]>(query[0], target[0]);
 
     if (result[0] && result[0].nickname) {
       res.send(["같은 닉네임이 존재합니다", "warning", "set"]);
@@ -189,14 +186,14 @@ router.post("/password", async (req, res) => {
   const {
     formData: { value1: password, value2: password2 },
   } = req.body;
-  const { user_id } = req.user[0];
+  const { user_id } = (req.user as { user_id: number }[])[0];
   const query = [
     "SELECT password FROM localuser WHERE user_id=?",
     "UPDATE localuser SET password=? WHERE user_id=?",
   ];
   const target = [user_id];
   try {
-    const [result] = await db.query(query[0], target);
+    const [result] = await db.query<RowDataPacket[]>(query[0], target);
     const isPasswordMatch = await bcrypt.compare(password, result[0].password);
 
     if (isPasswordMatch) {
@@ -213,4 +210,4 @@ router.post("/password", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

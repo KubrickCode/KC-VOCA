@@ -1,25 +1,23 @@
-const express = require("express");
-const router = express.Router();
-const bodyParser = require("body-parser");
-const mysql = require("mysql2/promise");
+import express from "express";
+import bodyParser from "body-parser";
+import mysql from "mysql2/promise";
+import checkDuplicate from "../lib/module";
+
 const db = mysql.createPool(require("../lib/config").user);
-const myModule = require("../lib/module");
+
+const router = express.Router();
 
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 
 router.post("/create_folder", async (req, res) => {
   const { folder_id, formData } = req.body;
-  const { user_id } = req.user[0];
+  const { user_id } = (req.user as { user_id: number }[])[0];
   const query = `INSERT INTO voca_folder(user_id,parent_id,folder_name) VALUES(?,?,?)`;
   const target = [user_id, folder_id, formData.value1];
   try {
-    const result = await myModule.checkDuplicate(
-      "folder",
-      folder_id,
-      formData.value1
-    );
-    if (!Boolean(result[0][0])) {
+    const result = await checkDuplicate("folder", folder_id, formData.value1);
+    if (!Boolean(result[0])) {
       await db.query(query, target);
       res.send(["폴더가 생성되었습니다", "success", "folder"]);
     } else {
@@ -37,16 +35,12 @@ router.post("/create_folder", async (req, res) => {
 
 router.post("/create_file", async (req, res) => {
   const { folder_id, formData } = req.body;
-  const { user_id } = req.user[0];
+  const { user_id } = (req.user as { user_id: number }[])[0];
   const query = `INSERT INTO voca_file(user_id,folder_id,file_name) VALUES(?,?,?)`;
   const target = [user_id, folder_id, formData.value1];
   try {
-    const result = await myModule.checkDuplicate(
-      "file",
-      folder_id,
-      formData.value1
-    );
-    if (!Boolean(result[0][0])) {
+    const result = await checkDuplicate("file", folder_id, formData.value1);
+    if (!Boolean(result[0])) {
       await db.query(query, target);
       res.send(["단어장이 생성되었습니다", "success", "file"]);
     } else {
@@ -64,7 +58,7 @@ router.post("/create_file", async (req, res) => {
 
 router.post("/create_data", async (req, res) => {
   const { folder_id, file_id } = req.body;
-  const { user_id } = req.user[0];
+  const { user_id } = (req.user as { user_id: number }[])[0];
   const { voca, voca_mean, exam, exam_mean } = req.body.formData;
   const query = `INSERT INTO voca_data(user_id,folder_id,file_id,voca,voca_mean,exam,exam_mean) VALUES(?,?,?,?,?,?,?)`;
   const target = [
@@ -85,4 +79,4 @@ router.post("/create_data", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

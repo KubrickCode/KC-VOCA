@@ -1,7 +1,12 @@
-require("dotenv").config();
-
-module.exports = {
-  user: {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.kakao = exports.google = exports.aws = exports.sessionstore = exports.user = void 0;
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
+exports.user = {
     host: process.env.DB_host,
     user: process.env.DB_user,
     password: process.env.DB_password,
@@ -9,8 +14,8 @@ module.exports = {
     database: process.env.DB_database,
     multipleStatements: true,
     dateStrings: process.env.DB_dateStrings,
-  },
-  sessionstore: {
+};
+exports.sessionstore = {
     host: process.env.DB_host,
     user: process.env.DB_user,
     port: process.env.DB_port,
@@ -19,23 +24,20 @@ module.exports = {
     multipleStatements: true,
     clearExpired: true,
     expiration: 1000 * 60 * 60 * 24 * 30,
-  },
-  aws: {
+};
+exports.aws = {
     accessKeyId: process.env.ACCESSKEYID,
     secretAccessKey: process.env.SECRETACCESSKEY,
     signatureVersion: process.env.SIGNATUREVERSION,
     region: process.env.REGION,
     k_region: process.env.K_REGION,
-  },
-
-  google: {
+};
+exports.google = {
     google_id: process.env.GOOGLE_ID,
     google_secret: process.env.GOOGLE_SECRET,
     google_callback: process.env.GOOGLE_CALLBACK,
-  },
-
-  kakao: {
+};
+exports.kakao = {
     kakao_id: process.env.KAKAO_ID,
     kakao_callback: process.env.KAKAO_CALLBACK,
-  },
 };
