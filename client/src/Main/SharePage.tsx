@@ -10,7 +10,7 @@ const SharePage = () => {
   const { dispatch } = useContext(MainContext);
   const { theme } = useContext(GlobalContext);
   const isDark = theme === "dark";
-  const textColor = { color: isDark ? "lightgray" : "inherit" };
+  const textColor = { color: isDark ? "lightgray" : "hsl(0, 0%, 20%)" };
   const navigate = useNavigate();
 
   useEffect(() => {

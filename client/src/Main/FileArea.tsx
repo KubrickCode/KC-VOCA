@@ -80,7 +80,7 @@ const FileArea = () => {
                       ? "230px"
                       : "200px",
                   backgroundColor: isDark ? "hsl(0, 0%, 35%)" : "white",
-                  color: isDark ? "lightgray" : "inherit",
+                  color: isDark ? "lightgray" : "hsl(0, 0%, 20%)",
                   textAlign: "center",
                 }}
                 onClick={() => {
@@ -117,7 +117,7 @@ const FileArea = () => {
                   position: "absolute",
                   right: 10,
                   top: 15,
-                  color: isDark ? "lightgray" : "inherit",
+                  color: isDark ? "lightgray" : "hsl(0, 0%, 20%)",
                   display:
                     state.selectedFolder === "get_share_file"
                       ? "none"
@@ -146,7 +146,11 @@ const FileArea = () => {
       </>
     );
   } else {
-    return <Typography>해당 폴더 내에 생성된 단어장이 없습니다</Typography>;
+    return (
+      <Typography sx={{ color: isDark ? "lightgray" : "hsl(0, 0%, 20%)" }}>
+        해당 폴더 내에 생성된 단어장이 없습니다
+      </Typography>
+    );
   }
 };
 

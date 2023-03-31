@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext, useMemo, memo } from "react";
+import { useEffect, useState, useContext, memo } from "react";
 import { MainContext, GlobalContext } from "../../Context";
 import Avatar from "@mui/material/Avatar";
 import List from "@mui/material/List";

@@ -62,8 +62,8 @@ const SearchPage = () => {
     });
   };
 
-  const bgColor = { backgroundColor: isDark ? "hsl(0, 0%, 30%)" : "inherit" };
-  const textColor = { color: isDark ? "lightgray" : "inherit" };
+  const bgColor = { backgroundColor: isDark ? "hsl(0, 0%, 30%)" : "white" };
+  const textColor = { color: isDark ? "lightgray" : "hsl(0, 0%, 20%)" };
 
   interface MyTableRowProps {
     title: string;

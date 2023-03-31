@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "server": "nodemon ./dist/www.js",
+    "server": "nodemon --watch \"src/**/*.ts\" --exec \"ts-node\" src/www.ts",
     "client": "cd client && yarn run dev",
     "dev": "concurrently --kill-others-on-fail \"yarn run server\" \"yarn run client\""
   },

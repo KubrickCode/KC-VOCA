@@ -50,7 +50,7 @@ const StyledTreeItem = (props: StyledTreeItemProps) => {
             color:
               theme === "dark" && state.moveDialog.isOpen === false
                 ? "lightgray"
-                : "inherit",
+                : "hsl(0, 0%, 20%)",
           }}
         >
           <Box component={LabelIcon} color="inherit" sx={{ mr: 1 }} />

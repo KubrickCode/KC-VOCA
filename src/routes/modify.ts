@@ -25,7 +25,7 @@ router.post("/rename_folder", async (req, res) => {
       formData.value1
     );
 
-    if (folder_id === "1") {
+    if (parent[0][0].parent_id === 0) {
       res.send(["Home 폴더명은 변경하실 수 없습니다", "error", "folder"]);
     } else if (!Boolean(result[0])) {
       await db.query(query[1], target[1]);
