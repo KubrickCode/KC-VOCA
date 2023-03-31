@@ -106,6 +106,25 @@ router.post("/shared", async (req, res) => {
   }
 });
 
+async function isDescendantFolder(childId: number, parentId: number) {
+  let currentParentId = parentId;
+
+  while (currentParentId !== 0) {
+    const [rows] = await db.query<RowDataPacket[]>(
+      "SELECT parent_id FROM voca_folder WHERE folder_id=?",
+      [currentParentId]
+    );
+
+    currentParentId = rows[0].parent_id;
+    console.log(currentParentId);
+
+    if (currentParentId == childId) {
+      return true;
+    }
+  }
+  return false;
+}
+
 router.post("/move_folder", async (req, res) => {
   const { folder_id, parent_folder } = req.body;
   const query = [
@@ -118,7 +137,11 @@ router.post("/move_folder", async (req, res) => {
     const parent_id = rows[0].parent_id;
     if (parent_id === 0) {
       res.send(["Home 폴더는 이동할 수 없습니다", "error", "folder"]);
-    } else if (parent_id == parent_folder || parent_folder == folder_id) {
+    } else if (
+      parent_id == parent_folder ||
+      parent_folder == folder_id ||
+      (await isDescendantFolder(folder_id, parent_folder))
+    ) {
       res.send(["해당 위치로 이동할 수 없습니다", "error", "folder"]);
     } else {
       await db.query(query[1], target[1]);
