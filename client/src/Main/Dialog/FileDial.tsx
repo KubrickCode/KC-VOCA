@@ -21,6 +21,12 @@ type FileDialProps = {
   setOpen: (open: boolean) => void;
 };
 
+type DialBodyProps = {
+  name: string;
+  icon: JSX.Element;
+  click: () => void;
+};
+
 const FileDial = ({ open, setOpen }: FileDialProps) => {
   const { state, dispatch } = useContext(MainContext);
   const { url } = useContext(GlobalContext);
@@ -154,21 +160,28 @@ const FileDial = ({ open, setOpen }: FileDialProps) => {
       <Dialog onClose={() => setOpen(!open)} open={open}>
         <List sx={{ pt: 0 }}>
           {newfileOptions.map((option) => (
-            <ListItem disableGutters key={option.name}>
-              <ListItemButton onClick={option.click} key={option.name}>
-                <ListItemAvatar>
-                  <Avatar sx={{ bgcolor: blue[100], color: blue[600] }}>
-                    {option.icon}
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText primary={option.name} />
-              </ListItemButton>
-            </ListItem>
+            <DialBody
+              key={option.name}
+              name={option.name}
+              icon={option.icon}
+              click={option.click}
+            />
           ))}
         </List>
       </Dialog>
     </>
   );
 };
+
+const DialBody = ({ name, click, icon }: DialBodyProps) => (
+  <ListItem disableGutters>
+    <ListItemButton onClick={click}>
+      <ListItemAvatar>
+        <Avatar sx={{ bgcolor: blue[100], color: blue[600] }}>{icon}</Avatar>
+      </ListItemAvatar>
+      <ListItemText primary={name} />
+    </ListItemButton>
+  </ListItem>
+);
 
 export default memo(FileDial);

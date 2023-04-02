@@ -1,5 +1,10 @@
 import { useState, useEffect, useContext, useMemo } from "react";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import {
+  useParams,
+  useLocation,
+  useNavigate,
+  NavigateFunction,
+} from "react-router-dom";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -24,6 +29,54 @@ import VolumeMuteIcon from "@mui/icons-material/VolumeMute";
 import { StyledTableRow } from "../Style/MUIStyle";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useAxios } from "../Module";
+import { ActionType } from "../Reducer";
+
+interface DataProps {
+  data_id: number | null;
+  voca: string;
+  voca_mean: string;
+  exam: string;
+  exam_mean: string;
+}
+interface DataEnv {
+  textColor: { color: string };
+  bgColor: { backgroundColor: string };
+  isDark?: boolean;
+  view: ViewObject;
+  setView?: (viewObj: ViewObject) => void;
+  share?: boolean;
+  url?: string;
+  setLoad?: (isloading: boolean) => void;
+}
+interface ViewObject {
+  state: boolean;
+  toggleBtn: JSX.Element;
+  text: string;
+}
+interface handleDataProps extends DataProps {
+  type: string;
+}
+
+interface dataItem extends DataProps, DataEnv {
+  index: number;
+  handleData: ({}: handleDataProps) => void;
+  view: ViewObject;
+}
+
+interface MyHeaderProps extends DataEnv {
+  matches: boolean;
+  navigate: NavigateFunction;
+  dispatch: React.Dispatch<ActionType>;
+  fileName: string;
+  handleData: ({}: handleDataProps) => void;
+}
+
+interface MyTableRowProps extends DataEnv {
+  title: string;
+  label: string;
+  checked: boolean;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
 
 type CheckedState = {
   [key: string]: boolean;
@@ -40,20 +93,16 @@ const VocaLoad = () => {
   const location = useParams();
   const [data, setData] = useState([]);
   const [fileName, setFileName] = useState("");
-  const [checked, setChecked] = useState<CheckedState>({});
-  const [count, setCount] = useState<CountState>({});
   const [view, setView] = useState({
     state: viewMode.state?.viewState ? false : true,
     toggleBtn: <AutoStoriesIcon />,
     text: "공부 모드",
   });
   const [share, setShare] = useState(false);
-  const isDark = theme === "dark";
+  const isDark: boolean = theme === "dark";
   const navigate = useNavigate();
 
   const matches = useMediaQuery("(max-width:830px)");
-  const matches2 = useMediaQuery("(max-width:1092px)");
-  const matches3 = useMediaQuery("(max-width:554px)");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -107,14 +156,14 @@ const VocaLoad = () => {
     []
   );
 
-  const handleData = (
-    type: string,
-    id: number | null,
-    voca: string,
-    voca_mean: string,
-    exam: string,
-    exam_mean: string
-  ) => {
+  const handleData = ({
+    type,
+    data_id,
+    voca,
+    voca_mean,
+    exam,
+    exam_mean,
+  }: handleDataProps) => {
     let typeData: { title: string; link: string; text?: string } = {
       title: "",
       link: "",
@@ -144,7 +193,7 @@ const VocaLoad = () => {
     dispatch({
       type: "setSelectedData",
       payload: {
-        id: id || null,
+        id: data_id || null,
         voca: voca || "",
         voca_mean: voca_mean || "",
         exam: exam || "",
@@ -156,137 +205,346 @@ const VocaLoad = () => {
   const bgColor = { backgroundColor: isDark ? "hsl(0, 0%, 30%)" : "white" };
   const textColor = { color: isDark ? "lightgray" : "hsl(0, 0%, 20%)" };
 
-  const MyHeader = () => {
-    return (
-      <Stack direction={matches ? "column" : "row"} spacing={2} mb={2} mt={10}>
-        <Stack direction="row" spacing={2}>
-          <IconButton
-            sx={{
-              ...textColor,
-              border: "1px solid lightgray",
-              "&:hover": {
-                backgroundColor: isDark ? "hsl(0, 0%, 45%)" : "lightgray",
-              },
-            }}
-            onClick={() => {
-              navigate("/");
-              dispatch({
-                type: "setSelectedFolder",
-                payload: "get_recent_file",
-              });
-            }}
-          >
-            <HomeIcon />
-          </IconButton>
-          <Typography
-            fontSize={20}
-            sx={{
-              ...textColor,
-              pt: "5px",
-            }}
-          >
-            단어장 : {fileName}
-          </Typography>
-        </Stack>
-        <Stack direction="row" spacing={2}>
-          <Button
-            variant={isDark ? "contained" : "outlined"}
-            endIcon={<AddIcon />}
-            onClick={() => {
-              handleData("create", null, "", "", "", "");
-            }}
-            sx={{ display: share ? "none" : "inlineBlock" }}
-          >
-            단어 추가
-          </Button>
-          <Button
-            variant={isDark ? "contained" : "outlined"}
-            endIcon={view.toggleBtn}
-            color="secondary"
-            onClick={() => {
-              setView({ ...view, state: !view.state });
-            }}
-            sx={{ display: share ? "none" : "inlineBlock" }}
-          >
-            {view.text}
-          </Button>
-        </Stack>
-      </Stack>
-    );
-  };
+  return (
+    <div>
+      <MyHeader
+        matches={matches}
+        textColor={textColor}
+        isDark={isDark}
+        navigate={navigate}
+        dispatch={dispatch}
+        fileName={fileName}
+        handleData={handleData}
+        share={share}
+        view={view}
+        setView={setView}
+        bgColor={bgColor}
+      />
+      {data.map((item: dataItem, index) => (
+        <DataBody
+          data_id={item.data_id}
+          voca={item.voca}
+          voca_mean={item.voca_mean}
+          exam={item.exam}
+          exam_mean={item.exam_mean}
+          index={index}
+          key={item.data_id}
+          handleData={handleData}
+          view={view}
+          bgColor={bgColor}
+          isDark={isDark}
+          textColor={textColor}
+          setView={setView}
+          url={url}
+        />
+      ))}
+    </div>
+  );
+};
 
-  type MyTableRowProps = {
-    title: string;
-    label: string;
-    checked: boolean;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  };
-
-  const MyTableRow = ({ title, label, checked, onChange }: MyTableRowProps) => {
-    const width = matches3 ? "35%" : matches2 ? "20%" : "10%";
-    return (
-      <StyledTableRow>
-        <TableCell
-          component="th"
-          scope="row"
+const MyHeader = ({
+  matches,
+  textColor,
+  isDark,
+  navigate,
+  dispatch,
+  fileName,
+  handleData,
+  share,
+  view,
+  setView,
+}: MyHeaderProps) => {
+  return (
+    <Stack direction={matches ? "column" : "row"} spacing={2} mb={2} mt={10}>
+      <Stack direction="row" spacing={2}>
+        <IconButton
           sx={{
             ...textColor,
-            ...bgColor,
-            width: width,
-            borderRight: 1,
-            borderRightColor: "grey.300",
-            fontSize: 17,
-            padding: "0 15px",
+            border: "1px solid lightgray",
+            "&:hover": {
+              backgroundColor: isDark ? "hsl(0, 0%, 45%)" : "lightgray",
+            },
+          }}
+          onClick={() => {
+            navigate("/");
+            dispatch({
+              type: "setSelectedFolder",
+              payload: "get_recent_file",
+            });
           }}
         >
-          <Typography sx={{ display: "inline" }}>{title}</Typography>
-          <IconButton
-            onClick={() => {
-              onListen(label);
-            }}
+          <HomeIcon />
+        </IconButton>
+        <Typography
+          fontSize={20}
+          sx={{
+            ...textColor,
+            pt: "5px",
+          }}
+        >
+          단어장 : {fileName}
+        </Typography>
+      </Stack>
+      <Stack direction="row" spacing={2}>
+        <Button
+          variant={isDark ? "contained" : "outlined"}
+          endIcon={<AddIcon />}
+          onClick={() => {
+            handleData({
+              type: "create",
+              data_id: null,
+              voca: "",
+              voca_mean: "",
+              exam: "",
+              exam_mean: "",
+            });
+          }}
+          sx={{ display: share ? "none" : "inlineBlock" }}
+        >
+          단어 추가
+        </Button>
+        <Button
+          variant={isDark ? "contained" : "outlined"}
+          endIcon={view.toggleBtn}
+          color="secondary"
+          onClick={() => {
+            if (setView) {
+              setView({ ...view, state: !view.state });
+            }
+          }}
+          sx={{ display: share ? "none" : "inlineBlock" }}
+        >
+          {view.text}
+        </Button>
+      </Stack>
+    </Stack>
+  );
+};
+
+const DataBody = ({
+  data_id,
+  voca,
+  voca_mean,
+  exam,
+  exam_mean,
+  index,
+  handleData,
+  view,
+  bgColor,
+  isDark,
+  textColor,
+  share,
+  url,
+  setLoad,
+}: dataItem) => {
+  const [checked, setChecked] = useState<CheckedState>({});
+  const [count, setCount] = useState<CountState>({});
+
+  const rows = [
+    {
+      title: "단어",
+      label: voca,
+      url: url,
+      setLoad: setLoad,
+      key: "voca" + index,
+    },
+    {
+      title: "단어 뜻",
+      label: voca_mean,
+      url: url,
+      setLoad: setLoad,
+      key: "voca_mean" + index,
+    },
+    {
+      title: "예문",
+      label: exam,
+      url: url,
+      setLoad: setLoad,
+      key: "exam" + index,
+    },
+    {
+      title: "예문 뜻",
+      label: exam_mean,
+      url: url,
+      setLoad: setLoad,
+      key: "exam_mean" + index,
+    },
+  ];
+
+  return (
+    <TableContainer
+      component={Paper}
+      key={data_id}
+      sx={{
+        mb: "20px",
+        overflow: "hidden",
+      }}
+    >
+      <Table aria-label="caption table">
+        <caption
+          style={{
+            ...bgColor,
+            padding: "10px",
+            display: share ? "none" : "inlineBlock",
+          }}
+        >
+          <ButtonGroup
+            variant={isDark ? "contained" : "outlined"}
+            aria-label="outlined button group"
+          >
+            <Button
+              sx={{ fontSize: 16 }}
+              color="success"
+              onClick={() =>
+                handleData({
+                  type: "modify",
+                  data_id,
+                  voca,
+                  voca_mean,
+                  exam,
+                  exam_mean,
+                })
+              }
+            >
+              수정
+            </Button>
+            <Button
+              color="error"
+              sx={{ fontSize: 16 }}
+              onClick={() =>
+                handleData({
+                  type: "delete",
+                  data_id,
+                  voca,
+                  voca_mean,
+                  exam,
+                  exam_mean,
+                })
+              }
+            >
+              삭제
+            </Button>
+          </ButtonGroup>
+          <Checkbox
             sx={{
               ...textColor,
-              float: "right",
               padding: 0,
+              display: view.state ? "none" : "inlineBlock",
+              marginLeft: "10px",
             }}
-          >
-            <VolumeMuteIcon />
-          </IconButton>
-        </TableCell>
-        <TableCell
-          align="left"
-          sx={{
-            ...bgColor,
-            wordBreak: "break-all",
-          }}
-        >
-          <Stack direction="row">
-            <Checkbox
-              sx={{
-                ...textColor,
-                padding: 0,
-                display: view.state ? "none" : "block",
-                marginRight: "10px",
+            checked={
+              Boolean(checked["voca" + index]) &&
+              Boolean(checked["voca_mean" + index]) &&
+              Boolean(checked["exam" + index]) &&
+              Boolean(checked["exam_mean" + index])
+            }
+            icon={<VisibilityIcon />}
+            checkedIcon={<VisibilityOffIcon />}
+            onChange={(e) => {
+              setChecked({
+                ...checked,
+                ["voca" + index]: e.target.checked,
+                ["voca_mean" + index]: e.target.checked,
+                ["exam" + index]: e.target.checked,
+                ["exam_mean" + index]: e.target.checked,
+              });
+            }}
+          />
+        </caption>
+        <TableBody>
+          {rows.map((row) => (
+            <MyTableRow
+              title={row.title}
+              label={row.label}
+              checked={Boolean(checked[row.key])}
+              onChange={(e) => {
+                setChecked({
+                  ...checked,
+                  [row.key]: e.target.checked,
+                });
               }}
-              checked={checked}
-              icon={<VisibilityIcon />}
-              checkedIcon={<VisibilityOffIcon />}
-              onChange={onChange}
+              view={view}
+              textColor={textColor}
+              bgColor={bgColor}
+              url={row.url}
+              setLoad={row.setLoad}
+              key={row.key}
             />
-            <Typography
+          ))}
+          <StyledTableRow sx={{ display: view.state ? "none" : "inlineBlock" }}>
+            <TableCell
+              component="th"
+              scope="row"
               sx={{
                 ...textColor,
+                ...bgColor,
+                width: "7%",
+                borderRight: 1,
+                borderRightColor: "grey.300",
                 fontSize: 17,
-                display: checked || view.state ? "block" : "none",
               }}
             >
-              {label}
-            </Typography>
-          </Stack>
-        </TableCell>
-      </StyledTableRow>
-    );
-  };
+              따라읽기
+            </TableCell>
+            <TableCell
+              align="left"
+              component="th"
+              scope="row"
+              sx={{
+                ...textColor,
+                ...bgColor,
+              }}
+            >
+              <IconButton
+                sx={{
+                  ...textColor,
+                  border: "1px solid lightgray",
+                }}
+                onClick={() => {
+                  setCount({
+                    ...count,
+                    [index]: !count?.[index] ? 1 : count[index] + 1,
+                  });
+                }}
+              >
+                <PlusOneIcon />
+              </IconButton>
+              <Typography sx={{ display: "inline", margin: "10px" }}>
+                반복 횟수 : {count[index] ? count[index] : 0}
+              </Typography>
+              <IconButton
+                sx={{
+                  border: "1px solid lightgray",
+                  color: isDark ? "lightgray" : undefined,
+                }}
+                onClick={() => {
+                  setCount({ ...count, [index]: 0 });
+                }}
+              >
+                <RestartAltIcon />
+              </IconButton>
+            </TableCell>
+          </StyledTableRow>
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+};
+
+const MyTableRow = ({
+  title,
+  label,
+  checked,
+  onChange,
+  view,
+  textColor,
+  bgColor,
+  url,
+  setLoad,
+}: MyTableRowProps) => {
+  const matches2 = useMediaQuery("(max-width:1092px)");
+  const matches3 = useMediaQuery("(max-width:554px)");
+  const width = matches3 ? "35%" : matches2 ? "20%" : "10%";
 
   const onListen = async (text: string) => {
     const data = await useAxios(
@@ -309,205 +567,67 @@ const VocaLoad = () => {
     });
   };
 
-  type dataItem = {
-    data_id: number;
-    voca: string;
-    voca_mean: string;
-    exam: string;
-    exam_mean: string;
-  };
-
   return (
-    <div>
-      <MyHeader />
-      {data.map((item: dataItem, index) => {
-        return (
-          <TableContainer
-            component={Paper}
-            key={item.data_id}
+    <StyledTableRow>
+      <TableCell
+        component="th"
+        scope="row"
+        sx={{
+          ...textColor,
+          ...bgColor,
+          width: width,
+          borderRight: 1,
+          borderRightColor: "grey.300",
+          fontSize: 17,
+          padding: "0 15px",
+        }}
+      >
+        <Typography sx={{ display: "inline" }}>{title}</Typography>
+        <IconButton
+          onClick={() => {
+            onListen(label);
+          }}
+          sx={{
+            ...textColor,
+            float: "right",
+            padding: 0,
+          }}
+        >
+          <VolumeMuteIcon />
+        </IconButton>
+      </TableCell>
+      <TableCell
+        align="left"
+        sx={{
+          ...bgColor,
+          wordBreak: "break-all",
+        }}
+      >
+        <Stack direction="row">
+          <Checkbox
             sx={{
-              mb: "20px",
-              overflow: "hidden",
+              ...textColor,
+              padding: 0,
+              display: view.state ? "none" : "block",
+              marginRight: "10px",
+            }}
+            checked={checked}
+            icon={<VisibilityIcon />}
+            checkedIcon={<VisibilityOffIcon />}
+            onChange={onChange}
+          />
+          <Typography
+            sx={{
+              ...textColor,
+              fontSize: 17,
+              display: checked || view.state ? "block" : "none",
             }}
           >
-            <Table aria-label="caption table">
-              <caption
-                style={{
-                  ...bgColor,
-                  padding: "10px",
-                  display: share ? "none" : "inlineBlock",
-                }}
-              >
-                <ButtonGroup
-                  variant={isDark ? "contained" : "outlined"}
-                  aria-label="outlined button group"
-                >
-                  <Button
-                    sx={{ fontSize: 16 }}
-                    color="success"
-                    onClick={() =>
-                      handleData(
-                        "modify",
-                        item.data_id,
-                        item.voca,
-                        item.voca_mean,
-                        item.exam,
-                        item.exam_mean
-                      )
-                    }
-                  >
-                    수정
-                  </Button>
-                  <Button
-                    color="error"
-                    sx={{ fontSize: 16 }}
-                    onClick={() =>
-                      handleData(
-                        "delete",
-                        item.data_id,
-                        item.voca,
-                        item.voca_mean,
-                        item.exam,
-                        item.exam_mean
-                      )
-                    }
-                  >
-                    삭제
-                  </Button>
-                </ButtonGroup>
-                <Checkbox
-                  sx={{
-                    ...textColor,
-                    padding: 0,
-                    display: view.state ? "none" : "inlineBlock",
-                    marginLeft: "10px",
-                  }}
-                  checked={
-                    Boolean(checked["voca" + index]) &&
-                    Boolean(checked["voca_mean" + index]) &&
-                    Boolean(checked["exam" + index]) &&
-                    Boolean(checked["exam_mean" + index])
-                  }
-                  icon={<VisibilityIcon />}
-                  checkedIcon={<VisibilityOffIcon />}
-                  onChange={(e) => {
-                    setChecked({
-                      ...checked,
-                      ["voca" + index]: e.target.checked,
-                      ["voca_mean" + index]: e.target.checked,
-                      ["exam" + index]: e.target.checked,
-                      ["exam_mean" + index]: e.target.checked,
-                    });
-                  }}
-                />
-              </caption>
-              <TableBody>
-                <MyTableRow
-                  title="단어"
-                  label={item.voca}
-                  checked={Boolean(checked["voca" + index])}
-                  onChange={(e) => {
-                    setChecked({
-                      ...checked,
-                      ["voca" + index]: e.target.checked,
-                    });
-                  }}
-                />
-                <MyTableRow
-                  title="단어 뜻"
-                  label={item.voca_mean}
-                  checked={Boolean(checked["voca_mean" + index])}
-                  onChange={(e) => {
-                    setChecked({
-                      ...checked,
-                      ["voca_mean" + index]: e.target.checked,
-                    });
-                  }}
-                />
-                <MyTableRow
-                  title="예문"
-                  label={item.exam}
-                  checked={Boolean(checked["exam" + index])}
-                  onChange={(e) => {
-                    setChecked({
-                      ...checked,
-                      ["exam" + index]: e.target.checked,
-                    });
-                  }}
-                />
-                <MyTableRow
-                  title="예문 뜻"
-                  label={item.exam_mean}
-                  checked={Boolean(checked["exam_mean" + index])}
-                  onChange={(e) => {
-                    setChecked({
-                      ...checked,
-                      ["exam_mean" + index]: e.target.checked,
-                    });
-                  }}
-                />
-                <StyledTableRow
-                  sx={{ display: view.state ? "none" : "inlineBlock" }}
-                >
-                  <TableCell
-                    component="th"
-                    scope="row"
-                    sx={{
-                      ...textColor,
-                      ...bgColor,
-                      width: "7%",
-                      borderRight: 1,
-                      borderRightColor: "grey.300",
-                      fontSize: 17,
-                    }}
-                  >
-                    따라읽기
-                  </TableCell>
-                  <TableCell
-                    align="left"
-                    component="th"
-                    scope="row"
-                    sx={{
-                      ...textColor,
-                      ...bgColor,
-                    }}
-                  >
-                    <IconButton
-                      sx={{
-                        ...textColor,
-                        border: "1px solid lightgray",
-                      }}
-                      onClick={() => {
-                        setCount({
-                          ...count,
-                          [index]: !count?.[index] ? 1 : count[index] + 1,
-                        });
-                      }}
-                    >
-                      <PlusOneIcon />
-                    </IconButton>
-                    <Typography sx={{ display: "inline", margin: "10px" }}>
-                      반복 횟수 : {count[index] ? count[index] : 0}
-                    </Typography>
-                    <IconButton
-                      sx={{
-                        border: "1px solid lightgray",
-                        color: isDark ? "lightgray" : undefined,
-                      }}
-                      onClick={() => {
-                        setCount({ ...count, [index]: 0 });
-                      }}
-                    >
-                      <RestartAltIcon />
-                    </IconButton>
-                  </TableCell>
-                </StyledTableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-        );
-      })}
-    </div>
+            {label}
+          </Typography>
+        </Stack>
+      </TableCell>
+    </StyledTableRow>
   );
 };
 

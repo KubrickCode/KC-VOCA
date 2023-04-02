@@ -21,9 +21,7 @@ const FileArea = () => {
   const { theme, url, setLoad } = useContext(GlobalContext);
   const isDark = theme === "dark";
 
-  const { state, dispatch } = useContext(MainContext);
-
-  const [open, setOpen] = useState(false);
+  const { state } = useContext(MainContext);
 
   useEffect(() => {
     let method: string;
@@ -60,87 +58,14 @@ const FileArea = () => {
           sx={{ clear: "right" }}
         >
           {files.map((file) => (
-            <Grid
-              xs={2}
-              sm={2}
-              md={2}
+            <FileBody
               key={file.file_id}
-              sx={{
-                position: "relative",
-              }}
-            >
-              <Item
-                sx={{
-                  "&:hover": {
-                    backgroundColor: isDark ? "hsl(0, 0%, 45%)" : "lightgray",
-                    cursor: "pointer",
-                  },
-                  height:
-                    state.selectedFolder === "get_share_file"
-                      ? "230px"
-                      : "200px",
-                  backgroundColor: isDark ? "hsl(0, 0%, 35%)" : "white",
-                  color: isDark ? "lightgray" : "hsl(0, 0%, 20%)",
-                  textAlign: "center",
-                }}
-                onClick={() => {
-                  location.href = `/load/${file.file_id}`;
-                }}
-              >
-                <div>
-                  <TextSnippetIcon sx={{ fontSize: 100 }} />
-                </div>
-                <div>
-                  <Typography
-                    variant="h6"
-                    gutterBottom
-                    sx={{ wordBreak: "break-all" }}
-                  >
-                    {file.file_name}
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    gutterBottom
-                    sx={{
-                      display:
-                        state.selectedFolder === "get_share_file"
-                          ? "block"
-                          : "none",
-                    }}
-                  >
-                    by {file.nickname}
-                  </Typography>
-                </div>
-              </Item>
-              <MoreVertIcon
-                sx={{
-                  position: "absolute",
-                  right: 10,
-                  top: 15,
-                  color: isDark ? "lightgray" : "hsl(0, 0%, 20%)",
-                  display:
-                    state.selectedFolder === "get_share_file"
-                      ? "none"
-                      : "block",
-                  "&:hover": {
-                    backgroundColor: isDark ? "hsl(0, 0%, 45%)" : "lightgray",
-                    cursor: "pointer",
-                  },
-                }}
-                onClick={() => {
-                  dispatch({
-                    type: "setSelectedFile",
-                    payload: {
-                      id: file.file_id,
-                      fav: file.favorites,
-                      sha: file.shared,
-                    },
-                  });
-                  setOpen(!open);
-                }}
-              />
-              <FileDial open={open} setOpen={setOpen} />
-            </Grid>
+              file_id={file.file_id}
+              file_name={file.file_name}
+              nickname={file.nickname}
+              favorites={file.favorites}
+              shared={file.shared}
+            />
           ))}
         </Grid>
       </>
@@ -152,6 +77,90 @@ const FileArea = () => {
       </Typography>
     );
   }
+};
+
+const FileBody = ({
+  file_id,
+  file_name,
+  nickname,
+  favorites,
+  shared,
+}: File) => {
+  const { theme } = useContext(GlobalContext);
+  const isDark = theme === "dark";
+  const { state, dispatch } = useContext(MainContext);
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Grid
+      xs={2}
+      sm={2}
+      md={2}
+      sx={{
+        position: "relative",
+      }}
+    >
+      <Item
+        sx={{
+          "&:hover": {
+            backgroundColor: isDark ? "hsl(0, 0%, 45%)" : "lightgray",
+            cursor: "pointer",
+          },
+          height: state.selectedFolder === "get_share_file" ? "230px" : "200px",
+          backgroundColor: isDark ? "hsl(0, 0%, 35%)" : "white",
+          color: isDark ? "lightgray" : "hsl(0, 0%, 20%)",
+          textAlign: "center",
+        }}
+        onClick={() => {
+          location.href = `/load/${file_id}`;
+        }}
+      >
+        <div>
+          <TextSnippetIcon sx={{ fontSize: 100 }} />
+        </div>
+        <div>
+          <Typography variant="h6" gutterBottom sx={{ wordBreak: "break-all" }}>
+            {file_name}
+          </Typography>
+          <Typography
+            variant="h6"
+            gutterBottom
+            sx={{
+              display:
+                state.selectedFolder === "get_share_file" ? "block" : "none",
+            }}
+          >
+            by {nickname}
+          </Typography>
+        </div>
+      </Item>
+      <MoreVertIcon
+        sx={{
+          position: "absolute",
+          right: 10,
+          top: 15,
+          color: isDark ? "lightgray" : "hsl(0, 0%, 20%)",
+          display: state.selectedFolder === "get_share_file" ? "none" : "block",
+          "&:hover": {
+            backgroundColor: isDark ? "hsl(0, 0%, 45%)" : "lightgray",
+            cursor: "pointer",
+          },
+        }}
+        onClick={() => {
+          dispatch({
+            type: "setSelectedFile",
+            payload: {
+              id: file_id,
+              fav: favorites,
+              sha: shared,
+            },
+          });
+          setOpen(!open);
+        }}
+      />
+      <FileDial open={open} setOpen={setOpen} />
+    </Grid>
+  );
 };
 
 export default FileArea;

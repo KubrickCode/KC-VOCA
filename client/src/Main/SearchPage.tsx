@@ -15,14 +15,25 @@ import { GlobalContext, MainContext } from "../Context";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useAxios } from "../Module";
 
+type dataItem = {
+  data_id: number;
+  voca: string;
+  voca_mean: string;
+  exam: string;
+  exam_mean: string;
+};
+
+type MyTableRowProps = {
+  title: string;
+  label: string;
+};
+
 const SearchPage = () => {
   const location = useLocation();
   const [data, setData] = useState([]);
   const { dispatch } = useContext(MainContext);
   const { theme, url, setLoad } = useContext(GlobalContext);
   const isDark = theme === "dark";
-  const matches2 = useMediaQuery("(max-width:1092px)");
-  const matches3 = useMediaQuery("(max-width:554px)");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,93 +52,7 @@ const SearchPage = () => {
     fetchData();
   }, [location.state.value]);
 
-  const onListen = async (text: string) => {
-    const data = await useAxios(
-      "post",
-      `${url}/getdata/tts`,
-      {
-        text,
-      },
-      setLoad,
-      {
-        responseType: "arraybuffer",
-      }
-    );
-    const context = new AudioContext();
-    context.decodeAudioData(data, (buffer) => {
-      const source = context.createBufferSource();
-      source.buffer = buffer;
-      source.connect(context.destination);
-      source.start(0);
-    });
-  };
-
-  const bgColor = { backgroundColor: isDark ? "hsl(0, 0%, 30%)" : "white" };
   const textColor = { color: isDark ? "lightgray" : "hsl(0, 0%, 20%)" };
-
-  type MyTableRowProps = {
-    title: string;
-    label: string;
-  };
-
-  const MyTableRow = ({ title, label }: MyTableRowProps) => {
-    const width = matches3 ? "35%" : matches2 ? "20%" : "10%";
-
-    return (
-      <StyledTableRow>
-        <TableCell
-          component="th"
-          scope="row"
-          sx={{
-            ...bgColor,
-            ...textColor,
-            width: width,
-            borderRight: 1,
-            borderRightColor: "grey.300",
-            padding: "0 15px",
-          }}
-        >
-          <Typography sx={{ display: "inline" }}>{title}</Typography>
-          <IconButton
-            onClick={() => {
-              onListen(label);
-            }}
-            sx={{
-              ...textColor,
-              float: "right",
-              padding: 0,
-            }}
-          >
-            <VolumeMuteIcon />
-          </IconButton>
-        </TableCell>
-        <TableCell
-          align="left"
-          sx={{
-            ...bgColor,
-            wordBreak: "break-all",
-          }}
-        >
-          <Typography
-            sx={{
-              ...textColor,
-              fontSize: 17,
-            }}
-          >
-            {label}
-          </Typography>
-        </TableCell>
-      </StyledTableRow>
-    );
-  };
-
-  type dataItem = {
-    data_id: number;
-    voca: string;
-    voca_mean: string;
-    exam: string;
-    exam_mean: string;
-  };
 
   return (
     <>
@@ -156,24 +81,109 @@ const SearchPage = () => {
       </Stack>
       {data.map((item: dataItem) => {
         return (
-          <TableContainer
-            component={Paper}
+          <DataBody
+            data_id={item.data_id}
+            voca={item.voca}
+            voca_mean={item.voca_mean}
+            exam={item.exam}
+            exam_mean={item.exam_mean}
             key={item.data_id}
-            sx={{ mb: "20px" }}
-          >
-            <Table sx={{ minWidth: 650 }} aria-label="caption table">
-              <TableBody>
-                <MyTableRow title="단어" label={item.voca} />
-                <MyTableRow title="단어 뜻" label={item.voca_mean} />
-                <MyTableRow title="예문" label={item.exam} />
-                <MyTableRow title="예문 뜻" label={item.exam_mean} />
-              </TableBody>
-            </Table>
-          </TableContainer>
+          />
         );
       })}
     </>
   );
 };
+
+const MyTableRow = ({ title, label }: MyTableRowProps) => {
+  const { theme, url, setLoad } = useContext(GlobalContext);
+  const isDark = theme === "dark";
+  const matches2 = useMediaQuery("(max-width:1092px)");
+  const matches3 = useMediaQuery("(max-width:554px)");
+  const width = matches3 ? "35%" : matches2 ? "20%" : "10%";
+  const bgColor = { backgroundColor: isDark ? "hsl(0, 0%, 30%)" : "white" };
+  const textColor = { color: isDark ? "lightgray" : "hsl(0, 0%, 20%)" };
+
+  const onListen = async (text: string) => {
+    const data = await useAxios(
+      "post",
+      `${url}/getdata/tts`,
+      {
+        text,
+      },
+      setLoad,
+      {
+        responseType: "arraybuffer",
+      }
+    );
+    const context = new AudioContext();
+    context.decodeAudioData(data, (buffer) => {
+      const source = context.createBufferSource();
+      source.buffer = buffer;
+      source.connect(context.destination);
+      source.start(0);
+    });
+  };
+
+  return (
+    <StyledTableRow>
+      <TableCell
+        component="th"
+        scope="row"
+        sx={{
+          ...bgColor,
+          ...textColor,
+          width: width,
+          borderRight: 1,
+          borderRightColor: "grey.300",
+          padding: "0 15px",
+        }}
+      >
+        <Typography sx={{ display: "inline" }}>{title}</Typography>
+        <IconButton
+          onClick={() => {
+            onListen(label);
+          }}
+          sx={{
+            ...textColor,
+            float: "right",
+            padding: 0,
+          }}
+        >
+          <VolumeMuteIcon />
+        </IconButton>
+      </TableCell>
+      <TableCell
+        align="left"
+        sx={{
+          ...bgColor,
+          wordBreak: "break-all",
+        }}
+      >
+        <Typography
+          sx={{
+            ...textColor,
+            fontSize: 17,
+          }}
+        >
+          {label}
+        </Typography>
+      </TableCell>
+    </StyledTableRow>
+  );
+};
+
+const DataBody = ({ voca, voca_mean, exam, exam_mean }: dataItem) => (
+  <TableContainer component={Paper} sx={{ mb: "20px" }}>
+    <Table sx={{ minWidth: 650 }} aria-label="caption table">
+      <TableBody>
+        <MyTableRow title="단어" label={voca} />
+        <MyTableRow title="단어 뜻" label={voca_mean} />
+        <MyTableRow title="예문" label={exam} />
+        <MyTableRow title="예문 뜻" label={exam_mean} />
+      </TableBody>
+    </Table>
+  </TableContainer>
+);
 
 export default SearchPage;
