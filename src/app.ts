@@ -87,7 +87,7 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   res.locals.error = req.app.get("env") === "development" ? err : {};
 
   // render the error page
-  res.status(err.status || 500);
+  res.status(err.hasOwnProperty("status") ? err.status : 500);
   res.render("error.jade");
 });
 

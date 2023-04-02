@@ -78,11 +78,11 @@ const StyledTreeItem = (props: StyledTreeItemProps) => {
   );
 };
 
-interface Folder {
+type Folder = {
   folder_id: number;
   folder_name: string;
   parent_id: number;
-}
+};
 
 const FolderArea = () => {
   const [folderData, setFolderData] = useState<Folder[]>([]);

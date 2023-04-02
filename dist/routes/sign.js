@@ -6,8 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const promise_1 = __importDefault(require("mysql2/promise"));
+const bcrypt_1 = __importDefault(require("bcrypt"));
 const router = express_1.default.Router();
-const bcrypt = require("bcrypt");
 const passport = require("../lib/passport")();
 const db = promise_1.default.createPool(require("../lib/config").user);
 require("dotenv").config();
@@ -66,7 +66,7 @@ router.post("/check_duplicate", async (req, res) => {
 });
 router.post("/signup_process", async (req, res) => {
     const { email, password, nickname } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt_1.default.hash(password, 10);
     const query = [
         `INSERT INTO localuser(email, password, nickname) VALUES(?,?,?)`,
         `SELECT user_id FROM localuser WHERE email=?`,

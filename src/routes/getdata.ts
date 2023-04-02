@@ -1,12 +1,12 @@
 import express from "express";
 import bodyParser from "body-parser";
 import mysql, { RowDataPacket } from "mysql2/promise";
+import bcrypt from "bcrypt";
 
 const router = express.Router();
 const db = mysql.createPool(require("../lib/config").user);
 const AWS = require("aws-sdk");
 const aws_info = require("../lib/config").aws;
-const bcrypt = require("bcrypt");
 
 const Polly = new AWS.Polly({
   accessKeyId: aws_info.accessKeyId,

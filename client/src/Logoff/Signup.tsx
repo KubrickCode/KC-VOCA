@@ -66,15 +66,19 @@ const SignUp = () => {
         nickname,
       });
       form.submit();
-    } catch (error: any) {
-      const duplicates = error.response.data.duplicates;
-      setErrMsg(
-        duplicates.email
-          ? "이미 존재하는 이메일입니다"
-          : duplicates.nickname
-          ? "이미 존재하는 닉네임입니다"
-          : ""
-      );
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const duplicates = error?.response?.data.duplicates;
+        setErrMsg(
+          duplicates.email
+            ? "이미 존재하는 이메일입니다"
+            : duplicates.nickname
+            ? "이미 존재하는 닉네임입니다"
+            : ""
+        );
+      } else {
+        console.error(error);
+      }
     }
     setLoad(false);
   };

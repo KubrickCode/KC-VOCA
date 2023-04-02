@@ -6,11 +6,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const promise_1 = __importDefault(require("mysql2/promise"));
+const bcrypt_1 = __importDefault(require("bcrypt"));
 const router = express_1.default.Router();
 const db = promise_1.default.createPool(require("../lib/config").user);
 const AWS = require("aws-sdk");
 const aws_info = require("../lib/config").aws;
-const bcrypt = require("bcrypt");
 const Polly = new AWS.Polly({
     accessKeyId: aws_info.accessKeyId,
     secretAccessKey: aws_info.secretAccessKey,
@@ -173,7 +173,7 @@ router.post("/find_password", async (req, res) => {
         const isExist = await db.query(query[0], [email]);
         if (Boolean(isExist[0][0].email)) {
             const newPassword = Math.random().toString(36).slice(2);
-            const hash = await bcrypt.hash(newPassword, 10);
+            const hash = await bcrypt_1.default.hash(newPassword, 10);
             await db.query(query[1], [hash, email]);
             let params = {
                 Source: "kcvoca2023@gmail.com",

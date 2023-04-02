@@ -7,10 +7,10 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import { useState, useMemo } from "react";
 
-interface CenteredTabsProps {
+type CenteredTabsProps = {
   value: number;
-  handleChange: (e: any, newvalue: number) => void;
-}
+  handleChange: (e: React.SyntheticEvent, newvalue: number) => void;
+};
 
 const CenteredTabs = ({ value, handleChange }: CenteredTabsProps) => {
   return (
@@ -27,7 +27,7 @@ const theme = createTheme();
 
 const Sign = () => {
   const [value, setValue] = useState(0);
-  const handleChange = (e: any, newValue: number) => {
+  const handleChange = (e: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
   const renderForm = useMemo(

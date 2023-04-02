@@ -152,12 +152,12 @@ const SignIn = () => {
   );
 };
 
-interface FormDialogProps {
+type FormDialogProps = {
   open: boolean;
   setOpen: (open: boolean) => void;
   url: string;
   setLoad: (load: boolean) => void;
-}
+};
 
 const FormDialog = ({ open, setOpen, url, setLoad }: FormDialogProps) => {
   const emailRef = useRef<HTMLInputElement>();
@@ -223,10 +223,10 @@ const FormDialog = ({ open, setOpen, url, setLoad }: FormDialogProps) => {
   );
 };
 
-interface EmailAlertProps {
+type EmailAlertProps = {
   type: AlertColor;
   text: string;
-}
+};
 
 const EmailAlert = ({ type, text }: EmailAlertProps) => {
   return <Alert severity={type}>{text}</Alert>;

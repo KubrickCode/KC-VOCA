@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-interface DatabaseConfig {
+type DatabaseConfig = {
   host: string | undefined;
   user: string | undefined;
   password: string | undefined;
@@ -11,26 +11,26 @@ interface DatabaseConfig {
   dateStrings?: string | undefined;
   clearExpired?: boolean;
   expiration?: number;
-}
+};
 
-interface AwsConfig {
+type AwsConfig = {
   accessKeyId: string | undefined;
   secretAccessKey: string | undefined;
   signatureVersion: string | undefined;
   region: string | undefined;
   k_region: string | undefined;
-}
+};
 
-interface GoogleConfig {
+type GoogleConfig = {
   google_id: string | undefined;
   google_secret: string | undefined;
   google_callback: string | undefined;
-}
+};
 
-interface KakaoConfig {
+type KakaoConfig = {
   kakao_id: string | undefined;
   kakao_callback: string | undefined;
-}
+};
 
 export const user: DatabaseConfig = {
   host: process.env.DB_host,

@@ -215,12 +215,12 @@ const VocaLoad = () => {
     );
   };
 
-  interface MyTableRowProps {
+  type MyTableRowProps = {
     title: string;
     label: string;
     checked: boolean;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  }
+  };
 
   const MyTableRow = ({ title, label, checked, onChange }: MyTableRowProps) => {
     const width = matches3 ? "35%" : matches2 ? "20%" : "10%";
@@ -309,13 +309,13 @@ const VocaLoad = () => {
     });
   };
 
-  interface dataItem {
+  type dataItem = {
     data_id: number;
     voca: string;
     voca_mean: string;
     exam: string;
     exam_mean: string;
-  }
+  };
 
   return (
     <div>

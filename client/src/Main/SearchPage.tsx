@@ -65,10 +65,10 @@ const SearchPage = () => {
   const bgColor = { backgroundColor: isDark ? "hsl(0, 0%, 30%)" : "white" };
   const textColor = { color: isDark ? "lightgray" : "hsl(0, 0%, 20%)" };
 
-  interface MyTableRowProps {
+  type MyTableRowProps = {
     title: string;
     label: string;
-  }
+  };
 
   const MyTableRow = ({ title, label }: MyTableRowProps) => {
     const width = matches3 ? "35%" : matches2 ? "20%" : "10%";
@@ -121,13 +121,13 @@ const SearchPage = () => {
     );
   };
 
-  interface dataItem {
+  type dataItem = {
     data_id: number;
     voca: string;
     voca_mean: string;
     exam: string;
     exam_mean: string;
-  }
+  };
 
   return (
     <>

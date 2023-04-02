@@ -1,9 +1,9 @@
 import express from "express";
 import bodyParser from "body-parser";
 import mysql, { RowDataPacket } from "mysql2/promise";
+import bcrypt from "bcrypt";
 
 const router = express.Router();
-const bcrypt = require("bcrypt");
 const passport = require("../lib/passport")();
 const db = mysql.createPool(require("../lib/config").user);
 require("dotenv").config();

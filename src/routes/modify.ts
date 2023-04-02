@@ -106,7 +106,7 @@ router.post("/shared", async (req, res) => {
   }
 });
 
-async function isDescendantFolder(childId: number, parentId: number) {
+const isDescendantFolder = async (childId: number, parentId: number) => {
   let currentParentId = parentId;
 
   while (currentParentId !== 0) {
@@ -123,7 +123,7 @@ async function isDescendantFolder(childId: number, parentId: number) {
     }
   }
   return false;
-}
+};
 
 router.post("/move_folder", async (req, res) => {
   const { folder_id, parent_folder } = req.body;

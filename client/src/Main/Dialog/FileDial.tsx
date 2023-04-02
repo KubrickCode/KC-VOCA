@@ -16,10 +16,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import StarIcon from "@mui/icons-material/Star";
 import { useNavigate } from "react-router-dom";
 
-interface FileDialProps {
+type FileDialProps = {
   open: boolean;
   setOpen: (open: boolean) => void;
-}
+};
 
 const FileDial = ({ open, setOpen }: FileDialProps) => {
   const { state, dispatch } = useContext(MainContext);

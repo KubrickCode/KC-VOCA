@@ -8,13 +8,13 @@ import { Item } from "../Style/MUIStyle";
 import FileDial from "./Dialog/FileDial";
 import { useAxios } from "../Module";
 
-interface File {
+type File = {
   file_id: number;
   file_name: string;
   nickname: string;
   favorites: number;
   shared: number;
-}
+};
 
 const FileArea = () => {
   const [files, setFiles] = useState<File[]>([]);
@@ -28,7 +28,7 @@ const FileArea = () => {
   useEffect(() => {
     let method: string;
     let action: string;
-    let body: object;
+    let body: { folder_id: string };
     const fetchFiles = async () => {
       if (Number(state.selectedFolder)) {
         method = "post";

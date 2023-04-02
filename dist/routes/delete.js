@@ -13,26 +13,22 @@ router.use(body_parser_1.default.json());
 router.use(body_parser_1.default.urlencoded({ extended: true }));
 router.post("/delete_folder", async (req, res) => {
     const { folder_id } = req.body;
-    const query = `
-  SELECT parent_id FROM voca_folder WHERE folder_id=?;
-  DELETE FROM voca_data WHERE folder_id=?;
-  DELETE FROM voca_file WHERE folder_id=?;
-  DELETE FROM voca_folder WHERE folder_id=?;
-`;
-    const target = [folder_id, folder_id, folder_id, folder_id];
+    const query = [
+        "SELECT parent_id FROM voca_folder WHERE folder_id=?;",
+        `DELETE FROM voca_data WHERE folder_id=?;
+    DELETE FROM voca_file WHERE folder_id=?;
+    DELETE FROM voca_folder WHERE folder_id=?;`,
+    ];
+    const target = [[folder_id], [folder_id, folder_id, folder_id]];
     try {
-        if (folder_id === "1") {
-            res.send(["Home 폴더는 삭제하실 수 없습니다", "warning"]);
+        const [result1] = await db.query(query[0], target[0]);
+        const parent_id = result1[0].parent_id;
+        if (parent_id === 0) {
+            res.send(["Home 폴더는 삭제하실 수 없습니다", "error", "folder"]);
         }
         else {
-            const [results] = await db.query(query, target);
-            const selectResult = results[0];
-            res.send([
-                "폴더가 삭제되었습니다",
-                "success",
-                "folder",
-                selectResult[0].parent_id,
-            ]);
+            await db.query(query[1], target[1]);
+            res.send(["폴더가 삭제되었습니다", "success", "folder", parent_id]);
         }
     }
     catch (err) {
