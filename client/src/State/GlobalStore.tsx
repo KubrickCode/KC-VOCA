@@ -13,13 +13,11 @@ const globalStore: StateCreator<GlobalType> = (set) => ({
 });
 
 export const usePersistStore = create<PersistStoreType>(
-  import.meta.env.VITE_NODE_ENV === "development"
-    ? (devtools(
-        persist(persistStore, {
-          name: "persistStore",
-        })
-      ) as unknown as StateCreator<PersistStoreType>)
-    : persistStore
+  devtools(
+    persist(persistStore, {
+      name: "persistStore",
+    })
+  ) as unknown as StateCreator<PersistStoreType>
 );
 
 export const useGlobalStore = create<GlobalType>(
