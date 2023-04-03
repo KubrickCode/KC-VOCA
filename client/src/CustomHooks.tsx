@@ -3,32 +3,38 @@ import axios from "axios";
 type UseAxiosFunc = (
   method: string,
   url: string,
-  data?: object | null,
-  setLoad?: (a: boolean) => void,
+  setIsLoading: (isLoading: boolean) => void,
+  data?: object,
   resType?: object
 ) => Promise<any>;
 
-export const useAxios: UseAxiosFunc = async (
+const useAxios: UseAxiosFunc = async (
   method,
   url,
+  setIsLoading,
   data,
-  setLoad,
   resType
 ) => {
   try {
-    setLoad && setLoad(true);
-
+    setIsLoading(true);
     let res: { data: {} };
     if (method === "get") {
       res = await axios.get(url, { withCredentials: true });
     } else {
       res = await axios.post(url, data, { withCredentials: true, ...resType });
     }
-    setLoad && setLoad(false);
-
+    setIsLoading(false);
     return res.data;
   } catch (err) {
     console.error(err);
     return null;
   }
+};
+
+type UseAxiosReturnType = {
+  useAxios: UseAxiosFunc;
+};
+
+export const useAxiosHook = (): UseAxiosReturnType => {
+  return { useAxios };
 };

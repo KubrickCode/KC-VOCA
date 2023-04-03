@@ -1,6 +1,5 @@
-import { useReducer, useState, useEffect, useContext, useMemo } from "react";
-import { useTheme } from "@mui/material/styles";
-import { ThemeProvider } from "@mui/material/styles";
+import { useState, useEffect, useMemo, lazy, Suspense } from "react";
+import { useTheme, ThemeProvider } from "@mui/material/styles";
 import Drawer from "@mui/material/Drawer";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
@@ -11,7 +10,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { Link, Stack } from "@mui/material";
+import Link from "@mui/material/Link";
+import Stack from "@mui/material/Stack";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
@@ -21,28 +21,32 @@ import ShareIcon from "@mui/icons-material/Share";
 import SettingsBrightnessIcon from "@mui/icons-material/SettingsBrightness";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
-import Content from "./Main/Content";
 import PostDialog from "./Main/Dialog/PostDialog";
 import CheckDialog from "./Main/Dialog/CheckDialog";
 import MySnackBar from "./Main/Dialog/MySnackbar";
-import VocaLoad from "./Main/VocaLoad";
-import SearchPage from "./Main/SearchPage";
-import SharePage from "./Main/SharePage";
-import { MainContext, GlobalContext } from "./Context";
 import { Route, Routes, useNavigate } from "react-router-dom";
-import { reducer, initialState } from "./Reducer";
 import { darkTheme, DrawerHeader } from "./Style/MUIStyle";
 import AppBar from "@mui/material/AppBar";
 import SetDialog from "./Main/Dialog/SetDialog";
-import { useAxios } from "./Module";
+import { useAxiosHook } from "./CustomHooks";
+import { useGlobalStore, usePersistStore } from "./State/GlobalStore";
+import { useMainStore } from "./State/MainStore";
+import LoadingOverlay from "./Loading";
+import Content from "./Main/Content";
 
 const PersistentDrawerLeft = () => {
-  const [state, dispatch] = useReducer(reducer, initialState);
-  const { theme, setTheme, url, setLoad } = useContext(GlobalContext);
+  const url = import.meta.env.VITE_SERVER_HOST;
   const [searchValue, setSearchValue] = useState("");
+  const toggleTheme = usePersistStore((state) => state.toggleTheme);
   const theme2 = useTheme();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const { useAxios } = useAxiosHook();
+  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
+  const state = useMainStore((state) => state);
+  const VocaLoad = lazy(() => import("./Main/VocaLoad"));
+  const SearchPage = lazy(() => import("./Main/SearchPage"));
+  const SharePage = lazy(() => import("./Main/SharePage"));
 
   const handleOpen = () => setOpen(!open);
 
@@ -75,23 +79,15 @@ const PersistentDrawerLeft = () => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const data = await useAxios("get", `${url}/getdata/user`, null, setLoad);
-      dispatch({
-        type: "setUser",
-        payload: { email: data.email, nickname: data.nickname },
-      });
+      const data = await useAxios("get", `${url}/getdata/user`, setIsLoading);
+      state.setUser({ email: data.email, nickname: data.nickname });
     };
 
     fetchUser();
   }, [state.setState]);
 
   return (
-    <MainContext.Provider
-      value={{
-        state,
-        dispatch,
-      }}
-    >
+    <>
       <ThemeProvider theme={darkTheme}>
         <AppBar>
           <Toolbar>
@@ -118,12 +114,14 @@ const PersistentDrawerLeft = () => {
         </AppBar>
       </ThemeProvider>
 
-      <Routes>
-        <Route path="/" element={<Content />} />
-        <Route path="/load/:id" element={<VocaLoad />} />
-        <Route path="/search" element={<SearchPage />} />
-        <Route path="/share" element={<SharePage />} />
-      </Routes>
+      <Suspense fallback={<LoadingOverlay />}>
+        <Routes>
+          <Route path="/" element={<Content />} />
+          <Route path="/load/:id" element={<VocaLoad />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/share" element={<SharePage />} />
+        </Routes>
+      </Suspense>
 
       <Drawer anchor="left" open={open}>
         <DrawerHeader>
@@ -144,10 +142,7 @@ const PersistentDrawerLeft = () => {
           <ListItem disablePadding>
             <ListItemButton
               onClick={() => {
-                dispatch({
-                  type: "setSetDialog",
-                  payload: { isOpen: true },
-                });
+                state.setSetDialog({ isOpen: true });
               }}
             >
               <ListItemIcon>
@@ -165,11 +160,7 @@ const PersistentDrawerLeft = () => {
             </ListItemButton>
           </ListItem>
           <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => {
-                setTheme(theme === "dark" ? "light" : "dark");
-              }}
-            >
+            <ListItemButton onClick={toggleTheme}>
               <ListItemIcon>
                 <SettingsBrightnessIcon />
               </ListItemIcon>
@@ -200,7 +191,7 @@ const PersistentDrawerLeft = () => {
         </List>
       </Drawer>
       {[renderPostDial, renderCheckDial, renderSnack, renderSetDial]}
-    </MainContext.Provider>
+    </>
   );
 };
 

@@ -1,5 +1,3 @@
-import { useContext } from "react";
-import { MainContext, GlobalContext } from "../../Context";
 import {
   Dialog,
   DialogTitle,
@@ -8,60 +6,46 @@ import {
   DialogContentText,
   Button,
 } from "@mui/material";
-import { useAxios } from "../../Module";
+import { useAxiosHook } from "../../CustomHooks";
+import { useGlobalStore } from "../../State/GlobalStore";
+import { useMainStore } from "../../State/MainStore";
 
 const CheckDialog = () => {
-  const { state, dispatch } = useContext(MainContext);
-  const { setLoad } = useContext(GlobalContext);
+  const state = useMainStore((state) => state);
+
+  const { useAxios } = useAxiosHook();
+  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
 
   const handleOpen = () => {
-    dispatch({ type: "setCheckDialog", payload: { isOpen: false } });
+    state.setCheckDialog({ isOpen: false });
   };
 
   const submitForm = async () => {
-    const data = await useAxios(
-      "post",
-      state.checkDialog.link,
-      {
-        folder_id: state.selectedFolder,
-        file_id: state.selectedFile.id,
-        file_favorites: state.selectedFile.fav,
-        file_shared: state.selectedFile.sha,
-        data_id: state.selectedData.id,
-      },
-      setLoad
-    );
+    const data = await useAxios("post", state.checkDialog.link, setIsLoading, {
+      folder_id: state.selectedFolder,
+      file_id: state.selectedFile.id,
+      file_favorites: state.selectedFile.fav,
+      file_shared: state.selectedFile.sha,
+      data_id: state.selectedData.id,
+    });
 
-    const stateType = data[2] + "State";
-    let payload;
+    state.setSnackBar({
+      text: data[0],
+      type: data[1],
+    });
+
     if (data[2] === "folder") {
-      payload = state.folderState + 1;
+      state.setFolderState(state.folderState + 1);
     } else if (data[2] === "file") {
-      payload = state.fileState + 1;
+      state.setFileState(state.fileState + 1);
     } else {
-      payload = state.dataState + 1;
+      state.setDataState(state.dataState + 1);
     }
 
-    dispatch({
-      type: "setSnackBar",
-      payload: {
-        text: data[0],
-        type: data[1],
-      },
-    });
-    dispatch({
-      type: stateType,
-      payload,
-    });
-    dispatch({
-      type: "setSnackBarOpen",
-      payload: true,
-    });
+    state.setSnackBarOpen(true);
+
     if (data[3]) {
-      dispatch({
-        type: "setSelectedFolder",
-        payload: data[3],
-      });
+      state.setSelectedFolder(data[3]);
     }
     handleOpen();
   };

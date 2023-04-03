@@ -1,18 +1,18 @@
 import * as React from "react";
-import { useContext } from "react";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
-import { MainContext } from "../../Context";
 import { AlertProps, AlertColor } from "@mui/material/Alert";
+import { useMainStore } from "../../State/MainStore";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>((props, ref) => (
   <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
 ));
 
 const MySnackBar = () => {
-  const { state, dispatch } = useContext(MainContext);
+  const state = useMainStore((state) => state);
+
   const handleSnackClose = () => {
-    dispatch({ type: "setSnackBarOpen", payload: false });
+    state.setSnackBarOpen(false);
   };
 
   return (

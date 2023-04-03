@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
@@ -11,9 +11,10 @@ import TableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
 import VolumeMuteIcon from "@mui/icons-material/VolumeMute";
 import { StyledTableRow } from "../Style/MUIStyle";
-import { GlobalContext, MainContext } from "../Context";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useAxios } from "../Module";
+import { useAxiosHook } from "../CustomHooks";
+import { useGlobalStore, usePersistStore } from "../State/GlobalStore";
+import { useMainStore } from "../State/MainStore";
 
 type dataItem = {
   data_id: number;
@@ -31,20 +32,22 @@ type MyTableRowProps = {
 const SearchPage = () => {
   const location = useLocation();
   const [data, setData] = useState([]);
-  const { dispatch } = useContext(MainContext);
-  const { theme, url, setLoad } = useContext(GlobalContext);
-  const isDark = theme === "dark";
+  const state = useMainStore((state) => state);
+  const url = import.meta.env.VITE_SERVER_HOST;
+  const theme = usePersistStore((state) => !state.theme);
   const navigate = useNavigate();
+  const { useAxios } = useAxiosHook();
+  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
 
   useEffect(() => {
     const fetchData = async () => {
       const data = await useAxios(
         "post",
         `${url}/getdata/search`,
+        setIsLoading,
         {
           word: location.state.value,
-        },
-        setLoad
+        }
       );
       setData(data);
     };
@@ -52,7 +55,7 @@ const SearchPage = () => {
     fetchData();
   }, [location.state.value]);
 
-  const textColor = { color: isDark ? "lightgray" : "hsl(0, 0%, 20%)" };
+  const textColor = { color: theme ? "lightgray" : "hsl(0, 0%, 20%)" };
 
   return (
     <>
@@ -62,15 +65,12 @@ const SearchPage = () => {
             ...textColor,
             border: "1px solid lightgray",
             "&:hover": {
-              backgroundColor: isDark ? "hsl(0, 0%, 45%)" : "lightgray",
+              backgroundColor: theme ? "hsl(0, 0%, 45%)" : "lightgray",
             },
           }}
           onClick={() => {
             navigate("/");
-            dispatch({
-              type: "setSelectedFolder",
-              payload: "get_recent_file",
-            });
+            state.setSelectedFolder("get_recent_file");
           }}
         >
           <HomeIcon />
@@ -96,22 +96,24 @@ const SearchPage = () => {
 };
 
 const MyTableRow = ({ title, label }: MyTableRowProps) => {
-  const { theme, url, setLoad } = useContext(GlobalContext);
-  const isDark = theme === "dark";
+  const url = import.meta.env.VITE_SERVER_HOST;
+  const theme = usePersistStore((state) => !state.theme);
   const matches2 = useMediaQuery("(max-width:1092px)");
   const matches3 = useMediaQuery("(max-width:554px)");
   const width = matches3 ? "35%" : matches2 ? "20%" : "10%";
-  const bgColor = { backgroundColor: isDark ? "hsl(0, 0%, 30%)" : "white" };
-  const textColor = { color: isDark ? "lightgray" : "hsl(0, 0%, 20%)" };
+  const bgColor = { backgroundColor: theme ? "hsl(0, 0%, 30%)" : "white" };
+  const textColor = { color: theme ? "lightgray" : "hsl(0, 0%, 20%)" };
+  const { useAxios } = useAxiosHook();
+  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
 
   const onListen = async (text: string) => {
     const data = await useAxios(
       "post",
       `${url}/getdata/tts`,
+      setIsLoading,
       {
         text,
       },
-      setLoad,
       {
         responseType: "arraybuffer",
       }

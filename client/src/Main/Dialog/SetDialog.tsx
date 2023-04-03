@@ -1,4 +1,3 @@
-import { MainContext, GlobalContext } from "../../Context";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogActions from "@mui/material/DialogActions";
@@ -7,7 +6,6 @@ import Button from "@mui/material/Button";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { useContext } from "react";
 import ContactPageIcon from "@mui/icons-material/ContactPage";
 import Paper from "@mui/material/Paper";
 import ButtonGroup from "@mui/material/ButtonGroup";
@@ -15,13 +13,14 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
 import ModeIcon from "@mui/icons-material/Mode";
 import KeyIcon from "@mui/icons-material/Key";
+import { useMainStore } from "../../State/MainStore";
 
 const SetDialog = () => {
-  const { state, dispatch } = useContext(MainContext);
-  const { url } = useContext(GlobalContext);
+  const state = useMainStore((state) => state);
+  const url = import.meta.env.VITE_SERVER_HOST;
 
   const handleOpen = () => {
-    dispatch({ type: "setSetDialog", payload: { isOpen: false } });
+    state.setSetDialog({ isOpen: false });
   };
 
   const handleButtonClick = (
@@ -30,10 +29,7 @@ const SetDialog = () => {
     link: string,
     content: string
   ) => {
-    dispatch({
-      type: "setPostDialog",
-      payload: { isOpen: true, title, label, link, content },
-    });
+    state.setPostDialog({ isOpen: true, title, label, link, content });
   };
 
   return (

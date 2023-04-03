@@ -1,16 +1,18 @@
-import { useState, useContext, useEffect } from "react";
-import { MainContext, GlobalContext } from "../../Context";
+import { useState, useEffect } from "react";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import Button from "@mui/material/Button";
-import { useAxios } from "../../Module";
+import { useAxiosHook } from "../../CustomHooks";
+import { useGlobalStore } from "../../State/GlobalStore";
+import { useMainStore } from "../../State/MainStore";
 
 const PostDialog = () => {
-  const { state, dispatch } = useContext(MainContext);
-  const { setLoad } = useContext(GlobalContext);
+  const { useAxios } = useAxiosHook();
+  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
+  const state = useMainStore((state) => state);
   const [formData, setFormData] = useState({
     value1: "",
     value2: "",
@@ -65,21 +67,16 @@ const PostDialog = () => {
   }, [formData]);
 
   const handleOpen = () => {
-    dispatch({ type: "setPostDialog", payload: { isOpen: false } });
+    state.setPostDialog({ isOpen: false });
   };
 
   const submitForm = async () => {
-    const data = await useAxios(
-      "post",
-      state.postDialog.link,
-      {
-        formData: formData,
-        folder_id: state.selectedFolder,
-        file_id: state.selectedFile.id,
-        data_id: state.selectedData.id,
-      },
-      setLoad
-    );
+    const data = await useAxios("post", state.postDialog.link, setIsLoading, {
+      formData: formData,
+      folder_id: state.selectedFolder,
+      file_id: state.selectedFile.id,
+      data_id: state.selectedData.id,
+    });
     if (
       state.postDialog.title === "정말 회원에서 탈퇴하시겠습니까?" &&
       data === "success"
@@ -87,30 +84,21 @@ const PostDialog = () => {
       location.reload();
     }
     handleOpen();
-    const stateType = data[2] + "State";
-    let payload;
+
+    state.setSnackBar({
+      text: data[0],
+      type: data[1],
+    });
+
     if (data[2] === "folder") {
-      payload = state.folderState + 1;
+      state.setFolderState(state.folderState + 1);
     } else if (data[2] === "file") {
-      payload = state.fileState + 1;
+      state.setFileState(state.fileState + 1);
     } else {
-      payload = state.dataState + 1;
+      state.setDataState(state.dataState + 1);
     }
-    dispatch({
-      type: "setSnackBar",
-      payload: {
-        text: data[0],
-        type: data[1],
-      },
-    });
-    dispatch({
-      type: stateType,
-      payload,
-    });
-    dispatch({
-      type: "setSnackBarOpen",
-      payload: true,
-    });
+
+    state.setSnackBarOpen(true);
   };
 
   const basicContent = () => {

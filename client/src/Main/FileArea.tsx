@@ -2,11 +2,12 @@ import TextSnippetIcon from "@mui/icons-material/TextSnippet";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Grid from "@mui/material/Unstable_Grid2";
 import Typography from "@mui/material/Typography";
-import { useEffect, useState, useContext } from "react";
-import { MainContext, GlobalContext } from "../Context";
+import { useEffect, useState } from "react";
 import { Item } from "../Style/MUIStyle";
 import FileDial from "./Dialog/FileDial";
-import { useAxios } from "../Module";
+import { useAxiosHook } from "../CustomHooks";
+import { useGlobalStore, usePersistStore } from "../State/GlobalStore";
+import { useMainStore } from "../State/MainStore";
 
 type File = {
   file_id: number;
@@ -17,11 +18,13 @@ type File = {
 };
 
 const FileArea = () => {
+  const { useAxios } = useAxiosHook();
+  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
   const [files, setFiles] = useState<File[]>([]);
-  const { theme, url, setLoad } = useContext(GlobalContext);
-  const isDark = theme === "dark";
+  const url = import.meta.env.VITE_SERVER_HOST;
+  const theme = usePersistStore((state) => !state.theme);
 
-  const { state } = useContext(MainContext);
+  const state = useMainStore((state) => state);
 
   useEffect(() => {
     let method: string;
@@ -40,8 +43,7 @@ const FileArea = () => {
         method = "get";
         action = `${url}/getdata/${state.selectedFolder}`;
       }
-
-      const data = await useAxios(method, action, body, setLoad);
+      const data = await useAxios(method, action, setIsLoading, body);
       setFiles(data);
     };
 
@@ -72,7 +74,7 @@ const FileArea = () => {
     );
   } else {
     return (
-      <Typography sx={{ color: isDark ? "lightgray" : "hsl(0, 0%, 20%)" }}>
+      <Typography sx={{ color: theme ? "lightgray" : "hsl(0, 0%, 20%)" }}>
         해당 폴더 내에 생성된 단어장이 없습니다
       </Typography>
     );
@@ -86,10 +88,10 @@ const FileBody = ({
   favorites,
   shared,
 }: File) => {
-  const { theme } = useContext(GlobalContext);
-  const isDark = theme === "dark";
-  const { state, dispatch } = useContext(MainContext);
+  const theme = usePersistStore((state) => !state.theme);
   const [open, setOpen] = useState(false);
+
+  const state = useMainStore((state) => state);
 
   return (
     <Grid
@@ -103,12 +105,12 @@ const FileBody = ({
       <Item
         sx={{
           "&:hover": {
-            backgroundColor: isDark ? "hsl(0, 0%, 45%)" : "lightgray",
+            backgroundColor: theme ? "hsl(0, 0%, 45%)" : "lightgray",
             cursor: "pointer",
           },
           height: state.selectedFolder === "get_share_file" ? "230px" : "200px",
-          backgroundColor: isDark ? "hsl(0, 0%, 35%)" : "white",
-          color: isDark ? "lightgray" : "hsl(0, 0%, 20%)",
+          backgroundColor: theme ? "hsl(0, 0%, 35%)" : "white",
+          color: theme ? "lightgray" : "hsl(0, 0%, 20%)",
           textAlign: "center",
         }}
         onClick={() => {
@@ -139,21 +141,18 @@ const FileBody = ({
           position: "absolute",
           right: 10,
           top: 15,
-          color: isDark ? "lightgray" : "hsl(0, 0%, 20%)",
+          color: theme ? "lightgray" : "hsl(0, 0%, 20%)",
           display: state.selectedFolder === "get_share_file" ? "none" : "block",
           "&:hover": {
-            backgroundColor: isDark ? "hsl(0, 0%, 45%)" : "lightgray",
+            backgroundColor: theme ? "hsl(0, 0%, 45%)" : "lightgray",
             cursor: "pointer",
           },
         }}
         onClick={() => {
-          dispatch({
-            type: "setSelectedFile",
-            payload: {
-              id: file_id,
-              fav: favorites,
-              sha: shared,
-            },
+          state.setSelectedFile({
+            id: file_id,
+            fav: favorites,
+            sha: shared,
           });
           setOpen(!open);
         }}

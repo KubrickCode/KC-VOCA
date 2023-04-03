@@ -5,17 +5,16 @@ import FileArea from "./FileArea";
 import FolderArea from "./FolderArea";
 import { Item } from "../Style/MUIStyle";
 import MoveDial from "./Dialog/MoveDialog";
-import { GlobalContext } from "../Context";
-import { useContext, useMemo } from "react";
+import { useMemo } from "react";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { MainContext } from "../Context";
+import { usePersistStore } from "../State/GlobalStore";
+import { useMainStore } from "../State/MainStore";
 
 const Content = () => {
-  const { theme } = useContext(GlobalContext);
-  const { state } = useContext(MainContext);
-  const isDark = theme === "dark";
+  const theme = usePersistStore((state) => !state.theme);
+  const state = useMainStore((state) => state);
   const matches = useMediaQuery("(max-width:768px)");
-  const bgColor = { backgroundColor: isDark ? "hsl(0, 0%, 30%)" : "white" };
+  const bgColor = { backgroundColor: theme ? "hsl(0, 0%, 30%)" : "white" };
 
   const renderMove = useMemo(
     () => state.moveDialog.isOpen && <MoveDial />,

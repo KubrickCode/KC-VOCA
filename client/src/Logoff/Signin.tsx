@@ -1,6 +1,5 @@
-import { useState, useEffect, useContext, useRef } from "react";
-import { useAxios } from "../Module";
-import { GlobalContext } from "../Context";
+import { useState, useEffect, useRef } from "react";
+import { useAxiosHook } from "../CustomHooks";
 import {
   Avatar,
   Button,
@@ -20,6 +19,7 @@ import {
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 import "@fontsource/roboto/500.css";
+import { useGlobalStore } from "../State/GlobalStore";
 const Copyright = () => {
   return (
     <Typography
@@ -41,15 +41,16 @@ const Copyright = () => {
 const SignIn = () => {
   const [errmsg, setErrMsg] = useState("");
   const [open, setOpen] = useState<boolean>(false);
-  const { url, setLoad } = useContext(GlobalContext);
+  const { useAxios } = useAxiosHook();
+  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
+  const url = import.meta.env.VITE_SERVER_HOST;
 
   useEffect(() => {
     const fetchData = async () => {
       const data = await useAxios(
         "get",
         `${url}/signpage/login_process`,
-        null,
-        setLoad
+        setIsLoading
       );
       setErrMsg(data.feedback);
     };
@@ -147,7 +148,7 @@ const SignIn = () => {
 
         <Copyright />
       </Box>
-      <FormDialog open={open} setOpen={setOpen} url={url} setLoad={setLoad} />
+      <FormDialog open={open} setOpen={setOpen} url={url} />
     </>
   );
 };
@@ -156,10 +157,11 @@ type FormDialogProps = {
   open: boolean;
   setOpen: (open: boolean) => void;
   url: string;
-  setLoad: (load: boolean) => void;
 };
 
-const FormDialog = ({ open, setOpen, url, setLoad }: FormDialogProps) => {
+const FormDialog = ({ open, setOpen, url }: FormDialogProps) => {
+  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
+  const { useAxios } = useAxiosHook();
   const emailRef = useRef<HTMLInputElement>();
   const [emailState, setEmailState] = useState({
     open: false,
@@ -174,8 +176,10 @@ const FormDialog = ({ open, setOpen, url, setLoad }: FormDialogProps) => {
       const data = await useAxios(
         "post",
         `${url}/getdata/find_password`,
-        { email: emailRef.current!.value },
-        setLoad
+        setIsLoading,
+        {
+          email: emailRef.current!.value,
+        }
       );
       const newState = {
         ...emailState,

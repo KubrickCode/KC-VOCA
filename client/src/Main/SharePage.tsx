@@ -1,20 +1,20 @@
-import { useEffect, useContext } from "react";
-import { MainContext, GlobalContext } from "../Context";
+import { useEffect } from "react";
 import FileArea from "./FileArea";
 import Typography from "@mui/material/Typography";
 import { IconButton, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
+import { usePersistStore } from "../State/GlobalStore";
+import { useMainStore } from "../State/MainStore";
 
 const SharePage = () => {
-  const { dispatch } = useContext(MainContext);
-  const { theme } = useContext(GlobalContext);
-  const isDark = theme === "dark";
-  const textColor = { color: isDark ? "lightgray" : "hsl(0, 0%, 20%)" };
+  const state = useMainStore((state) => state);
+  const theme = usePersistStore((state) => !state.theme);
+  const textColor = { color: theme ? "lightgray" : "hsl(0, 0%, 20%)" };
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch({ type: "setSelectedFolder", payload: "get_share_file" });
+    state.setSelectedFolder("get_share_file");
   }, []);
 
   return (
@@ -25,15 +25,12 @@ const SharePage = () => {
             ...textColor,
             border: "1px solid lightgray",
             "&:hover": {
-              backgroundColor: isDark ? "hsl(0, 0%, 45%)" : "lightgray",
+              backgroundColor: theme ? "hsl(0, 0%, 45%)" : "lightgray",
             },
           }}
           onClick={() => {
             navigate("/");
-            dispatch({
-              type: "setSelectedFolder",
-              payload: "get_recent_file",
-            });
+            state.setSelectedFolder("get_recent_file");
           }}
         >
           <HomeIcon />

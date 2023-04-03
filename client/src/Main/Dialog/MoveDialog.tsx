@@ -1,54 +1,40 @@
-import { MainContext, GlobalContext } from "../../Context";
 import FolderArea from "../FolderArea";
-import { useContext } from "react";
 import { Dialog, DialogTitle, DialogActions, Button } from "@mui/material";
-import { useAxios } from "../../Module";
+import { useAxiosHook } from "../../CustomHooks";
+import { useGlobalStore } from "../../State/GlobalStore";
+import { useMainStore } from "../../State/MainStore";
 
 const MoveDial = () => {
-  const { state, dispatch } = useContext(MainContext);
-  const { setLoad } = useContext(GlobalContext);
+  const state = useMainStore((state) => state);
+  const { useAxios } = useAxiosHook();
+  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
 
   const handleOpen = () => {
-    dispatch({ type: "setMoveDialog", payload: { isOpen: false } });
+    state.setMoveDialog({ isOpen: false });
   };
 
   const submitForm = async () => {
-    const data = await useAxios(
-      "post",
-      state.moveDialog.link,
-      {
-        folder_id: state.selectedFolder,
-        file_id: state.selectedFile.id,
-        parent_folder: state.moveSelectedFolder,
-      },
-      setLoad
-    );
+    const data = await useAxios("post", state.moveDialog.link, setIsLoading, {
+      folder_id: state.selectedFolder,
+      file_id: state.selectedFile.id,
+      parent_folder: state.moveSelectedFolder,
+    });
     handleOpen();
-    const stateType = data[2] + "State";
-    let payload;
+
+    state.setSnackBar({
+      text: data[0],
+      type: data[1],
+    });
+
     if (data[2] === "folder") {
-      payload = state.folderState + 1;
+      state.setFolderState(state.folderState + 1);
     } else if (data[2] === "file") {
-      payload = state.fileState + 1;
+      state.setFileState(state.fileState + 1);
     } else {
-      payload = state.dataState + 1;
+      state.setDataState(state.dataState + 1);
     }
 
-    dispatch({
-      type: "setSnackBar",
-      payload: {
-        text: data[0],
-        type: data[1],
-      },
-    });
-    dispatch({
-      type: stateType,
-      payload,
-    });
-    dispatch({
-      type: "setSnackBarOpen",
-      payload: true,
-    });
+    state.setSnackBarOpen(true);
   };
 
   return (

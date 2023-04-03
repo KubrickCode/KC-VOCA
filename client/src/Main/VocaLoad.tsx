@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   useParams,
   useLocation,
@@ -17,7 +17,6 @@ import Typography from "@mui/material/Typography";
 import PlusOneIcon from "@mui/icons-material/PlusOne";
 import IconButton from "@mui/material/IconButton";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import { MainContext, GlobalContext } from "../Context";
 import HomeIcon from "@mui/icons-material/Home";
 import AddIcon from "@mui/icons-material/Add";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
@@ -28,8 +27,9 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VolumeMuteIcon from "@mui/icons-material/VolumeMute";
 import { StyledTableRow } from "../Style/MUIStyle";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useAxios } from "../Module";
-import { ActionType } from "../Reducer";
+import { useAxiosHook } from "../CustomHooks";
+import { useGlobalStore, usePersistStore } from "../State/GlobalStore";
+import { useMainStore } from "../State/MainStore";
 
 interface DataProps {
   data_id: number | null;
@@ -41,7 +41,7 @@ interface DataProps {
 interface DataEnv {
   textColor: { color: string };
   bgColor: { backgroundColor: string };
-  isDark?: boolean;
+  theme?: boolean;
   view: ViewObject;
   setView?: (viewObj: ViewObject) => void;
   share?: boolean;
@@ -66,7 +66,6 @@ interface dataItem extends DataProps, DataEnv {
 interface MyHeaderProps extends DataEnv {
   matches: boolean;
   navigate: NavigateFunction;
-  dispatch: React.Dispatch<ActionType>;
   fileName: string;
   handleData: ({}: handleDataProps) => void;
 }
@@ -87,8 +86,9 @@ type CountState = {
 };
 
 const VocaLoad = () => {
-  const { state, dispatch } = useContext(MainContext);
-  const { theme, url, setLoad } = useContext(GlobalContext);
+  const state = useMainStore((state) => state);
+  const url = import.meta.env.VITE_SERVER_HOST;
+  const theme = usePersistStore((state) => !state.theme);
   const viewMode = useLocation();
   const location = useParams();
   const [data, setData] = useState([]);
@@ -99,8 +99,9 @@ const VocaLoad = () => {
     text: "공부 모드",
   });
   const [share, setShare] = useState(false);
-  const isDark: boolean = theme === "dark";
   const navigate = useNavigate();
+  const { useAxios } = useAxiosHook();
+  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
 
   const matches = useMediaQuery("(max-width:830px)");
 
@@ -109,23 +110,17 @@ const VocaLoad = () => {
       const data = await useAxios(
         "post",
         `${url}/getdata/get_data`,
+        setIsLoading,
         {
           file_id: location.id,
-        },
-        setLoad
+        }
       );
       setData(data[0]);
       setShare(Boolean(data[2]));
       setFileName(data[1][0].file_name);
-      dispatch({
-        type: "setSelectedFolder",
-        payload: String(data[1][0].folder_id),
-      });
-      dispatch({
-        type: "setSelectedFile",
-        payload: {
-          id: data[1][0].file_id,
-        },
+      state.setSelectedFolder(String(data[1][0].folder_id));
+      state.setSelectedFile({
+        id: data[1][0].file_id,
       });
     };
     fetchData();
@@ -178,41 +173,39 @@ const VocaLoad = () => {
     }
 
     const { title, link, text } = typeData;
+    type === "delete"
+      ? state["setCheckDialog"]({
+          isOpen: true,
+          title,
+          link,
+          text,
+        })
+      : state["setPostDialog"]({
+          isOpen: true,
+          title,
+          link,
+          content: "data",
+        });
 
-    dispatch({
-      type: type === "delete" ? "setCheckDialog" : "setPostDialog",
-      payload: {
-        isOpen: true,
-        title,
-        link,
-        content: "data",
-        text,
-      },
-    });
-
-    dispatch({
-      type: "setSelectedData",
-      payload: {
-        id: data_id || null,
-        voca: voca || "",
-        voca_mean: voca_mean || "",
-        exam: exam || "",
-        exam_mean: exam_mean || "",
-      },
+    state.setSelectedData({
+      id: data_id || null,
+      voca: voca || "",
+      voca_mean: voca_mean || "",
+      exam: exam || "",
+      exam_mean: exam_mean || "",
     });
   };
 
-  const bgColor = { backgroundColor: isDark ? "hsl(0, 0%, 30%)" : "white" };
-  const textColor = { color: isDark ? "lightgray" : "hsl(0, 0%, 20%)" };
+  const bgColor = { backgroundColor: theme ? "hsl(0, 0%, 30%)" : "white" };
+  const textColor = { color: theme ? "lightgray" : "hsl(0, 0%, 20%)" };
 
   return (
     <div>
       <MyHeader
         matches={matches}
         textColor={textColor}
-        isDark={isDark}
+        theme={theme}
         navigate={navigate}
-        dispatch={dispatch}
         fileName={fileName}
         handleData={handleData}
         share={share}
@@ -232,7 +225,7 @@ const VocaLoad = () => {
           handleData={handleData}
           view={view}
           bgColor={bgColor}
-          isDark={isDark}
+          theme={theme}
           textColor={textColor}
           setView={setView}
           url={url}
@@ -245,15 +238,15 @@ const VocaLoad = () => {
 const MyHeader = ({
   matches,
   textColor,
-  isDark,
+  theme,
   navigate,
-  dispatch,
   fileName,
   handleData,
   share,
   view,
   setView,
 }: MyHeaderProps) => {
+  const state = useMainStore((state) => state);
   return (
     <Stack direction={matches ? "column" : "row"} spacing={2} mb={2} mt={10}>
       <Stack direction="row" spacing={2}>
@@ -262,15 +255,12 @@ const MyHeader = ({
             ...textColor,
             border: "1px solid lightgray",
             "&:hover": {
-              backgroundColor: isDark ? "hsl(0, 0%, 45%)" : "lightgray",
+              backgroundColor: theme ? "hsl(0, 0%, 45%)" : "lightgray",
             },
           }}
           onClick={() => {
             navigate("/");
-            dispatch({
-              type: "setSelectedFolder",
-              payload: "get_recent_file",
-            });
+            state.setSelectedFolder("get_recent_file");
           }}
         >
           <HomeIcon />
@@ -287,7 +277,7 @@ const MyHeader = ({
       </Stack>
       <Stack direction="row" spacing={2}>
         <Button
-          variant={isDark ? "contained" : "outlined"}
+          variant={theme ? "contained" : "outlined"}
           endIcon={<AddIcon />}
           onClick={() => {
             handleData({
@@ -304,7 +294,7 @@ const MyHeader = ({
           단어 추가
         </Button>
         <Button
-          variant={isDark ? "contained" : "outlined"}
+          variant={theme ? "contained" : "outlined"}
           endIcon={view.toggleBtn}
           color="secondary"
           onClick={() => {
@@ -331,7 +321,7 @@ const DataBody = ({
   handleData,
   view,
   bgColor,
-  isDark,
+  theme,
   textColor,
   share,
   url,
@@ -389,7 +379,7 @@ const DataBody = ({
           }}
         >
           <ButtonGroup
-            variant={isDark ? "contained" : "outlined"}
+            variant={theme ? "contained" : "outlined"}
             aria-label="outlined button group"
           >
             <Button
@@ -515,7 +505,7 @@ const DataBody = ({
               <IconButton
                 sx={{
                   border: "1px solid lightgray",
-                  color: isDark ? "lightgray" : undefined,
+                  color: theme ? "lightgray" : undefined,
                 }}
                 onClick={() => {
                   setCount({ ...count, [index]: 0 });
@@ -545,15 +535,17 @@ const MyTableRow = ({
   const matches2 = useMediaQuery("(max-width:1092px)");
   const matches3 = useMediaQuery("(max-width:554px)");
   const width = matches3 ? "35%" : matches2 ? "20%" : "10%";
+  const { useAxios } = useAxiosHook();
+  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
 
   const onListen = async (text: string) => {
     const data = await useAxios(
       "post",
       `${url}/getdata/tts`,
+      setIsLoading,
       {
         text,
       },
-      setLoad,
       {
         responseType: "arraybuffer",
       }

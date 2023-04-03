@@ -98,6 +98,7 @@ out
 
 # vuepress build output
 .vuepress/dist
+dist
 
 # vuepress v2.x temp and cache directory
 .temp
@@ -129,3 +130,6 @@ out
 .pnp.*
 
 client/src/Test.jsx
+
+.git
+.vscode

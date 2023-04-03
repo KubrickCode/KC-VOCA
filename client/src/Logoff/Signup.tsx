@@ -7,10 +7,10 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
-import { useState, useEffect, useContext, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Alert from "@mui/material/Alert";
-import { GlobalContext } from "../Context";
+import { useGlobalStore } from "../State/GlobalStore";
 
 const Copyright = () => {
   return (
@@ -37,7 +37,8 @@ const SignUp = () => {
   const nicknameInput = useRef<HTMLInputElement>();
   const [btnState, setBtnState] = useState(true);
   const [formField, setFormField] = useState(true);
-  const { url, setLoad } = useContext(GlobalContext);
+  const url = import.meta.env.VITE_SERVER_HOST;
+  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
 
   const [formErrors, setFormErrors] = useState({
     emailError: false,
@@ -58,7 +59,7 @@ const SignUp = () => {
     const nickname = form.nickname.value;
 
     e.preventDefault();
-    setLoad(true);
+    setIsLoading(true);
 
     try {
       await axios.post(`${url}/signpage/check_duplicate`, {
@@ -80,7 +81,7 @@ const SignUp = () => {
         console.error(error);
       }
     }
-    setLoad(false);
+    setIsLoading(false);
   };
 
   useEffect(() => {

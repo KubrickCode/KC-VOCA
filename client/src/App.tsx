@@ -1,52 +1,25 @@
 import { useState, useEffect } from "react";
 import Layout from "./Layout";
 import Sign from "./Logoff/Sign";
-import { GlobalContext } from "./Context";
-import CircularProgress from "@mui/material/CircularProgress";
-import { useAxios } from "./Module";
-
-const LoadingOverlay = () => (
-  <div
-    style={{
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      height: "100%",
-      width: "100%",
-      position: "fixed",
-      top: 0,
-      left: 0,
-      zIndex: 9999,
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      pointerEvents: "auto",
-    }}
-  >
-    <CircularProgress
-      color="primary"
-      size={80}
-      thickness={5}
-      style={{ pointerEvents: "none" }}
-    />
-  </div>
-);
+import { useAxiosHook } from "./CustomHooks";
+import { useGlobalStore, usePersistStore } from "./State/GlobalStore";
+import LoadingOverlay from "./Loading";
 
 const App = () => {
   const [isLogin, setIsLogin] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
-  const [theme, setTheme] = useState(() => {
-    const savedTheme = window.localStorage.getItem("kcvoca_theme");
-    return savedTheme || "light";
-  });
-  const [load, setLoad] = useState(false);
+  const theme = usePersistStore((state) => !state.theme);
+  const isLoading = useGlobalStore((state) => state.isLoading);
+  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
   const url = import.meta.env.VITE_SERVER_HOST;
+  const { useAxios } = useAxiosHook();
 
   useEffect(() => {
     const fetchIsLogin = async () => {
       const data = await useAxios(
         "get",
         `${url}/signpage/islogin`,
-        null,
-        setLoad
+        setIsLoading
       );
       setIsLogin(data);
       setIsFetching(false);
@@ -55,14 +28,13 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const backgroundColor = theme === "dark" ? "hsl(0, 0%, 20%)" : "#fff";
-    window.localStorage.setItem("kcvoca_theme", theme);
+    const backgroundColor = theme ? "hsl(0, 0%, 20%)" : "#fff";
     document.body.style.backgroundColor = backgroundColor;
   }, [theme]);
 
   return (
     <>
-      {load && <LoadingOverlay />}
+      {isLoading && <LoadingOverlay />}
       <div
         style={{
           position: "fixed",
@@ -70,13 +42,10 @@ const App = () => {
           left: 0,
           width: "100%",
           height: "100%",
-          backgroundColor: "transparent",
-          pointerEvents: load ? "auto" : "none",
+          pointerEvents: isLoading ? "auto" : "none",
         }}
       />
-      <GlobalContext.Provider value={{ theme, setTheme, url, setLoad }}>
-        {isFetching ? <LoadingOverlay /> : isLogin ? <Layout /> : <Sign />}
-      </GlobalContext.Provider>
+      {isFetching ? <LoadingOverlay /> : isLogin ? <Layout /> : <Sign />}
     </>
   );
 };

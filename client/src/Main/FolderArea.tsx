@@ -1,4 +1,4 @@
-import { useEffect, useContext, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import FolderIcon from "@mui/icons-material/Folder";
 import TreeView from "@mui/lab/TreeView";
 import Box from "@mui/material/Box";
@@ -7,10 +7,11 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import WatchLaterIcon from "@mui/icons-material/WatchLater";
 import StarIcon from "@mui/icons-material/Star";
-import { MainContext, GlobalContext } from "../Context";
 import { StyledTreeItemRoot } from "../Style/MUIStyle";
-import { useAxios } from "../Module";
+import { useAxiosHook } from "../CustomHooks";
 import { TreeItemProps } from "@mui/lab/TreeItem";
+import { useGlobalStore, usePersistStore } from "../State/GlobalStore";
+import { useMainStore } from "../State/MainStore";
 
 interface StyledTreeItemProps extends Omit<TreeItemProps, "onClick"> {
   bgColor?: string;
@@ -27,8 +28,9 @@ interface StyledTreeItemProps extends Omit<TreeItemProps, "onClick"> {
 }
 
 const StyledTreeItem = (props: StyledTreeItemProps) => {
-  const { theme } = useContext(GlobalContext);
-  const { state } = useContext(MainContext);
+  const theme = usePersistStore((state) => !state.theme);
+  const moveDialog = useMainStore((state) => state.moveDialog);
+
   const {
     bgColor,
     color = "inherit",
@@ -48,7 +50,7 @@ const StyledTreeItem = (props: StyledTreeItemProps) => {
             p: 0.5,
             pr: 0,
             color:
-              theme === "dark" && state.moveDialog.isOpen === false
+              theme && moveDialog.isOpen === false
                 ? "lightgray"
                 : "hsl(0, 0%, 20%)",
           }}
@@ -86,17 +88,19 @@ type Folder = {
 
 const FolderArea = () => {
   const [folderData, setFolderData] = useState<Folder[]>([]);
+  const { useAxios } = useAxiosHook();
+  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
 
-  const { state, dispatch } = useContext(MainContext);
-  const { url, setLoad } = useContext(GlobalContext);
+  const state = useMainStore((state) => state);
+
+  const url = import.meta.env.VITE_SERVER_HOST;
 
   useEffect(() => {
     const fetchFolders = async () => {
       const data = await useAxios(
         "get",
         `${url}/getdata/get_folder`,
-        null,
-        setLoad
+        setIsLoading
       );
       setFolderData(data);
     };
@@ -109,15 +113,9 @@ const FolderArea = () => {
       let tree: React.ReactNode[] = [];
       const clickFolder = (id: number) => {
         if (!state.moveDialog.isOpen) {
-          dispatch({
-            type: "setSelectedFolder",
-            payload: String(id),
-          });
+          state.setSelectedFolder(String(id));
         } else {
-          dispatch({
-            type: "setMoveSelectedFolder",
-            payload: String(id),
-          });
+          state.setMoveSelectedFolder(String(id));
         }
       };
       folderData.forEach((folder) => {
@@ -167,7 +165,7 @@ const FolderArea = () => {
         labelText="최근 본 단어장"
         labelIcon={WatchLaterIcon}
         onClick={() => {
-          dispatch({ type: "setSelectedFolder", payload: "get_recent_file" });
+          state.setSelectedFolder("get_recent_file");
         }}
         sx={folderDisplay}
       />
@@ -176,7 +174,7 @@ const FolderArea = () => {
         labelText="즐겨찾기 단어장"
         labelIcon={StarIcon}
         onClick={() => {
-          dispatch({ type: "setSelectedFolder", payload: "get_fav_file" });
+          state.setSelectedFolder("get_fav_file");
         }}
         sx={folderDisplay}
       />

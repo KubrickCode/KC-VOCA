@@ -1,5 +1,4 @@
-import { useEffect, useState, useContext, memo } from "react";
-import { MainContext, GlobalContext } from "../../Context";
+import { useEffect, useState, memo } from "react";
 import Avatar from "@mui/material/Avatar";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -15,6 +14,7 @@ import ShareIcon from "@mui/icons-material/Share";
 import DeleteIcon from "@mui/icons-material/Delete";
 import StarIcon from "@mui/icons-material/Star";
 import { useNavigate } from "react-router-dom";
+import { useMainStore } from "../../State/MainStore";
 
 type FileDialProps = {
   open: boolean;
@@ -28,8 +28,7 @@ type DialBodyProps = {
 };
 
 const FileDial = ({ open, setOpen }: FileDialProps) => {
-  const { state, dispatch } = useContext(MainContext);
-  const { url } = useContext(GlobalContext);
+  const url = import.meta.env.VITE_SERVER_HOST;
   const navigate = useNavigate();
   const [favObject, setFavObject] = useState({
     title: "",
@@ -40,6 +39,8 @@ const FileDial = ({ open, setOpen }: FileDialProps) => {
     title: "",
     text: "",
   });
+
+  const state = useMainStore((state) => state);
 
   useEffect(() => {
     setOpen(open);
@@ -79,15 +80,12 @@ const FileDial = ({ open, setOpen }: FileDialProps) => {
       name: "단어장명 변경",
       click: () => {
         setOpen(!open);
-        dispatch({
-          type: "setPostDialog",
-          payload: {
-            isOpen: true,
-            title: "단어장 변경",
-            label: "단어장명을 입력해 주세요",
-            link: `${url}/modify/rename_file`,
-            content: "basic",
-          },
+        state.setPostDialog({
+          isOpen: true,
+          title: "단어장 변경",
+          label: "단어장명을 입력해 주세요",
+          link: `${url}/modify/rename_file`,
+          content: "basic",
         });
       },
     },
@@ -96,12 +94,9 @@ const FileDial = ({ open, setOpen }: FileDialProps) => {
       name: "단어장 이동",
       click: () => {
         setOpen(!open);
-        dispatch({
-          type: "setMoveDialog",
-          payload: {
-            isOpen: true,
-            link: `${url}/modify/move_file`,
-          },
+        state.setMoveDialog({
+          isOpen: true,
+          link: `${url}/modify/move_file`,
         });
       },
     },
@@ -110,14 +105,11 @@ const FileDial = ({ open, setOpen }: FileDialProps) => {
       name: favObject.title,
       click: () => {
         setOpen(!open);
-        dispatch({
-          type: "setCheckDialog",
-          payload: {
-            isOpen: true,
-            title: favObject.title,
-            text: favObject.text,
-            link: `${url}/modify/favorites`,
-          },
+        state.setCheckDialog({
+          isOpen: true,
+          title: favObject.title,
+          text: favObject.text,
+          link: `${url}/modify/favorites`,
         });
       },
     },
@@ -126,14 +118,11 @@ const FileDial = ({ open, setOpen }: FileDialProps) => {
       name: shaObject.title,
       click: () => {
         setOpen(!open);
-        dispatch({
-          type: "setCheckDialog",
-          payload: {
-            isOpen: true,
-            title: shaObject.title,
-            text: shaObject.text,
-            link: `${url}/modify/shared`,
-          },
+        state.setCheckDialog({
+          isOpen: true,
+          title: shaObject.title,
+          text: shaObject.text,
+          link: `${url}/modify/shared`,
         });
       },
     },
@@ -142,14 +131,11 @@ const FileDial = ({ open, setOpen }: FileDialProps) => {
       name: "단어장 삭제",
       click: () => {
         setOpen(!open);
-        dispatch({
-          type: "setCheckDialog",
-          payload: {
-            isOpen: true,
-            title: "단어장 삭제",
-            text: "정말 단어장을 삭제하시겠습니까?",
-            link: `${url}/delete/delete_file`,
-          },
+        state.setCheckDialog({
+          isOpen: true,
+          title: "단어장 삭제",
+          text: "정말 단어장을 삭제하시겠습니까?",
+          link: `${url}/delete/delete_file`,
         });
       },
     },

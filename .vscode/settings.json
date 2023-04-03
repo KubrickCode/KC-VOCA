@@ -1,4 +1,0 @@
-{
-  "dotenv.enableAutocloaking": false,
-  "typescript.tsdk": "C:/Program Files/nodejs/node_modules/typescript/lib"
-}
