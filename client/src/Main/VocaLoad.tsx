@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   useParams,
   useLocation,
@@ -27,9 +27,9 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VolumeMuteIcon from "@mui/icons-material/VolumeMute";
 import { StyledTableRow } from "../Style/MUIStyle";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useAxiosHook } from "../CustomHooks";
-import { useGlobalStore, usePersistStore } from "../State/GlobalStore";
+import { usePersistStore } from "../State/GlobalStore";
 import { useMainStore } from "../State/MainStore";
+import { usePostAxios } from "../UseQuery";
 
 interface DataProps {
   data_id: number | null;
@@ -46,7 +46,6 @@ interface DataEnv {
   setView?: (viewObj: ViewObject) => void;
   share?: boolean;
   url?: string;
-  setLoad?: (isloading: boolean) => void;
 }
 interface ViewObject {
   state: boolean;
@@ -91,7 +90,6 @@ const VocaLoad = () => {
   const theme = usePersistStore((state) => !state.theme);
   const viewMode = useLocation();
   const location = useParams();
-  const [data, setData] = useState([]);
   const [fileName, setFileName] = useState("");
   const [view, setView] = useState({
     state: viewMode.state?.viewState ? false : true,
@@ -100,30 +98,27 @@ const VocaLoad = () => {
   });
   const [share, setShare] = useState(false);
   const navigate = useNavigate();
-  const { useAxios } = useAxiosHook();
-  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
 
   const matches = useMediaQuery("(max-width:830px)");
 
+  const { data, mutate } = usePostAxios(`${url}/getdata/get_data`);
+  const memoizedMutate = useCallback(mutate, []);
+
+  const requsetData = {
+    body: { file_id: location.id },
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await useAxios(
-        "post",
-        `${url}/getdata/get_data`,
-        setIsLoading,
-        {
-          file_id: location.id,
-        }
-      );
-      setData(data[0]);
-      setShare(Boolean(data[2]));
-      setFileName(data[1][0].file_name);
-      state.setSelectedFolder(String(data[1][0].folder_id));
-      state.setSelectedFile({
-        id: data[1][0].file_id,
-      });
-    };
-    fetchData();
+    memoizedMutate(requsetData, {
+      onSuccess: (data) => {
+        setShare(Boolean(data[2]));
+        setFileName(data[1][0].file_name);
+        state.setSelectedFolder(String(data[1][0].folder_id));
+        state.setSelectedFile({
+          id: data[1][0].file_id,
+        });
+      },
+    });
   }, [state.dataState]);
 
   useEffect(() => {
@@ -213,24 +208,25 @@ const VocaLoad = () => {
         setView={setView}
         bgColor={bgColor}
       />
-      {data.map((item: dataItem, index) => (
-        <DataBody
-          data_id={item.data_id}
-          voca={item.voca}
-          voca_mean={item.voca_mean}
-          exam={item.exam}
-          exam_mean={item.exam_mean}
-          index={index}
-          key={item.data_id}
-          handleData={handleData}
-          view={view}
-          bgColor={bgColor}
-          theme={theme}
-          textColor={textColor}
-          setView={setView}
-          url={url}
-        />
-      ))}
+      {data.data &&
+        data.data[0].map((item: dataItem, index: number) => (
+          <DataBody
+            data_id={item.data_id}
+            voca={item.voca}
+            voca_mean={item.voca_mean}
+            exam={item.exam}
+            exam_mean={item.exam_mean}
+            index={index}
+            key={item.data_id}
+            handleData={handleData}
+            view={view}
+            bgColor={bgColor}
+            theme={theme}
+            textColor={textColor}
+            setView={setView}
+            url={url}
+          />
+        ))}
     </div>
   );
 };
@@ -325,7 +321,6 @@ const DataBody = ({
   textColor,
   share,
   url,
-  setLoad,
 }: dataItem) => {
   const [checked, setChecked] = useState<CheckedState>({});
   const [count, setCount] = useState<CountState>({});
@@ -335,28 +330,24 @@ const DataBody = ({
       title: "단어",
       label: voca,
       url: url,
-      setLoad: setLoad,
       key: "voca" + index,
     },
     {
       title: "단어 뜻",
       label: voca_mean,
       url: url,
-      setLoad: setLoad,
       key: "voca_mean" + index,
     },
     {
       title: "예문",
       label: exam,
       url: url,
-      setLoad: setLoad,
       key: "exam" + index,
     },
     {
       title: "예문 뜻",
       label: exam_mean,
       url: url,
-      setLoad: setLoad,
       key: "exam_mean" + index,
     },
   ];
@@ -457,7 +448,6 @@ const DataBody = ({
               textColor={textColor}
               bgColor={bgColor}
               url={row.url}
-              setLoad={row.setLoad}
               key={row.key}
             />
           ))}
@@ -530,32 +520,27 @@ const MyTableRow = ({
   textColor,
   bgColor,
   url,
-  setLoad,
 }: MyTableRowProps) => {
   const matches2 = useMediaQuery("(max-width:1092px)");
   const matches3 = useMediaQuery("(max-width:554px)");
   const width = matches3 ? "35%" : matches2 ? "20%" : "10%";
-  const { useAxios } = useAxiosHook();
-  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
+  const { mutate } = usePostAxios(`${url}/getdata/tts`);
 
   const onListen = async (text: string) => {
-    const data = await useAxios(
-      "post",
-      `${url}/getdata/tts`,
-      setIsLoading,
-      {
-        text,
+    const requestData = {
+      body: { text },
+      responseType: { responseType: "arraybuffer" },
+    };
+    mutate(requestData, {
+      onSuccess: (data) => {
+        const context = new AudioContext();
+        context.decodeAudioData(data, (buffer) => {
+          const source = context.createBufferSource();
+          source.buffer = buffer;
+          source.connect(context.destination);
+          source.start(0);
+        });
       },
-      {
-        responseType: "arraybuffer",
-      }
-    );
-    const context = new AudioContext();
-    context.decodeAudioData(data, (buffer) => {
-      const source = context.createBufferSource();
-      source.buffer = buffer;
-      source.connect(context.destination);
-      source.start(0);
     });
   };
 

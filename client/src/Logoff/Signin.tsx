@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { useAxiosHook } from "../CustomHooks";
 import {
   Avatar,
   Button,
@@ -19,7 +18,8 @@ import {
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 import "@fontsource/roboto/500.css";
-import { useGlobalStore } from "../State/GlobalStore";
+import { useGetAxios, usePostAxios } from "../UseQuery";
+
 const Copyright = () => {
   return (
     <Typography
@@ -41,22 +41,12 @@ const Copyright = () => {
 const SignIn = () => {
   const [errmsg, setErrMsg] = useState("");
   const [open, setOpen] = useState<boolean>(false);
-  const { useAxios } = useAxiosHook();
-  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
   const url = import.meta.env.VITE_SERVER_HOST;
+  const { data } = useGetAxios(url + "/signpage/login_process");
 
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await useAxios(
-        "get",
-        `${url}/signpage/login_process`,
-        setIsLoading
-      );
-      setErrMsg(data.feedback);
-    };
-
-    fetchData();
-  }, []);
+    setErrMsg(data?.feedback);
+  }, [data]);
 
   return (
     <>
@@ -160,9 +150,8 @@ type FormDialogProps = {
 };
 
 const FormDialog = ({ open, setOpen, url }: FormDialogProps) => {
-  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
-  const { useAxios } = useAxiosHook();
   const emailRef = useRef<HTMLInputElement>();
+  const { mutate, data } = usePostAxios(url + "/getdata/find_password");
   const [emailState, setEmailState] = useState({
     open: false,
     type: "warning" as AlertColor,
@@ -172,28 +161,20 @@ const FormDialog = ({ open, setOpen, url }: FormDialogProps) => {
     setOpen(false);
   };
   const submitForm = () => {
-    const fetchData = async () => {
-      const data = await useAxios(
-        "post",
-        `${url}/getdata/find_password`,
-        setIsLoading,
-        {
-          email: emailRef.current!.value,
-        }
-      );
-      const newState = {
-        ...emailState,
-        open: true,
-        type: data ? "success" : ("warning" as AlertColor),
-        text: data
-          ? "이메일이 전송되었습니다."
-          : "존재하지 않는 이메일 입니다.",
-      };
-
-      setEmailState(newState);
+    const requsetData = {
+      body: {
+        email: emailRef.current!.value,
+      },
+    };
+    mutate(requsetData);
+    const newState = {
+      ...emailState,
+      open: true,
+      type: data ? "success" : ("warning" as AlertColor),
+      text: data ? "이메일이 전송되었습니다." : "존재하지 않는 이메일 입니다.",
     };
 
-    fetchData();
+    setEmailState(newState);
   };
 
   return (

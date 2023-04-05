@@ -28,11 +28,11 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import { darkTheme, DrawerHeader } from "./Style/MUIStyle";
 import AppBar from "@mui/material/AppBar";
 import SetDialog from "./Main/Dialog/SetDialog";
-import { useAxiosHook } from "./CustomHooks";
-import { useGlobalStore, usePersistStore } from "./State/GlobalStore";
+import { usePersistStore } from "./State/GlobalStore";
 import { useMainStore } from "./State/MainStore";
 import LoadingOverlay from "./Loading";
 import Content from "./Main/Content";
+import { useGetAxios } from "./UseQuery";
 
 const PersistentDrawerLeft = () => {
   const url = import.meta.env.VITE_SERVER_HOST;
@@ -41,12 +41,11 @@ const PersistentDrawerLeft = () => {
   const theme2 = useTheme();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const { useAxios } = useAxiosHook();
-  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
   const state = useMainStore((state) => state);
   const VocaLoad = lazy(() => import("./Main/VocaLoad"));
   const SearchPage = lazy(() => import("./Main/SearchPage"));
   const SharePage = lazy(() => import("./Main/SharePage"));
+  const { data, refetch } = useGetAxios(`${url}/getdata/user`);
 
   const handleOpen = () => setOpen(!open);
 
@@ -78,13 +77,9 @@ const PersistentDrawerLeft = () => {
   );
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const data = await useAxios("get", `${url}/getdata/user`, setIsLoading);
-      state.setUser({ email: data.email, nickname: data.nickname });
-    };
-
-    fetchUser();
-  }, [state.setState]);
+    refetch();
+    state.setUser({ email: data?.email, nickname: data?.nickname });
+  }, [state.setState, data]);
 
   return (
     <>
@@ -127,7 +122,7 @@ const PersistentDrawerLeft = () => {
         <DrawerHeader>
           <Stack direction="row" spacing={1}>
             <AccountCircleIcon />
-            <Typography>{state.user.nickname}</Typography>
+            <Typography>{data?.nickname}</Typography>
           </Stack>
           <IconButton onClick={handleOpen}>
             {theme2.direction === "ltr" ? (

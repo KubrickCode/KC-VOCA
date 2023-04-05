@@ -1,6 +1,7 @@
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import { BrowserRouter } from "react-router-dom";
+import ReactQueryProvider from "./ReactQueryProvider";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -9,7 +10,9 @@ const root = ReactDOM.createRoot(
 // root 엘리먼트에 <BrowserRouter>와 <App> 컴포넌트를 렌더링합니다.
 root.render(
   <BrowserRouter>
-    <App />
+    <ReactQueryProvider>
+      <App />
+    </ReactQueryProvider>
   </BrowserRouter>
 );
 

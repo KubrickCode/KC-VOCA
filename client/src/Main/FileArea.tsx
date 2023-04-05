@@ -5,9 +5,9 @@ import Typography from "@mui/material/Typography";
 import { useEffect, useState } from "react";
 import { Item } from "../Style/MUIStyle";
 import FileDial from "./Dialog/FileDial";
-import { useAxiosHook } from "../CustomHooks";
-import { useGlobalStore, usePersistStore } from "../State/GlobalStore";
+import { usePersistStore } from "../State/GlobalStore";
 import { useMainStore } from "../State/MainStore";
+import { usePostAxios } from "../UseQuery";
 
 type File = {
   file_id: number;
@@ -18,39 +18,22 @@ type File = {
 };
 
 const FileArea = () => {
-  const { useAxios } = useAxiosHook();
-  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
-  const [files, setFiles] = useState<File[]>([]);
   const url = import.meta.env.VITE_SERVER_HOST;
   const theme = usePersistStore((state) => !state.theme);
 
   const state = useMainStore((state) => state);
+  const { data, mutate } = usePostAxios(`${url}/getdata/get_file`);
+  const requsetData = {
+    body: { folder_id: state.selectedFolder },
+  };
 
   useEffect(() => {
-    let method: string;
-    let action: string;
-    let body: { folder_id: string };
-    const fetchFiles = async () => {
-      if (Number(state.selectedFolder)) {
-        method = "post";
-        action = `${url}/getdata/get_file`;
-        body = { folder_id: state.selectedFolder };
-      } else if (
-        ["get_share_file", "get_fav_file", "get_recent_file"].includes(
-          state.selectedFolder
-        )
-      ) {
-        method = "get";
-        action = `${url}/getdata/${state.selectedFolder}`;
-      }
-      const data = await useAxios(method, action, setIsLoading, body);
-      setFiles(data);
-    };
+    if (state.selectedFolder) {
+      mutate(requsetData);
+    }
+  }, [state.selectedFolder, mutate, state.fileState, state.folderState]);
 
-    fetchFiles();
-  }, [state.selectedFolder, state.fileState, state.folderState]);
-
-  if (files.length > 0) {
+  if (data.data?.length > 0) {
     return (
       <>
         <Grid
@@ -59,7 +42,7 @@ const FileArea = () => {
           columns={{ xs: 4, sm: 6, md: 10 }}
           sx={{ clear: "right" }}
         >
-          {files.map((file) => (
+          {data.data.map((file: File) => (
             <FileBody
               key={file.file_id}
               file_id={file.file_id}

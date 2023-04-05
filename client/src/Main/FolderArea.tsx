@@ -8,10 +8,10 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import WatchLaterIcon from "@mui/icons-material/WatchLater";
 import StarIcon from "@mui/icons-material/Star";
 import { StyledTreeItemRoot } from "../Style/MUIStyle";
-import { useAxiosHook } from "../CustomHooks";
 import { TreeItemProps } from "@mui/lab/TreeItem";
-import { useGlobalStore, usePersistStore } from "../State/GlobalStore";
+import { usePersistStore } from "../State/GlobalStore";
 import { useMainStore } from "../State/MainStore";
+import { useGetAxios } from "../UseQuery";
 
 interface StyledTreeItemProps extends Omit<TreeItemProps, "onClick"> {
   bgColor?: string;
@@ -86,63 +86,19 @@ type Folder = {
   parent_id: number;
 };
 
+type FolderTreeProps = {
+  data: Folder[];
+  parentId: number;
+};
+
 const FolderArea = () => {
-  const [folderData, setFolderData] = useState<Folder[]>([]);
-  const { useAxios } = useAxiosHook();
-  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
-
   const state = useMainStore((state) => state);
-
   const url = import.meta.env.VITE_SERVER_HOST;
+  const { data, refetch } = useGetAxios(`${url}/getdata/get_folder`);
 
   useEffect(() => {
-    const fetchFolders = async () => {
-      const data = await useAxios(
-        "get",
-        `${url}/getdata/get_folder`,
-        setIsLoading
-      );
-      setFolderData(data);
-    };
-
-    fetchFolders();
+    refetch();
   }, [state.folderState]);
-
-  const buildTree = useCallback(
-    (folderData: Folder[], parent_id: number) => {
-      let tree: React.ReactNode[] = [];
-      const clickFolder = (id: number) => {
-        if (!state.moveDialog.isOpen) {
-          state.setSelectedFolder(String(id));
-        } else {
-          state.setMoveSelectedFolder(String(id));
-        }
-      };
-      folderData.forEach((folder) => {
-        if (
-          folder.parent_id === parent_id ||
-          (parent_id === 0 && !folder.parent_id)
-        ) {
-          const children = buildTree(folderData, folder.folder_id);
-          const node = (
-            <StyledTreeItem
-              key={folder.folder_id}
-              nodeId={folder.folder_id.toString()}
-              labelText={folder.folder_name}
-              labelIcon={FolderIcon}
-              onClick={() => {
-                clickFolder(folder.folder_id);
-              }}
-              children={children}
-            />
-          );
-          tree.push(node);
-        }
-      });
-      return tree;
-    },
-    [folderData]
-  );
 
   const folderDisplay = {
     display: !state.moveDialog.isOpen ? "block" : "none",
@@ -178,9 +134,51 @@ const FolderArea = () => {
         }}
         sx={folderDisplay}
       />
-      {buildTree(folderData, 0)}
+      <FolderTree data={data} parentId={0} />
     </TreeView>
   );
+};
+
+const FolderTree: React.FC<FolderTreeProps> = ({ data, parentId }) => {
+  const state = useMainStore((state) => state);
+
+  const clickFolder = (id: number) => {
+    if (!state.moveDialog.isOpen) {
+      state.setSelectedFolder(String(id));
+    } else {
+      state.setMoveSelectedFolder(String(id));
+    }
+  };
+
+  const tree = data
+    ?.filter(
+      (folder) =>
+        folder.parent_id === parentId || (parentId === 0 && !folder.parent_id)
+    )
+    .map((folder) => {
+      const children = (
+        <FolderTree
+          key={folder.folder_id}
+          data={data}
+          parentId={folder.folder_id}
+        />
+      );
+
+      return (
+        <StyledTreeItem
+          key={folder.folder_id}
+          nodeId={folder.folder_id.toString()}
+          labelText={folder.folder_name}
+          labelIcon={FolderIcon}
+          onClick={() => {
+            clickFolder(folder.folder_id);
+          }}
+          children={children}
+        />
+      );
+    });
+
+  return <>{tree}</>;
 };
 
 export default FolderArea;

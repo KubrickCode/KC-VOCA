@@ -26,7 +26,7 @@ module.exports = () => {
     done(null, user.email);
   });
 
-  passport.deserializeUser((email: string, done: Function) => {
+  passport.deserializeUser(async (email: string, done: Function) => {
     db.query(
       `SELECT user_id FROM localuser WHERE email=?`,
       [email],

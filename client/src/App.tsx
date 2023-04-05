@@ -1,31 +1,16 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import Layout from "./Layout";
 import Sign from "./Logoff/Sign";
-import { useAxiosHook } from "./CustomHooks";
 import { useGlobalStore, usePersistStore } from "./State/GlobalStore";
 import LoadingOverlay from "./Loading";
 
+import { useGetAxios } from "./UseQuery";
+
 const App = () => {
-  const [isLogin, setIsLogin] = useState(false);
-  const [isFetching, setIsFetching] = useState(true);
   const theme = usePersistStore((state) => !state.theme);
   const isLoading = useGlobalStore((state) => state.isLoading);
-  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
   const url = import.meta.env.VITE_SERVER_HOST;
-  const { useAxios } = useAxiosHook();
-
-  useEffect(() => {
-    const fetchIsLogin = async () => {
-      const data = await useAxios(
-        "get",
-        `${url}/signpage/islogin`,
-        setIsLoading
-      );
-      setIsLogin(data);
-      setIsFetching(false);
-    };
-    fetchIsLogin();
-  }, []);
+  const { data } = useGetAxios(url + "/signpage/islogin");
 
   useEffect(() => {
     const backgroundColor = theme ? "hsl(0, 0%, 20%)" : "#fff";
@@ -45,7 +30,7 @@ const App = () => {
           pointerEvents: isLoading ? "auto" : "none",
         }}
       />
-      {isFetching ? <LoadingOverlay /> : isLogin ? <Layout /> : <Sign />}
+      {data ? <Layout /> : <Sign />}
     </>
   );
 };

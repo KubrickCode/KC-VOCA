@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
@@ -12,9 +12,9 @@ import Paper from "@mui/material/Paper";
 import VolumeMuteIcon from "@mui/icons-material/VolumeMute";
 import { StyledTableRow } from "../Style/MUIStyle";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useAxiosHook } from "../CustomHooks";
-import { useGlobalStore, usePersistStore } from "../State/GlobalStore";
+import { usePersistStore } from "../State/GlobalStore";
 import { useMainStore } from "../State/MainStore";
+import { usePostAxios } from "../UseQuery";
 
 type dataItem = {
   data_id: number;
@@ -31,29 +31,21 @@ type MyTableRowProps = {
 
 const SearchPage = () => {
   const location = useLocation();
-  const [data, setData] = useState([]);
   const state = useMainStore((state) => state);
   const url = import.meta.env.VITE_SERVER_HOST;
   const theme = usePersistStore((state) => !state.theme);
   const navigate = useNavigate();
-  const { useAxios } = useAxiosHook();
-  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
+
+  const { data, mutate } = usePostAxios(`${url}/getdata/search`);
+  const memoizedMutate = useCallback(mutate, [location.state.value]);
+
+  const requsetData = {
+    body: { word: location.state.value },
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await useAxios(
-        "post",
-        `${url}/getdata/search`,
-        setIsLoading,
-        {
-          word: location.state.value,
-        }
-      );
-      setData(data);
-    };
-
-    fetchData();
-  }, [location.state.value]);
+    memoizedMutate(requsetData);
+  }, [location.state.value, memoizedMutate]);
 
   const textColor = { color: theme ? "lightgray" : "hsl(0, 0%, 20%)" };
 
@@ -79,18 +71,19 @@ const SearchPage = () => {
           검색 키워드 : {location.state.value}
         </Typography>
       </Stack>
-      {data.map((item: dataItem) => {
-        return (
-          <DataBody
-            data_id={item.data_id}
-            voca={item.voca}
-            voca_mean={item.voca_mean}
-            exam={item.exam}
-            exam_mean={item.exam_mean}
-            key={item.data_id}
-          />
-        );
-      })}
+      {data.data &&
+        data.data.map((item: dataItem) => {
+          return (
+            <DataBody
+              data_id={item.data_id}
+              voca={item.voca}
+              voca_mean={item.voca_mean}
+              exam={item.exam}
+              exam_mean={item.exam_mean}
+              key={item.data_id}
+            />
+          );
+        })}
     </>
   );
 };
@@ -103,27 +96,23 @@ const MyTableRow = ({ title, label }: MyTableRowProps) => {
   const width = matches3 ? "35%" : matches2 ? "20%" : "10%";
   const bgColor = { backgroundColor: theme ? "hsl(0, 0%, 30%)" : "white" };
   const textColor = { color: theme ? "lightgray" : "hsl(0, 0%, 20%)" };
-  const { useAxios } = useAxiosHook();
-  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
+  const { mutate } = usePostAxios(`${url}/getdata/tts`);
 
   const onListen = async (text: string) => {
-    const data = await useAxios(
-      "post",
-      `${url}/getdata/tts`,
-      setIsLoading,
-      {
-        text,
+    const requestData = {
+      body: { text },
+      responseType: { responseType: "arraybuffer" },
+    };
+    mutate(requestData, {
+      onSuccess: (data) => {
+        const context = new AudioContext();
+        context.decodeAudioData(data, (buffer) => {
+          const source = context.createBufferSource();
+          source.buffer = buffer;
+          source.connect(context.destination);
+          source.start(0);
+        });
       },
-      {
-        responseType: "arraybuffer",
-      }
-    );
-    const context = new AudioContext();
-    context.decodeAudioData(data, (buffer) => {
-      const source = context.createBufferSource();
-      source.buffer = buffer;
-      source.connect(context.destination);
-      source.start(0);
     });
   };
 

@@ -41,14 +41,50 @@ router.get("/get_folder", async (req, res) => {
 
 router.post("/get_file", async (req, res) => {
   const { folder_id } = req.body;
-  const query = `SELECT * FROM voca_file WHERE folder_id=?`;
-  const target = [folder_id];
-  try {
-    const [result] = await db.query(query, target);
-    res.json(result);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Internal server error");
+  const { user_id } = (req.user as { user_id: number }[])[0];
+
+  if (folder_id === "get_recent_file") {
+    const query = `SELECT * FROM voca_file WHERE user_id=? ORDER BY current DESC;`;
+    const target = [user_id];
+    try {
+      const [result] = await db.query<RowDataPacket[]>(query, target);
+      res.json(result.slice(0, 10));
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Internal server error");
+    }
+  } else if (folder_id === "get_fav_file") {
+    const query = `SELECT * FROM voca_file WHERE favorites=1 AND user_id=?`;
+    const target = [user_id];
+    try {
+      const [result] = await db.query(query, target);
+      res.json(result);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Internal server error");
+    }
+  } else if (folder_id === "get_share_file") {
+    const query = `SELECT v.*, u.nickname
+  FROM voca_file v
+  JOIN localuser u ON v.user_id = u.user_id
+  WHERE v.shared = 1;`;
+    try {
+      const [result] = await db.query(query);
+      res.json(result);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Internal server error");
+    }
+  } else {
+    const query = `SELECT * FROM voca_file WHERE folder_id=?`;
+    const target = [folder_id];
+    try {
+      const [result] = await db.query(query, target);
+      res.json(result);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Internal server error");
+    }
   }
 });
 
@@ -95,6 +131,7 @@ router.get("/get_share_file", async (req, res) => {
 router.post("/get_data", async (req, res) => {
   const { file_id } = req.body;
   const { user_id } = (req.user as { user_id: number }[])[0];
+
   const query = [
     "SELECT * FROM voca_data WHERE file_id=?",
     "SELECT * FROM voca_file WHERE file_id=?",
@@ -208,6 +245,10 @@ router.post("/find_password", async (req, res) => {
     console.error(err);
     res.send(false);
   }
+});
+
+router.get("/wow", (req, res) => {
+  res.send("hello");
 });
 
 export default router;

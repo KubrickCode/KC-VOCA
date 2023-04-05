@@ -57,6 +57,7 @@ export interface StateType {
     nickname: string;
   };
   setSnackBarOpen: (snackBarOpen: boolean) => void;
+  setSetState: (setState: number) => void;
   setFolderState: (folderState: number) => void;
   setFileState: (fileState: number) => void;
   setDataState: (dataState: number) => void;

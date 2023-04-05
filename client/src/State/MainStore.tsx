@@ -57,6 +57,7 @@ const mainStore: StateCreator<StateType> = (set) => ({
   ...initialMainStore,
   setSnackBarOpen: (snackBarOpen: boolean) =>
     set((state) => ({ ...state, snackBarOpen })),
+  setSetState: (setState: number) => set((state) => ({ ...state, setState })),
   setFolderState: (folderState: number) =>
     set((state) => ({ ...state, folderState })),
   setFileState: (fileState: number) =>

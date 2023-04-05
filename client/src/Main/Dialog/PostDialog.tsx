@@ -5,14 +5,12 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import Button from "@mui/material/Button";
-import { useAxiosHook } from "../../CustomHooks";
-import { useGlobalStore } from "../../State/GlobalStore";
 import { useMainStore } from "../../State/MainStore";
+import { usePostAxios } from "../../UseQuery";
 
 const PostDialog = () => {
-  const { useAxios } = useAxiosHook();
-  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
   const state = useMainStore((state) => state);
+  const { mutate } = usePostAxios(state.postDialog.link);
   const [formData, setFormData] = useState({
     value1: "",
     value2: "",
@@ -71,34 +69,42 @@ const PostDialog = () => {
   };
 
   const submitForm = async () => {
-    const data = await useAxios("post", state.postDialog.link, setIsLoading, {
-      formData: formData,
-      folder_id: state.selectedFolder,
-      file_id: state.selectedFile.id,
-      data_id: state.selectedData.id,
+    const requsetData = {
+      body: {
+        formData: formData,
+        folder_id: state.selectedFolder,
+        file_id: state.selectedFile.id,
+        data_id: state.selectedData.id,
+      },
+    };
+    mutate(requsetData, {
+      onSuccess: (data) => {
+        if (
+          state.postDialog.title === "정말 회원에서 탈퇴하시겠습니까?" &&
+          data === "success"
+        ) {
+          location.reload();
+        }
+        handleOpen();
+
+        state.setSnackBar({
+          text: data[0],
+          type: data[1],
+        });
+
+        if (data[2] === "folder") {
+          state.setFolderState(state.folderState + 1);
+        } else if (data[2] === "file") {
+          state.setFileState(state.fileState + 1);
+        } else if (data[2] === "data") {
+          state.setDataState(state.dataState + 1);
+        } else {
+          state.setSetState(state.setState + 1);
+        }
+
+        state.setSnackBarOpen(true);
+      },
     });
-    if (
-      state.postDialog.title === "정말 회원에서 탈퇴하시겠습니까?" &&
-      data === "success"
-    ) {
-      location.reload();
-    }
-    handleOpen();
-
-    state.setSnackBar({
-      text: data[0],
-      type: data[1],
-    });
-
-    if (data[2] === "folder") {
-      state.setFolderState(state.folderState + 1);
-    } else if (data[2] === "file") {
-      state.setFileState(state.fileState + 1);
-    } else {
-      state.setDataState(state.dataState + 1);
-    }
-
-    state.setSnackBarOpen(true);
   };
 
   const basicContent = () => {
