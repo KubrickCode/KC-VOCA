@@ -1,13 +1,11 @@
-import SpeedDial from "@mui/material/SpeedDial";
-import SpeedDialIcon from "@mui/material/SpeedDialIcon";
-import SpeedDialAction from "@mui/material/SpeedDialAction";
+import { useMemo, useState } from "react";
+import { useMainStore } from "../../State/MainStore";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
 import DriveFileMoveIcon from "@mui/icons-material/DriveFileMove";
-import { useMemo, useState } from "react";
-import { useMainStore } from "../../State/MainStore";
+import { SpeedDial, SpeedDialIcon, SpeedDialAction } from "@mui/material";
 
 const SpeedDialComp = () => {
   const state = useMainStore((state) => state);

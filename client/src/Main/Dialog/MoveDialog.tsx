@@ -1,11 +1,25 @@
 import FolderArea from "../FolderArea";
-import { Dialog, DialogTitle, DialogActions, Button } from "@mui/material";
 import { useMainStore } from "../../State/MainStore";
 import { usePostAxios } from "../../UseQuery";
+import { useQueryClient } from "react-query";
+import { usePersistStore } from "../../State/GlobalStore";
+import { Dialog, DialogTitle, DialogActions, Button } from "@mui/material";
 
 const MoveDial = () => {
   const state = useMainStore((state) => state);
   const { mutate } = usePostAxios(state.moveDialog.link);
+  const queryClient = useQueryClient();
+  const theme = usePersistStore((state) => !state.theme);
+
+  const toggleStyle = {
+    backgroundColor: theme ? "hsl(0, 0%, 30%)" : "white",
+    color: theme ? "lightgray" : "hsl(0, 0%, 20%)",
+  };
+
+  const toggleBtnStyle = {
+    color: theme ? "lightgray" : "primary",
+  };
+
   const handleOpen = () => {
     state.setMoveDialog({ isOpen: false });
   };
@@ -28,11 +42,9 @@ const MoveDial = () => {
         });
 
         if (data[2] === "folder") {
-          state.setFolderState(state.folderState + 1);
+          queryClient.invalidateQueries("getFolder");
         } else if (data[2] === "file") {
-          state.setFileState(state.fileState + 1);
-        } else {
-          state.setDataState(state.dataState + 1);
+          queryClient.invalidateQueries("getFile");
         }
 
         state.setSnackBarOpen(true);
@@ -42,11 +54,13 @@ const MoveDial = () => {
 
   return (
     <Dialog onClose={handleOpen} open={state.moveDialog.isOpen}>
-      <DialogTitle>선택하신 폴더 내로 이동합니다</DialogTitle>
+      <DialogTitle sx={toggleStyle}>선택하신 폴더 내로 이동합니다</DialogTitle>
       <FolderArea />
-      <DialogActions>
-        <Button onClick={handleOpen}>닫기</Button>
-        <Button onClick={submitForm} autoFocus>
+      <DialogActions sx={toggleStyle}>
+        <Button onClick={handleOpen} sx={toggleBtnStyle}>
+          닫기
+        </Button>
+        <Button onClick={submitForm} autoFocus sx={toggleBtnStyle}>
           선택
         </Button>
       </DialogActions>

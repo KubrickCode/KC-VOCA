@@ -5,10 +5,6 @@ import { StateType } from "./StateType";
 
 const initialMainStore = {
   snackBarOpen: false,
-  folderState: 0,
-  fileState: 0,
-  dataState: 0,
-  setState: 0,
   snackBar: {
     text: "",
     type: "",
@@ -47,23 +43,12 @@ const initialMainStore = {
     exam: "",
     exam_mean: "",
   },
-  user: {
-    email: "",
-    nickname: "",
-  },
 };
 
 const mainStore: StateCreator<StateType> = (set) => ({
   ...initialMainStore,
   setSnackBarOpen: (snackBarOpen: boolean) =>
     set((state) => ({ ...state, snackBarOpen })),
-  setSetState: (setState: number) => set((state) => ({ ...state, setState })),
-  setFolderState: (folderState: number) =>
-    set((state) => ({ ...state, folderState })),
-  setFileState: (fileState: number) =>
-    set((state) => ({ ...state, fileState })),
-  setDataState: (dataState: number) =>
-    set((state) => ({ ...state, dataState })),
   setSnackBar: (snackBar: { text: string; type: string }) =>
     set((state) => ({ ...state, snackBar })),
   setPostDialog: (postDialog: Partial<StateType["postDialog"]>) =>
@@ -100,8 +85,6 @@ const mainStore: StateCreator<StateType> = (set) => ({
       ...state,
       selectedData: { ...state.selectedData, ...selectedData },
     })),
-  setUser: (user: Partial<StateType["user"]>) =>
-    set((state) => ({ ...state, user: { ...state.user, ...user } })),
 });
 
 export const useMainStore = create<StateType>(

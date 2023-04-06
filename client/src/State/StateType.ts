@@ -10,10 +10,6 @@ export type GlobalType = {
 
 export interface StateType {
   snackBarOpen: boolean;
-  folderState: number;
-  fileState: number;
-  dataState: number;
-  setState: number;
   snackBar: {
     text: string;
     type: string;
@@ -52,15 +48,7 @@ export interface StateType {
     exam: string;
     exam_mean: string;
   };
-  user: {
-    email: string;
-    nickname: string;
-  };
   setSnackBarOpen: (snackBarOpen: boolean) => void;
-  setSetState: (setState: number) => void;
-  setFolderState: (folderState: number) => void;
-  setFileState: (fileState: number) => void;
-  setDataState: (dataState: number) => void;
   setSnackBar: (snackBar: { text: string; type: string }) => void;
   setPostDialog: (postDialog: Partial<StateType["postDialog"]>) => void;
   setCheckDialog: (checkDialog: Partial<StateType["checkDialog"]>) => void;
@@ -70,5 +58,4 @@ export interface StateType {
   setMoveSelectedFolder: (moveSelectedFolder: string) => void;
   setSelectedFile: (selectedFile: Partial<StateType["selectedFile"]>) => void;
   setSelectedData: (selectedData: Partial<StateType["selectedData"]>) => void;
-  setUser: (user: Partial<StateType["user"]>) => void;
 }

@@ -1,11 +1,7 @@
 import { useEffect, useState, memo } from "react";
-import Avatar from "@mui/material/Avatar";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
-import Dialog from "@mui/material/Dialog";
+import { useNavigate } from "react-router-dom";
+import { useMainStore } from "../../State/MainStore";
+import { usePersistStore } from "../../State/GlobalStore";
 import { blue } from "@mui/material/colors";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
@@ -13,21 +9,18 @@ import DriveFileMoveIcon from "@mui/icons-material/DriveFileMove";
 import ShareIcon from "@mui/icons-material/Share";
 import DeleteIcon from "@mui/icons-material/Delete";
 import StarIcon from "@mui/icons-material/Star";
-import { useNavigate } from "react-router-dom";
-import { useMainStore } from "../../State/MainStore";
+import {
+  Avatar,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemButton,
+  ListItemText,
+  Dialog,
+} from "@mui/material";
+import { DialBodyProps, FormDialogProps } from "../../ComponentsType";
 
-type FileDialProps = {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-};
-
-type DialBodyProps = {
-  name: string;
-  icon: JSX.Element;
-  click: () => void;
-};
-
-const FileDial = ({ open, setOpen }: FileDialProps) => {
+const FileDial = ({ open, setOpen }: FormDialogProps) => {
   const url = import.meta.env.VITE_SERVER_HOST;
   const navigate = useNavigate();
   const [favObject, setFavObject] = useState({
@@ -41,6 +34,12 @@ const FileDial = ({ open, setOpen }: FileDialProps) => {
   });
 
   const state = useMainStore((state) => state);
+  const theme = usePersistStore((state) => !state.theme);
+
+  const toggleStyle = {
+    backgroundColor: theme ? "hsl(0, 0%, 30%)" : "white",
+    color: theme ? "lightgray" : "hsl(0, 0%, 20%)",
+  };
 
   useEffect(() => {
     setOpen(open);
@@ -144,7 +143,7 @@ const FileDial = ({ open, setOpen }: FileDialProps) => {
   return (
     <>
       <Dialog onClose={() => setOpen(!open)} open={open}>
-        <List sx={{ pt: 0 }}>
+        <List sx={{ pt: 0, ...toggleStyle }}>
           {newfileOptions.map((option) => (
             <DialBody
               key={option.name}

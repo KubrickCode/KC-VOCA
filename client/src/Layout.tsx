@@ -1,42 +1,45 @@
-import { useState, useEffect, useMemo, lazy, Suspense } from "react";
-import { useTheme, ThemeProvider } from "@mui/material/styles";
-import Drawer from "@mui/material/Drawer";
-import Toolbar from "@mui/material/Toolbar";
-import List from "@mui/material/List";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
+import { useState, useMemo, lazy, Suspense } from "react";
+import { Route, Routes, useNavigate } from "react-router-dom";
+import { usePersistStore } from "./State/GlobalStore";
+import { useMainStore } from "./State/MainStore";
+import { useGetAxios } from "./UseQuery";
+import LoadingOverlay from "./Loading";
+import Content from "./Main/Content";
+import MySnackBar from "./Main/Dialog/MySnackbar";
+import SetDialog from "./Main/Dialog/SetDialog";
+import PostDialog from "./Main/Dialog/PostDialog";
+import CheckDialog from "./Main/Dialog/CheckDialog";
+import { darkTheme, DrawerHeader } from "./Style/MUIStyle";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import Link from "@mui/material/Link";
-import Stack from "@mui/material/Stack";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ShareIcon from "@mui/icons-material/Share";
 import SettingsBrightnessIcon from "@mui/icons-material/SettingsBrightness";
-import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
-import PostDialog from "./Main/Dialog/PostDialog";
-import CheckDialog from "./Main/Dialog/CheckDialog";
-import MySnackBar from "./Main/Dialog/MySnackbar";
-import { Route, Routes, useNavigate } from "react-router-dom";
-import { darkTheme, DrawerHeader } from "./Style/MUIStyle";
-import AppBar from "@mui/material/AppBar";
-import SetDialog from "./Main/Dialog/SetDialog";
-import { usePersistStore } from "./State/GlobalStore";
-import { useMainStore } from "./State/MainStore";
-import LoadingOverlay from "./Loading";
-import Content from "./Main/Content";
-import { useGetAxios } from "./UseQuery";
+import { useTheme, ThemeProvider } from "@mui/material/styles";
+import {
+  Drawer,
+  Toolbar,
+  List,
+  Typography,
+  Divider,
+  IconButton,
+  Link,
+  Stack,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  InputBase,
+  AppBar,
+} from "@mui/material";
 
 const PersistentDrawerLeft = () => {
   const url = import.meta.env.VITE_SERVER_HOST;
   const [searchValue, setSearchValue] = useState("");
+  const theme = usePersistStore((state) => !state.theme);
   const toggleTheme = usePersistStore((state) => state.toggleTheme);
   const theme2 = useTheme();
   const navigate = useNavigate();
@@ -45,7 +48,7 @@ const PersistentDrawerLeft = () => {
   const VocaLoad = lazy(() => import("./Main/VocaLoad"));
   const SearchPage = lazy(() => import("./Main/SearchPage"));
   const SharePage = lazy(() => import("./Main/SharePage"));
-  const { data, refetch } = useGetAxios(`${url}/getdata/user`);
+  const { data } = useGetAxios(`${url}/getdata/user`, "getUser");
 
   const handleOpen = () => setOpen(!open);
 
@@ -76,10 +79,10 @@ const PersistentDrawerLeft = () => {
     [isSetDialogOpen]
   );
 
-  useEffect(() => {
-    refetch();
-    state.setUser({ email: data?.email, nickname: data?.nickname });
-  }, [state.setState, data]);
+  const toggleStyle = {
+    backgroundColor: theme ? "hsl(0, 0%, 30%)" : "white",
+    color: theme ? "lightgray" : "hsl(0, 0%, 20%)",
+  };
 
   return (
     <Suspense fallback={<LoadingOverlay />}>
@@ -119,21 +122,21 @@ const PersistentDrawerLeft = () => {
       </Suspense>
 
       <Drawer anchor="left" open={open}>
-        <DrawerHeader>
+        <DrawerHeader sx={toggleStyle}>
           <Stack direction="row" spacing={1}>
             <AccountCircleIcon />
             <Typography>{data?.nickname}</Typography>
           </Stack>
           <IconButton onClick={handleOpen}>
             {theme2.direction === "ltr" ? (
-              <ChevronLeftIcon />
+              <ChevronLeftIcon sx={toggleStyle} />
             ) : (
-              <ChevronRightIcon />
+              <ChevronRightIcon sx={toggleStyle} />
             )}
           </IconButton>
         </DrawerHeader>
-        <Divider />
-        <List>
+        <Divider sx={toggleStyle} />
+        <List sx={{ height: "100%", ...toggleStyle }}>
           <ListItem disablePadding>
             <ListItemButton
               onClick={() => {
@@ -141,7 +144,7 @@ const PersistentDrawerLeft = () => {
               }}
             >
               <ListItemIcon>
-                <SettingsIcon />
+                <SettingsIcon sx={toggleStyle} />
               </ListItemIcon>
               <ListItemText primary="설정" />
             </ListItemButton>
@@ -149,7 +152,7 @@ const PersistentDrawerLeft = () => {
           <ListItem disablePadding>
             <ListItemButton onClick={() => navigate("/share")}>
               <ListItemIcon>
-                <ShareIcon />
+                <ShareIcon sx={toggleStyle} />
               </ListItemIcon>
               <ListItemText primary="공유마당" />
             </ListItemButton>
@@ -157,7 +160,7 @@ const PersistentDrawerLeft = () => {
           <ListItem disablePadding>
             <ListItemButton onClick={toggleTheme}>
               <ListItemIcon>
-                <SettingsBrightnessIcon />
+                <SettingsBrightnessIcon sx={toggleStyle} />
               </ListItemIcon>
               <ListItemText primary="다크모드" />
             </ListItemButton>
@@ -167,7 +170,7 @@ const PersistentDrawerLeft = () => {
             sx={{ borderBottom: 1, borderColor: "grey.500" }}
           >
             <InputBase
-              sx={{ ml: 1, flex: 1 }}
+              sx={{ ml: 1, flex: 1, ...toggleStyle }}
               placeholder="Search..."
               onChange={(e) => setSearchValue(e.target.value)}
               inputProps={{ maxLength: 100 }}
@@ -180,7 +183,7 @@ const PersistentDrawerLeft = () => {
                 navigate("/search", { state: { value: searchValue } });
               }}
             >
-              <SearchIcon />
+              <SearchIcon sx={toggleStyle} />
             </IconButton>
           </ListItem>
         </List>

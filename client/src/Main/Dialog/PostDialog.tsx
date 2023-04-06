@@ -1,12 +1,16 @@
 import { useState, useEffect } from "react";
-import TextField from "@mui/material/TextField";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import Button from "@mui/material/Button";
 import { useMainStore } from "../../State/MainStore";
 import { usePostAxios } from "../../UseQuery";
+import { useQueryClient } from "react-query";
+import { usePersistStore } from "../../State/GlobalStore";
+import {
+  TextField,
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  DialogContent,
+  Button,
+} from "@mui/material";
 
 const PostDialog = () => {
   const state = useMainStore((state) => state);
@@ -20,6 +24,21 @@ const PostDialog = () => {
     exam_mean: "",
   });
   const [submitBtn, setSubmitBtn] = useState(true);
+  const queryClient = useQueryClient();
+  const theme = usePersistStore((state) => !state.theme);
+
+  const toggleStyle = {
+    backgroundColor: theme ? "hsl(0, 0%, 30%)" : "white",
+    color: theme ? "lightgray" : "hsl(0, 0%, 20%)",
+  };
+
+  const toggleInputStyle = {
+    color: theme ? "lightgray" : "hsl(0, 0%, 20%)",
+  };
+
+  const toggleBtnStyle = {
+    color: theme ? "lightgray" : "primary",
+  };
 
   useEffect(() => {
     setFormData({
@@ -93,13 +112,13 @@ const PostDialog = () => {
         });
 
         if (data[2] === "folder") {
-          state.setFolderState(state.folderState + 1);
+          queryClient.invalidateQueries("getFolder");
         } else if (data[2] === "file") {
-          state.setFileState(state.fileState + 1);
+          queryClient.invalidateQueries("getFile");
         } else if (data[2] === "data") {
-          state.setDataState(state.dataState + 1);
+          queryClient.invalidateQueries("getData");
         } else {
-          state.setSetState(state.setState + 1);
+          queryClient.invalidateQueries("getUser");
         }
 
         state.setSnackBarOpen(true);
@@ -129,7 +148,14 @@ const PostDialog = () => {
           onChange={(e) => {
             setFormData({ ...formData, value1: e.target.value });
           }}
-          inputProps={{ minLength: pwdState ? 6 : 1, maxLength: 18 }}
+          inputProps={{
+            minLength: pwdState ? 6 : 1,
+            maxLength: 18,
+            style: toggleInputStyle,
+          }}
+          InputLabelProps={{
+            style: toggleInputStyle,
+          }}
         />
         {pwdState && (
           <TextField
@@ -144,7 +170,14 @@ const PostDialog = () => {
             onChange={(e) => {
               setFormData({ ...formData, value2: e.target.value });
             }}
-            inputProps={{ minLength: 6, maxLength: 18 }}
+            inputProps={{
+              minLength: 6,
+              maxLength: 18,
+              style: toggleInputStyle,
+            }}
+            InputLabelProps={{
+              style: toggleInputStyle,
+            }}
           />
         )}
       </div>
@@ -166,7 +199,10 @@ const PostDialog = () => {
           onChange={(e) => {
             setFormData({ ...formData, voca: e.target.value });
           }}
-          inputProps={{ minLength: 1, maxLength: 100 }}
+          inputProps={{ minLength: 1, maxLength: 100, style: toggleInputStyle }}
+          InputLabelProps={{
+            style: toggleInputStyle,
+          }}
           multiline={true}
         />
         <TextField
@@ -180,7 +216,10 @@ const PostDialog = () => {
           onChange={(e) => {
             setFormData({ ...formData, voca_mean: e.target.value });
           }}
-          inputProps={{ maxLength: 100 }}
+          inputProps={{ maxLength: 100, style: toggleInputStyle }}
+          InputLabelProps={{
+            style: toggleInputStyle,
+          }}
           multiline={true}
         />
         <TextField
@@ -194,7 +233,10 @@ const PostDialog = () => {
           onChange={(e) => {
             setFormData({ ...formData, exam: e.target.value });
           }}
-          inputProps={{ maxLength: 1000 }}
+          inputProps={{ maxLength: 1000, style: toggleInputStyle }}
+          InputLabelProps={{
+            style: toggleInputStyle,
+          }}
           multiline={true}
         />
         <TextField
@@ -208,7 +250,10 @@ const PostDialog = () => {
           onChange={(e) => {
             setFormData({ ...formData, exam_mean: e.target.value });
           }}
-          inputProps={{ maxLength: 1000 }}
+          inputProps={{ maxLength: 1000, style: toggleInputStyle }}
+          InputLabelProps={{
+            style: toggleInputStyle,
+          }}
           multiline={true}
         />
       </div>
@@ -217,13 +262,15 @@ const PostDialog = () => {
 
   return (
     <Dialog open={state.postDialog.isOpen} onClose={handleOpen}>
-      <DialogTitle>{state.postDialog.title}</DialogTitle>
-      <DialogContent>
+      <DialogTitle sx={toggleStyle}>{state.postDialog.title}</DialogTitle>
+      <DialogContent sx={toggleStyle}>
         {state.postDialog.content === "basic" ? basicContent() : dataContent()}
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleOpen}>닫기</Button>
-        <Button onClick={submitForm} disabled={submitBtn}>
+      <DialogActions sx={toggleStyle}>
+        <Button onClick={handleOpen} sx={toggleBtnStyle}>
+          닫기
+        </Button>
+        <Button onClick={submitForm} disabled={submitBtn} sx={toggleBtnStyle}>
           확인
         </Button>
       </DialogActions>

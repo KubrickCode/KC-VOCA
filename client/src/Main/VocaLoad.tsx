@@ -1,88 +1,45 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   useParams,
   useLocation,
   useNavigate,
   NavigateFunction,
 } from "react-router-dom";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import Paper from "@mui/material/Paper";
-import Button from "@mui/material/Button";
-import ButtonGroup from "@mui/material/ButtonGroup";
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
+import { usePersistStore } from "../State/GlobalStore";
+import { useMainStore } from "../State/MainStore";
+import { useGetAxios, usePostAxios } from "../UseQuery";
+import { StyledTableRow } from "../Style/MUIStyle";
 import PlusOneIcon from "@mui/icons-material/PlusOne";
-import IconButton from "@mui/material/IconButton";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import HomeIcon from "@mui/icons-material/Home";
 import AddIcon from "@mui/icons-material/Add";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
-import Checkbox from "@mui/material/Checkbox";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VolumeMuteIcon from "@mui/icons-material/VolumeMute";
-import { StyledTableRow } from "../Style/MUIStyle";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { usePersistStore } from "../State/GlobalStore";
-import { useMainStore } from "../State/MainStore";
-import { usePostAxios } from "../UseQuery";
-
-interface DataProps {
-  data_id: number | null;
-  voca: string;
-  voca_mean: string;
-  exam: string;
-  exam_mean: string;
-}
-interface DataEnv {
-  textColor: { color: string };
-  bgColor: { backgroundColor: string };
-  theme?: boolean;
-  view: ViewObject;
-  setView?: (viewObj: ViewObject) => void;
-  share?: boolean;
-  url?: string;
-}
-interface ViewObject {
-  state: boolean;
-  toggleBtn: JSX.Element;
-  text: string;
-}
-interface handleDataProps extends DataProps {
-  type: string;
-}
-
-interface dataItem extends DataProps, DataEnv {
-  index: number;
-  handleData: ({}: handleDataProps) => void;
-  view: ViewObject;
-}
-
-interface MyHeaderProps extends DataEnv {
-  matches: boolean;
-  navigate: NavigateFunction;
-  fileName: string;
-  handleData: ({}: handleDataProps) => void;
-}
-
-interface MyTableRowProps extends DataEnv {
-  title: string;
-  label: string;
-  checked: boolean;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
-
-type CheckedState = {
-  [key: string]: boolean;
-};
-
-type CountState = {
-  [key: string]: number;
-};
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  Paper,
+  Button,
+  ButtonGroup,
+  Stack,
+  Typography,
+  IconButton,
+  Checkbox,
+  useMediaQuery,
+} from "@mui/material";
+import {
+  CheckedState,
+  CountState,
+  DataItem,
+  MyHeaderProps,
+  MyTableRowProps,
+  handleDataProps,
+} from "../ComponentsType";
 
 const VocaLoad = () => {
   const state = useMainStore((state) => state);
@@ -90,36 +47,28 @@ const VocaLoad = () => {
   const theme = usePersistStore((state) => !state.theme);
   const viewMode = useLocation();
   const location = useParams();
-  const [fileName, setFileName] = useState("");
+  const navigate = useNavigate();
+  const [share, setShare] = useState(false);
   const [view, setView] = useState({
     state: viewMode.state?.viewState ? false : true,
     toggleBtn: <AutoStoriesIcon />,
     text: "공부 모드",
   });
-  const [share, setShare] = useState(false);
-  const navigate = useNavigate();
 
   const matches = useMediaQuery("(max-width:830px)");
 
-  const { data, mutate } = usePostAxios(`${url}/getdata/get_data`);
-  const memoizedMutate = useCallback(mutate, []);
-
-  const requsetData = {
-    body: { file_id: location.id },
-  };
+  const { data } = useGetAxios(
+    `${url}/getdata/get_data/${location.id}`,
+    "getData"
+  );
 
   useEffect(() => {
-    memoizedMutate(requsetData, {
-      onSuccess: (data) => {
-        setShare(Boolean(data[2]));
-        setFileName(data[1][0].file_name);
-        state.setSelectedFolder(String(data[1][0].folder_id));
-        state.setSelectedFile({
-          id: data[1][0].file_id,
-        });
-      },
+    setShare(Boolean(data[2]));
+    state.setSelectedFolder(String(data[1][0].folder_id));
+    state.setSelectedFile({
+      id: data[1][0].file_id,
     });
-  }, [state.dataState]);
+  }, []);
 
   useEffect(() => {
     view.state
@@ -201,15 +150,15 @@ const VocaLoad = () => {
         textColor={textColor}
         theme={theme}
         navigate={navigate}
-        fileName={fileName}
+        fileName={data[1][0].file_name}
         handleData={handleData}
         share={share}
         view={view}
         setView={setView}
         bgColor={bgColor}
       />
-      {data.data &&
-        data.data[0].map((item: dataItem, index: number) => (
+      {data &&
+        data[0].map((item: DataItem, index: number) => (
           <DataBody
             data_id={item.data_id}
             voca={item.voca}
@@ -321,7 +270,7 @@ const DataBody = ({
   textColor,
   share,
   url,
-}: dataItem) => {
+}: DataItem) => {
   const [checked, setChecked] = useState<CheckedState>({});
   const [count, setCount] = useState<CountState>({});
 

@@ -1,11 +1,10 @@
 import { useEffect } from "react";
-import FileArea from "./FileArea";
-import Typography from "@mui/material/Typography";
-import { IconButton, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import HomeIcon from "@mui/icons-material/Home";
+import FileArea from "./FileArea";
 import { usePersistStore } from "../State/GlobalStore";
 import { useMainStore } from "../State/MainStore";
+import HomeIcon from "@mui/icons-material/Home";
+import { IconButton, Stack, Typography } from "@mui/material";
 
 const SharePage = () => {
   const state = useMainStore((state) => state);

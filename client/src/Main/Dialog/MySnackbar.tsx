@@ -1,10 +1,10 @@
-import * as React from "react";
+import { forwardRef } from "react";
+import { useMainStore } from "../../State/MainStore";
+import { AlertProps, AlertColor } from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
-import { AlertProps, AlertColor } from "@mui/material/Alert";
-import { useMainStore } from "../../State/MainStore";
 
-const Alert = React.forwardRef<HTMLDivElement, AlertProps>((props, ref) => (
+const Alert = forwardRef<HTMLDivElement, AlertProps>((props, ref) => (
   <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
 ));
 

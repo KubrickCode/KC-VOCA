@@ -39,8 +39,8 @@ router.get("/get_folder", async (req, res) => {
   }
 });
 
-router.post("/get_file", async (req, res) => {
-  const { folder_id } = req.body;
+router.get("/get_file/:id", async (req, res) => {
+  const folder_id = req.params.id;
   const { user_id } = (req.user as { user_id: number }[])[0];
 
   if (folder_id === "get_recent_file") {
@@ -128,8 +128,8 @@ router.get("/get_share_file", async (req, res) => {
   }
 });
 
-router.post("/get_data", async (req, res) => {
-  const { file_id } = req.body;
+router.get("/get_data/:id", async (req, res) => {
+  const file_id = req.params.id;
   const { user_id } = (req.user as { user_id: number }[])[0];
 
   const query = [

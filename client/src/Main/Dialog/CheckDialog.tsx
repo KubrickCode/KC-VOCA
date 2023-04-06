@@ -1,3 +1,7 @@
+import { useMainStore } from "../../State/MainStore";
+import { usePostAxios } from "../../UseQuery";
+import { useQueryClient } from "react-query";
+import { usePersistStore } from "../../State/GlobalStore";
 import {
   Dialog,
   DialogTitle,
@@ -6,13 +10,26 @@ import {
   DialogContentText,
   Button,
 } from "@mui/material";
-import { useMainStore } from "../../State/MainStore";
-import { usePostAxios } from "../../UseQuery";
 
 const CheckDialog = () => {
   const state = useMainStore((state) => state);
 
   const { mutate } = usePostAxios(state.checkDialog.link);
+  const queryClient = useQueryClient();
+  const theme = usePersistStore((state) => !state.theme);
+
+  const toggleStyle = {
+    backgroundColor: theme ? "hsl(0, 0%, 30%)" : "white",
+    color: theme ? "lightgray" : "hsl(0, 0%, 20%)",
+  };
+
+  const toggleInputStyle = {
+    color: theme ? "lightgray" : "hsl(0, 0%, 20%)",
+  };
+
+  const toggleBtnStyle = {
+    color: theme ? "lightgray" : "primary",
+  };
 
   const handleOpen = () => {
     state.setCheckDialog({ isOpen: false });
@@ -36,13 +53,13 @@ const CheckDialog = () => {
         });
 
         if (data[2] === "folder") {
-          state.setFolderState(state.folderState + 1);
+          queryClient.invalidateQueries("getFolder");
         } else if (data[2] === "file") {
-          state.setFileState(state.fileState + 1);
+          queryClient.invalidateQueries("getFile");
         } else if (data[2] === "data") {
-          state.setDataState(state.dataState + 1);
+          queryClient.invalidateQueries("getData");
         } else {
-          state.setSetState(state.setState + 1);
+          queryClient.invalidateQueries("getData");
         }
         state.setSnackBarOpen(true);
 
@@ -61,17 +78,21 @@ const CheckDialog = () => {
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">
+      <DialogTitle id="alert-dialog-title" sx={toggleStyle}>
         {state.checkDialog.title}
       </DialogTitle>
-      <DialogContent>
-        <DialogContentText id="alert-dialog-description">
+      <DialogContent sx={toggleStyle}>
+        <DialogContentText id="alert-dialog-description" sx={toggleInputStyle}>
           {state.checkDialog.text}
         </DialogContentText>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleOpen}>취소</Button>
-        <Button onClick={submitForm}>확인</Button>
+      <DialogActions sx={toggleStyle}>
+        <Button onClick={handleOpen} sx={toggleBtnStyle}>
+          취소
+        </Button>
+        <Button onClick={submitForm} sx={toggleBtnStyle}>
+          확인
+        </Button>
       </DialogActions>
     </Dialog>
   );

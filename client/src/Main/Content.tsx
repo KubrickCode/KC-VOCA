@@ -1,14 +1,13 @@
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Unstable_Grid2";
-import MySpeedDial from "./Dialog/SpeedDial";
-import FileArea from "./FileArea";
-import FolderArea from "./FolderArea";
-import { Item } from "../Style/MUIStyle";
-import MoveDial from "./Dialog/MoveDialog";
 import { useMemo } from "react";
-import useMediaQuery from "@mui/material/useMediaQuery";
 import { usePersistStore } from "../State/GlobalStore";
 import { useMainStore } from "../State/MainStore";
+import FolderArea from "./FolderArea";
+import FileArea from "./FileArea";
+import MoveDial from "./Dialog/MoveDialog";
+import MySpeedDial from "./Dialog/SpeedDial";
+import Grid from "@mui/material/Unstable_Grid2";
+import { Item } from "../Style/MUIStyle";
+import { useMediaQuery, Box } from "@mui/material";
 
 const Content = () => {
   const theme = usePersistStore((state) => !state.theme);

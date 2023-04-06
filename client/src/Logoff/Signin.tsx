@@ -1,4 +1,8 @@
 import { useState, useEffect, useRef, Suspense } from "react";
+import { useGetAxios, usePostAxios } from "../UseQuery";
+import LoadingOverlay from "../Loading";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import "@fontsource/roboto/500.css";
 import {
   Avatar,
   Button,
@@ -15,11 +19,7 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-
-import "@fontsource/roboto/500.css";
-import { useGetAxios, usePostAxios } from "../UseQuery";
-import LoadingOverlay from "../Loading";
+import { EmailAlertProps, FormDialogProps } from "../ComponentsType";
 
 const Copyright = () => {
   return (
@@ -43,7 +43,10 @@ const SignIn = () => {
   const [errmsg, setErrMsg] = useState("");
   const [open, setOpen] = useState<boolean>(false);
   const url = import.meta.env.VITE_SERVER_HOST;
-  const { data } = useGetAxios(url + "/signpage/login_process");
+  const { data } = useGetAxios(
+    url + "/signpage/login_process",
+    "getLoginProcess"
+  );
 
   useEffect(() => {
     setErrMsg(data?.feedback);
@@ -144,12 +147,6 @@ const SignIn = () => {
   );
 };
 
-type FormDialogProps = {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  url: string;
-};
-
 const FormDialog = ({ open, setOpen, url }: FormDialogProps) => {
   const emailRef = useRef<HTMLInputElement>();
   const { mutate, data } = usePostAxios(url + "/getdata/find_password");
@@ -207,11 +204,6 @@ const FormDialog = ({ open, setOpen, url }: FormDialogProps) => {
       </Dialog>
     </div>
   );
-};
-
-type EmailAlertProps = {
-  type: AlertColor;
-  text: string;
 };
 
 const EmailAlert = ({ type, text }: EmailAlertProps) => {

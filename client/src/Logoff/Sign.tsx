@@ -1,16 +1,17 @@
+import { useState, useMemo } from "react";
 import Signin from "./Signin";
 import Signup from "./Signup";
-import { CssBaseline, Grid, Paper } from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import { useState, useMemo } from "react";
-
-type CenteredTabsProps = {
-  value: number;
-  handleChange: (e: React.SyntheticEvent, newvalue: number) => void;
-};
+import {
+  createTheme,
+  ThemeProvider,
+  Box,
+  Tabs,
+  Tab,
+  CssBaseline,
+  Grid,
+  Paper,
+} from "@mui/material";
+import { CenteredTabsProps } from "../ComponentsType";
 
 const CenteredTabs = ({ value, handleChange }: CenteredTabsProps) => {
   return (

@@ -1,33 +1,23 @@
 import { useCallback, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
-import HomeIcon from "@mui/icons-material/Home";
-import Stack from "@mui/material/Stack";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import Paper from "@mui/material/Paper";
-import VolumeMuteIcon from "@mui/icons-material/VolumeMute";
-import { StyledTableRow } from "../Style/MUIStyle";
-import useMediaQuery from "@mui/material/useMediaQuery";
 import { usePersistStore } from "../State/GlobalStore";
 import { useMainStore } from "../State/MainStore";
 import { usePostAxios } from "../UseQuery";
-
-type dataItem = {
-  data_id: number;
-  voca: string;
-  voca_mean: string;
-  exam: string;
-  exam_mean: string;
-};
-
-type MyTableRowProps = {
-  title: string;
-  label: string;
-};
+import { StyledTableRow } from "../Style/MUIStyle";
+import HomeIcon from "@mui/icons-material/Home";
+import VolumeMuteIcon from "@mui/icons-material/VolumeMute";
+import {
+  Typography,
+  IconButton,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  Paper,
+  useMediaQuery,
+} from "@mui/material";
+import { SearchDataItem, SearchMyTableRowProps } from "../ComponentsType";
 
 const SearchPage = () => {
   const location = useLocation();
@@ -72,7 +62,7 @@ const SearchPage = () => {
         </Typography>
       </Stack>
       {data.data &&
-        data.data.map((item: dataItem) => {
+        data.data.map((item: SearchDataItem) => {
           return (
             <DataBody
               data_id={item.data_id}
@@ -88,7 +78,7 @@ const SearchPage = () => {
   );
 };
 
-const MyTableRow = ({ title, label }: MyTableRowProps) => {
+const MyTableRow = ({ title, label }: SearchMyTableRowProps) => {
   const url = import.meta.env.VITE_SERVER_HOST;
   const theme = usePersistStore((state) => !state.theme);
   const matches2 = useMediaQuery("(max-width:1092px)");
@@ -164,7 +154,7 @@ const MyTableRow = ({ title, label }: MyTableRowProps) => {
   );
 };
 
-const DataBody = ({ voca, voca_mean, exam, exam_mean }: dataItem) => (
+const DataBody = ({ voca, voca_mean, exam, exam_mean }: SearchDataItem) => (
   <TableContainer component={Paper} sx={{ mb: "20px" }}>
     <Table sx={{ minWidth: 650 }} aria-label="caption table">
       <TableBody>

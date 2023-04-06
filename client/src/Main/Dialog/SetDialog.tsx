@@ -1,23 +1,43 @@
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import Button from "@mui/material/Button";
-import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
-import ContactPageIcon from "@mui/icons-material/ContactPage";
-import Paper from "@mui/material/Paper";
-import ButtonGroup from "@mui/material/ButtonGroup";
+import { useMainStore } from "../../State/MainStore";
+import { useGetAxios } from "../../UseQuery";
+import { usePersistStore } from "../../State/GlobalStore";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
 import ModeIcon from "@mui/icons-material/Mode";
 import KeyIcon from "@mui/icons-material/Key";
-import { useMainStore } from "../../State/MainStore";
+import ContactPageIcon from "@mui/icons-material/ContactPage";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import {
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  DialogContent,
+  Button,
+  Stack,
+  Typography,
+  Paper,
+  ButtonGroup,
+} from "@mui/material";
 
 const SetDialog = () => {
   const state = useMainStore((state) => state);
   const url = import.meta.env.VITE_SERVER_HOST;
+  const { data } = useGetAxios(`${url}/getdata/user`, "getUser");
+  const theme = usePersistStore((state) => !state.theme);
+
+  const toggleStyle = {
+    backgroundColor: theme ? "hsl(0, 0%, 30%)" : "white",
+    color: theme ? "lightgray" : "hsl(0, 0%, 20%)",
+  };
+
+  const toggleBtnGroupStyle = {
+    color: theme ? "lightgray" : undefined,
+    borderColor: theme ? "lightgray" : undefined,
+  };
+
+  const toggleBtnStyle = {
+    color: theme ? "lightgray" : "primary",
+  };
 
   const handleOpen = () => {
     state.setSetDialog({ isOpen: false });
@@ -34,19 +54,18 @@ const SetDialog = () => {
 
   return (
     <Dialog open={state.setDialog.isOpen} onClose={handleOpen}>
-      <DialogTitle>
+      <DialogTitle sx={toggleStyle}>
         <Stack direction="row" spacing={1}>
           <ManageAccountsIcon />
           <Typography fontSize={"18px"}>설정</Typography>
         </Stack>
       </DialogTitle>
-      <DialogContent>
-        <Paper sx={{ padding: "10px" }}>
+      <DialogContent sx={toggleStyle}>
+        <Paper sx={{ padding: "10px", ...toggleStyle }}>
           <Stack direction="row" spacing={1}>
             <ContactPageIcon /> <Typography>회원 정보</Typography>
           </Stack>
-          <p>이메일 : {state.user.email}</p>{" "}
-          <p>닉네임 : {state.user.nickname}</p>
+          <p>이메일 : {data.email}</p> <p>닉네임 : {data.nickname}</p>
         </Paper>
         <ButtonGroup
           orientation="vertical"
@@ -56,6 +75,7 @@ const SetDialog = () => {
           <Button
             startIcon={<LogoutIcon />}
             onClick={() => (window.location.href = `${url}/signpage/logout`)}
+            sx={toggleBtnGroupStyle}
           >
             로그아웃
           </Button>
@@ -69,6 +89,7 @@ const SetDialog = () => {
                 "basic"
               )
             }
+            sx={toggleBtnGroupStyle}
           >
             닉네임 변경
           </Button>
@@ -82,6 +103,7 @@ const SetDialog = () => {
                 "basic"
               )
             }
+            sx={toggleBtnGroupStyle}
           >
             비밀번호 변경
           </Button>
@@ -96,13 +118,16 @@ const SetDialog = () => {
                 "basic"
               )
             }
+            sx={toggleBtnGroupStyle}
           >
             회원탈퇴
           </Button>
         </ButtonGroup>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleOpen}>닫기</Button>
+      <DialogActions sx={toggleStyle}>
+        <Button onClick={handleOpen} sx={toggleBtnStyle}>
+          닫기
+        </Button>
       </DialogActions>
     </Dialog>
   );

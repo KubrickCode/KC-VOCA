@@ -1,3 +1,4 @@
+import { usePersistStore } from "../State/GlobalStore";
 import { styled, createTheme } from "@mui/material/styles";
 import TreeItem, { treeItemClasses } from "@mui/lab/TreeItem";
 import Paper from "@mui/material/Paper";
@@ -43,7 +44,9 @@ export const StyledTreeItemRoot = styled(TreeItem)<StyledTreeItemRootProps>(
   ({ theme }) => ({
     color: theme.palette.text.secondary,
     [`& .${treeItemClasses.content}`]: {
-      color: theme.palette.text.secondary,
+      color: usePersistStore((state) => !state.theme)
+        ? "lightgray"
+        : theme.palette.text.secondary,
       borderTopRightRadius: theme.spacing(2),
       borderBottomRightRadius: theme.spacing(2),
       paddingRight: theme.spacing(1),

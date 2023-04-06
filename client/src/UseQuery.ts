@@ -1,13 +1,13 @@
-import axios from "axios";
 import { useMutation, useQuery } from "react-query";
+import axios from "axios";
 
-export const useGetAxios = (link: string, queryOptions?: {}) => {
+export const useGetAxios = (link: string, key: string, queryOptions?: {}) => {
   const queryFunc = async () => {
     const response = await axios.get(link, { withCredentials: true });
     return response.data;
   };
 
-  return useQuery(link, queryFunc, {
+  return useQuery([key, link], queryFunc, {
     refetchOnWindowFocus: false,
     suspense: true,
     ...queryOptions,

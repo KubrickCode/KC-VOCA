@@ -1,36 +1,24 @@
-import { useEffect, useState, useCallback, Suspense } from "react";
-import FolderIcon from "@mui/icons-material/Folder";
-import TreeView from "@mui/lab/TreeView";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import WatchLaterIcon from "@mui/icons-material/WatchLater";
-import StarIcon from "@mui/icons-material/Star";
-import { StyledTreeItemRoot } from "../Style/MUIStyle";
-import { TreeItemProps } from "@mui/lab/TreeItem";
+import { Suspense } from "react";
 import { usePersistStore } from "../State/GlobalStore";
 import { useMainStore } from "../State/MainStore";
 import { useGetAxios } from "../UseQuery";
 import LoadingOverlay from "../Loading";
-
-interface StyledTreeItemProps extends Omit<TreeItemProps, "onClick"> {
-  bgColor?: string;
-  color?: string;
-  key?: number;
-  nodeId: string;
-  labelInfo?: string;
-  labelText: string;
-  labelIcon: React.ElementType;
-  onClick: React.MouseEventHandler<HTMLLIElement> &
-    ((folder_id: number) => void);
-  children?: React.ReactNode;
-  sx?: object;
-}
+import { StyledTreeItemRoot } from "../Style/MUIStyle";
+import { TreeItemProps } from "@mui/lab/TreeItem";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import WatchLaterIcon from "@mui/icons-material/WatchLater";
+import StarIcon from "@mui/icons-material/Star";
+import FolderIcon from "@mui/icons-material/Folder";
+import TreeView from "@mui/lab/TreeView";
+import { Box, Typography } from "@mui/material";
+import { FolderTreeProps, StyledTreeItemProps } from "../ComponentsType";
 
 const StyledTreeItem = (props: StyledTreeItemProps) => {
   const theme = usePersistStore((state) => !state.theme);
-  const moveDialog = useMainStore((state) => state.moveDialog);
+  const toggleInputStyle = {
+    color: theme ? "lightgray" : "hsl(0, 0%, 20%)",
+  };
 
   const {
     bgColor,
@@ -50,10 +38,7 @@ const StyledTreeItem = (props: StyledTreeItemProps) => {
             alignItems: "center",
             p: 0.5,
             pr: 0,
-            color:
-              theme && moveDialog.isOpen === false
-                ? "lightgray"
-                : "hsl(0, 0%, 20%)",
+            ...toggleInputStyle,
           }}
         >
           <Box component={LabelIcon} color="inherit" sx={{ mr: 1 }} />
@@ -81,25 +66,16 @@ const StyledTreeItem = (props: StyledTreeItemProps) => {
   );
 };
 
-type Folder = {
-  folder_id: number;
-  folder_name: string;
-  parent_id: number;
-};
-
-type FolderTreeProps = {
-  data: Folder[];
-  parentId: number;
-};
-
 const FolderArea = () => {
   const state = useMainStore((state) => state);
   const url = import.meta.env.VITE_SERVER_HOST;
-  const { data, refetch } = useGetAxios(`${url}/getdata/get_folder`);
+  const { data } = useGetAxios(`${url}/getdata/get_folder`, "getFolder");
+  const theme = usePersistStore((state) => !state.theme);
 
-  useEffect(() => {
-    refetch();
-  }, [state.folderState]);
+  const toggleStyle = {
+    backgroundColor: theme ? "hsl(0, 0%, 30%)" : "white",
+    color: theme ? "lightgray" : "hsl(0, 0%, 20%)",
+  };
 
   const folderDisplay = {
     display: !state.moveDialog.isOpen ? "block" : "none",
@@ -116,6 +92,7 @@ const FolderArea = () => {
         sx={{
           flexGrow: 1,
           overflow: "hidden",
+          ...toggleStyle,
         }}
       >
         <StyledTreeItem

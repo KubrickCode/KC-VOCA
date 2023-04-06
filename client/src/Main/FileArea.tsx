@@ -1,48 +1,37 @@
-import TextSnippetIcon from "@mui/icons-material/TextSnippet";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import Grid from "@mui/material/Unstable_Grid2";
-import Typography from "@mui/material/Typography";
-import { useEffect, useState } from "react";
-import { Item } from "../Style/MUIStyle";
+import { Suspense, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import FileDial from "./Dialog/FileDial";
 import { usePersistStore } from "../State/GlobalStore";
 import { useMainStore } from "../State/MainStore";
-import { usePostAxios } from "../UseQuery";
-
-type File = {
-  file_id: number;
-  file_name: string;
-  nickname: string;
-  favorites: number;
-  shared: number;
-};
+import { useGetAxios } from "../UseQuery";
+import { Item } from "../Style/MUIStyle";
+import LoadingOverlay from "../Loading";
+import TextSnippetIcon from "@mui/icons-material/TextSnippet";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Unstable_Grid2";
+import { File } from "../ComponentsType";
 
 const FileArea = () => {
   const url = import.meta.env.VITE_SERVER_HOST;
   const theme = usePersistStore((state) => !state.theme);
 
   const state = useMainStore((state) => state);
-  const { data, mutate } = usePostAxios(`${url}/getdata/get_file`);
-  const requsetData = {
-    body: { folder_id: state.selectedFolder },
-  };
+  const { data } = useGetAxios(
+    `${url}/getdata/get_file/${state.selectedFolder}`,
+    "getFile"
+  );
 
-  useEffect(() => {
-    if (state.selectedFolder) {
-      mutate(requsetData);
-    }
-  }, [state.selectedFolder, mutate, state.fileState, state.folderState]);
-
-  if (data.data?.length > 0) {
+  if (data.length > 0) {
     return (
-      <>
+      <Suspense fallback={<LoadingOverlay />}>
         <Grid
           container
           spacing={{ xs: 2, md: 2 }}
           columns={{ xs: 4, sm: 6, md: 10 }}
           sx={{ clear: "right" }}
         >
-          {data.data.map((file: File) => (
+          {data.map((file: File) => (
             <FileBody
               key={file.file_id}
               file_id={file.file_id}
@@ -53,7 +42,7 @@ const FileArea = () => {
             />
           ))}
         </Grid>
-      </>
+      </Suspense>
     );
   } else {
     return (
@@ -75,6 +64,7 @@ const FileBody = ({
   const [open, setOpen] = useState(false);
 
   const state = useMainStore((state) => state);
+  const navigate = useNavigate();
 
   return (
     <Grid
@@ -97,7 +87,7 @@ const FileBody = ({
           textAlign: "center",
         }}
         onClick={() => {
-          location.href = `/load/${file_id}`;
+          navigate(`/load/${file_id}`);
         }}
       >
         <div>

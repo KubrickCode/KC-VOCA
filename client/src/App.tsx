@@ -1,16 +1,15 @@
 import { Suspense, useEffect, useState } from "react";
+import { usePersistStore } from "./State/GlobalStore";
 import Layout from "./Layout";
 import Sign from "./Logoff/Sign";
-import { usePersistStore } from "./State/GlobalStore";
 import LoadingOverlay from "./Loading";
-
 import { useGetAxios } from "./UseQuery";
 
 const App = () => {
   const theme = usePersistStore((state) => !state.theme);
   const url = import.meta.env.VITE_SERVER_HOST;
   const [shouldFetch, setShouldFetch] = useState(false);
-  const { data } = useGetAxios(url + "/signpage/islogin", {
+  const { data } = useGetAxios(url + "/signpage/islogin", "getIsLogin", {
     enabled: shouldFetch,
   });
 
