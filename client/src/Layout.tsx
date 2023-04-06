@@ -82,7 +82,7 @@ const PersistentDrawerLeft = () => {
   }, [state.setState, data]);
 
   return (
-    <>
+    <Suspense fallback={<LoadingOverlay />}>
       <ThemeProvider theme={darkTheme}>
         <AppBar>
           <Toolbar>
@@ -186,7 +186,7 @@ const PersistentDrawerLeft = () => {
         </List>
       </Drawer>
       {[renderPostDial, renderCheckDial, renderSnack, renderSetDial]}
-    </>
+    </Suspense>
   );
 };
 

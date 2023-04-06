@@ -1,32 +1,26 @@
 import axios from "axios";
 import { useMutation, useQuery } from "react-query";
-import { useGlobalStore } from "./State/GlobalStore";
 
-export const useGetAxios = (link: string) => {
-  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
+export const useGetAxios = (link: string, queryOptions?: {}) => {
   const queryFunc = async () => {
-    setIsLoading(true);
     const response = await axios.get(link, { withCredentials: true });
-    setIsLoading(false);
     return response.data;
   };
 
-  return useQuery(["get", link], queryFunc, {
+  return useQuery(link, queryFunc, {
     refetchOnWindowFocus: false,
+    suspense: true,
+    ...queryOptions,
   });
 };
 
 export const usePostAxios = (link: string) => {
-  const setIsLoading = useGlobalStore((state) => state.setIsLoading);
-
   const mutation = useMutation(
     async (req: { body: object; responseType?: object }) => {
-      setIsLoading(true);
       const response = await axios.post(link, req.body, {
         withCredentials: true,
         ...req.responseType,
       });
-      setIsLoading(false);
       return response.data;
     }
   );

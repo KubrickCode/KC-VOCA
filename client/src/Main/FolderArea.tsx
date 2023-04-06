@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, Suspense } from "react";
 import FolderIcon from "@mui/icons-material/Folder";
 import TreeView from "@mui/lab/TreeView";
 import Box from "@mui/material/Box";
@@ -12,6 +12,7 @@ import { TreeItemProps } from "@mui/lab/TreeItem";
 import { usePersistStore } from "../State/GlobalStore";
 import { useMainStore } from "../State/MainStore";
 import { useGetAxios } from "../UseQuery";
+import LoadingOverlay from "../Loading";
 
 interface StyledTreeItemProps extends Omit<TreeItemProps, "onClick"> {
   bgColor?: string;
@@ -105,37 +106,39 @@ const FolderArea = () => {
   };
 
   return (
-    <TreeView
-      defaultExpanded={["1"]}
-      defaultSelected={["0"]}
-      defaultCollapseIcon={<ArrowDropDownIcon />}
-      defaultExpandIcon={<ArrowRightIcon />}
-      defaultEndIcon={<div style={{ width: 24 }} />}
-      sx={{
-        flexGrow: 1,
-        overflow: "hidden",
-      }}
-    >
-      <StyledTreeItem
-        nodeId="0"
-        labelText="최근 본 단어장"
-        labelIcon={WatchLaterIcon}
-        onClick={() => {
-          state.setSelectedFolder("get_recent_file");
+    <Suspense fallback={<LoadingOverlay />}>
+      <TreeView
+        defaultExpanded={["1"]}
+        defaultSelected={["0"]}
+        defaultCollapseIcon={<ArrowDropDownIcon />}
+        defaultExpandIcon={<ArrowRightIcon />}
+        defaultEndIcon={<div style={{ width: 24 }} />}
+        sx={{
+          flexGrow: 1,
+          overflow: "hidden",
         }}
-        sx={folderDisplay}
-      />
-      <StyledTreeItem
-        nodeId="0-1"
-        labelText="즐겨찾기 단어장"
-        labelIcon={StarIcon}
-        onClick={() => {
-          state.setSelectedFolder("get_fav_file");
-        }}
-        sx={folderDisplay}
-      />
-      <FolderTree data={data} parentId={0} />
-    </TreeView>
+      >
+        <StyledTreeItem
+          nodeId="0"
+          labelText="최근 본 단어장"
+          labelIcon={WatchLaterIcon}
+          onClick={() => {
+            state.setSelectedFolder("get_recent_file");
+          }}
+          sx={folderDisplay}
+        />
+        <StyledTreeItem
+          nodeId="0-1"
+          labelText="즐겨찾기 단어장"
+          labelIcon={StarIcon}
+          onClick={() => {
+            state.setSelectedFolder("get_fav_file");
+          }}
+          sx={folderDisplay}
+        />
+        <FolderTree data={data} parentId={0} />
+      </TreeView>
+    </Suspense>
   );
 };
 

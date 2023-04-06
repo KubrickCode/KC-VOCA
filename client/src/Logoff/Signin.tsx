@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import {
   Avatar,
   Button,
@@ -19,6 +19,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 import "@fontsource/roboto/500.css";
 import { useGetAxios, usePostAxios } from "../UseQuery";
+import LoadingOverlay from "../Loading";
 
 const Copyright = () => {
   return (
@@ -49,7 +50,7 @@ const SignIn = () => {
   }, [data]);
 
   return (
-    <>
+    <Suspense fallback={<LoadingOverlay />}>
       <Avatar sx={{ m: 3, bgcolor: "secondary.main" }}>
         <LockOutlinedIcon />
       </Avatar>
@@ -139,7 +140,7 @@ const SignIn = () => {
         <Copyright />
       </Box>
       <FormDialog open={open} setOpen={setOpen} url={url} />
-    </>
+    </Suspense>
   );
 };
 
