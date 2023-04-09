@@ -3,7 +3,6 @@ import {
   useParams,
   useLocation,
   useNavigate,
-  NavigateFunction,
 } from "react-router-dom";
 import { usePersistStore } from "../State/GlobalStore";
 import { useMainStore } from "../State/MainStore";
@@ -76,24 +75,21 @@ const VocaLoad = () => {
       : setView({ ...view, toggleBtn: <MenuBookIcon />, text: "전체 보기" });
   }, [view.state]);
 
-  const options = useMemo(
-    () => ({
-      modify: {
-        title: "데이터 수정",
-        link: `${url}/modify/modify_data`,
-      },
-      create: {
-        title: "데이터 추가",
-        link: `${url}/create/create_data`,
-      },
-      delete: {
-        title: "데이터 삭제",
-        link: `${url}/delete/delete_data`,
-        text: "정말 데이터를 삭제하시겠습니까?",
-      },
-    }),
-    []
-  );
+  const options = {
+    modify: {
+      title: "데이터 수정",
+      link: `${url}/modify/modify_data`,
+    },
+    create: {
+      title: "데이터 추가",
+      link: `${url}/create/create_data`,
+    },
+    delete: {
+      title: "데이터 삭제",
+      link: `${url}/delete/delete_data`,
+      text: "정말 데이터를 삭제하시겠습니까?",
+    },
+  };
 
   const handleData = ({
     type,

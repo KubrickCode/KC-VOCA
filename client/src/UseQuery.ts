@@ -10,6 +10,7 @@ export const useGetAxios = (link: string, key: string, queryOptions?: {}) => {
   return useQuery([key, link], queryFunc, {
     refetchOnWindowFocus: false,
     suspense: true,
+    staleTime: 1000 * 60 * 3,
     ...queryOptions,
   });
 };

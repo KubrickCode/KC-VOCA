@@ -247,8 +247,4 @@ router.post("/find_password", async (req, res) => {
   }
 });
 
-router.get("/wow", (req, res) => {
-  res.send("hello");
-});
-
 export default router;

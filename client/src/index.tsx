@@ -2,6 +2,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import ReactQueryProvider from "./ReactQueryProvider";
 import App from "./App";
+import "./globalstyle.css";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement

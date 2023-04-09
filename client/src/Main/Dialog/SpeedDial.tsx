@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useMainStore } from "../../State/MainStore";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
@@ -14,66 +14,64 @@ const SpeedDialComp = () => {
 
   const handleOpen = () => setOpen(!open);
 
-  const speedDialActions = useMemo(() => {
-    return [
-      {
-        icon: <NoteAddIcon />,
-        name: "단어장 추가",
-        dialog: () =>
-          state.setPostDialog({
-            isOpen: true,
-            title: "단어장 추가",
-            label: "단어장명을 입력해 주세요",
-            link: `${url}/create/create_file`,
-            content: "basic",
-          }),
-      },
-      {
-        icon: <CreateNewFolderIcon />,
-        name: "폴더 추가",
-        dialog: () =>
-          state.setPostDialog({
-            isOpen: true,
-            title: "폴더 추가",
-            label: "폴더명을 입력해 주세요",
-            link: `${url}/create/create_folder`,
-            content: "basic",
-          }),
-      },
-      {
-        icon: <DeleteIcon />,
-        name: "폴더 삭제",
-        dialog: () =>
-          state.setCheckDialog({
-            isOpen: true,
-            title: "폴더 삭제",
-            text: "정말 폴더를 삭제하시겠습니까?",
-            link: `${url}/delete/delete_folder`,
-          }),
-      },
-      {
-        icon: <ChangeCircleIcon />,
-        name: "폴더명 변경",
-        dialog: () =>
-          state.setPostDialog({
-            isOpen: true,
-            title: "폴더명 변경",
-            label: "폴더명을 입력해 주세요",
-            link: `${url}/modify/rename_folder`,
-            content: "basic",
-          }),
-      },
-      {
-        icon: <DriveFileMoveIcon />,
-        name: "폴더 이동",
-        dialog: () =>
-          state.setMoveDialog({
-            isOpen: true,
-            link: `${url}/modify/move_folder`,
-          }),
-      },
-    ];
-  }, []);
+  const speedDialActions = [
+    {
+      icon: <NoteAddIcon />,
+      name: "단어장 추가",
+      dialog: () =>
+        state.setPostDialog({
+          isOpen: true,
+          title: "단어장 추가",
+          label: "단어장명을 입력해 주세요",
+          link: `${url}/create/create_file`,
+          content: "basic",
+        }),
+    },
+    {
+      icon: <CreateNewFolderIcon />,
+      name: "폴더 추가",
+      dialog: () =>
+        state.setPostDialog({
+          isOpen: true,
+          title: "폴더 추가",
+          label: "폴더명을 입력해 주세요",
+          link: `${url}/create/create_folder`,
+          content: "basic",
+        }),
+    },
+    {
+      icon: <DeleteIcon />,
+      name: "폴더 삭제",
+      dialog: () =>
+        state.setCheckDialog({
+          isOpen: true,
+          title: "폴더 삭제",
+          text: "정말 폴더를 삭제하시겠습니까?",
+          link: `${url}/delete/delete_folder`,
+        }),
+    },
+    {
+      icon: <ChangeCircleIcon />,
+      name: "폴더명 변경",
+      dialog: () =>
+        state.setPostDialog({
+          isOpen: true,
+          title: "폴더명 변경",
+          label: "폴더명을 입력해 주세요",
+          link: `${url}/modify/rename_folder`,
+          content: "basic",
+        }),
+    },
+    {
+      icon: <DriveFileMoveIcon />,
+      name: "폴더 이동",
+      dialog: () =>
+        state.setMoveDialog({
+          isOpen: true,
+          link: `${url}/modify/move_folder`,
+        }),
+    },
+  ];
 
   return (
     <>

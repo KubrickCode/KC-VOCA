@@ -4,7 +4,6 @@ import { useMainStore } from "../State/MainStore";
 import { useGetAxios } from "../UseQuery";
 import LoadingOverlay from "../Loading";
 import { StyledTreeItemRoot } from "../Style/MUIStyle";
-import { TreeItemProps } from "@mui/lab/TreeItem";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import WatchLaterIcon from "@mui/icons-material/WatchLater";
