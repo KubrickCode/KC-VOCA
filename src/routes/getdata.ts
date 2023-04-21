@@ -2,23 +2,26 @@ import express from "express";
 import bodyParser from "body-parser";
 import mysql, { RowDataPacket } from "mysql2/promise";
 import bcrypt from "bcrypt";
+import { user as userConfig } from "../lib/config";
+import AWS from "aws-sdk";
+import { awsConfig } from "../lib/config";
+import asyncHandler from "../middlewares/asyncHandler";
+
+const db = mysql.createPool(userConfig);
 
 const router = express.Router();
-const db = mysql.createPool(require("../lib/config").user);
-const AWS = require("aws-sdk");
-const aws_info = require("../lib/config").aws;
 
 const Polly = new AWS.Polly({
-  accessKeyId: aws_info.accessKeyId,
-  secretAccessKey: aws_info.secretAccessKey,
-  signatureVersion: aws_info.signatureVersion,
-  region: aws_info.region,
+  accessKeyId: awsConfig.accessKeyId,
+  secretAccessKey: awsConfig.secretAccessKey,
+  signatureVersion: awsConfig.signatureVersion,
+  region: awsConfig.region,
 });
 
 const SES_CONFIG = {
-  accessKeyId: aws_info.accessKeyId,
-  secretAccessKey: aws_info.secretAccessKey,
-  region: aws_info.k_region,
+  accessKeyId: awsConfig.accessKeyId,
+  secretAccessKey: awsConfig.secretAccessKey,
+  region: awsConfig.k_region,
 };
 
 const AWS_SES = new AWS.SES(SES_CONFIG);
@@ -26,107 +29,82 @@ const AWS_SES = new AWS.SES(SES_CONFIG);
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 
-router.get("/get_folder", async (req, res) => {
-  const { user_id } = (req.user as { user_id: number }[])[0];
-  const query = `SELECT * FROM voca_folder WHERE user_id=?`;
-  const target = [user_id];
-  try {
+router.get(
+  "/get_folder",
+  asyncHandler(async (req, res) => {
+    const { user_id } = (req.user as { user_id: number }[])[0];
+    const query = `SELECT * FROM voca_folder WHERE user_id=?`;
+    const target = [user_id];
     const [result] = await db.query(query, target);
     res.json(result);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Internal server error");
-  }
-});
+  })
+);
 
-router.get("/get_file/:id", async (req, res) => {
-  const folder_id = req.params.id;
-  const { user_id } = (req.user as { user_id: number }[])[0];
+router.get(
+  "/get_file/:id",
+  asyncHandler(async (req, res) => {
+    const folder_id = req.params.id;
+    const { user_id } = (req.user as { user_id: number }[])[0];
 
-  if (folder_id === "get_recent_file") {
-    const query = `SELECT * FROM voca_file WHERE user_id=? ORDER BY current DESC;`;
-    const target = [user_id];
-    try {
+    if (folder_id === "get_recent_file") {
+      const query = `SELECT * FROM voca_file WHERE user_id=? ORDER BY current DESC;`;
+      const target = [user_id];
       const [result] = await db.query<RowDataPacket[]>(query, target);
       res.json(result.slice(0, 10));
-    } catch (err) {
-      console.error(err);
-      res.status(500).send("Internal server error");
-    }
-  } else if (folder_id === "get_fav_file") {
-    const query = `SELECT * FROM voca_file WHERE favorites=1 AND user_id=?`;
-    const target = [user_id];
-    try {
+    } else if (folder_id === "get_fav_file") {
+      const query = `SELECT * FROM voca_file WHERE favorites=1 AND user_id=?`;
+      const target = [user_id];
       const [result] = await db.query(query, target);
       res.json(result);
-    } catch (err) {
-      console.error(err);
-      res.status(500).send("Internal server error");
-    }
-  } else if (folder_id === "get_share_file") {
-    const query = `SELECT v.*, u.nickname
-  FROM voca_file v
-  JOIN localuser u ON v.user_id = u.user_id
-  WHERE v.shared = 1;`;
-    try {
+    } else if (folder_id === "get_share_file") {
+      const query = `SELECT v.*, u.nickname
+      FROM voca_file v
+      JOIN localuser u ON v.user_id = u.user_id
+      WHERE v.shared = 1;`;
       const [result] = await db.query(query);
       res.json(result);
-    } catch (err) {
-      console.error(err);
-      res.status(500).send("Internal server error");
-    }
-  } else {
-    const query = `SELECT * FROM voca_file WHERE folder_id=?`;
-    const target = [folder_id];
-    try {
+    } else {
+      const query = `SELECT * FROM voca_file WHERE folder_id=?`;
+      const target = [folder_id];
       const [result] = await db.query(query, target);
       res.json(result);
-    } catch (err) {
-      console.error(err);
-      res.status(500).send("Internal server error");
     }
-  }
-});
+  })
+);
 
-router.get("/get_fav_file", async (req, res) => {
-  const { user_id } = (req.user as { user_id: number }[])[0];
-  const query = `SELECT * FROM voca_file WHERE favorites=1 AND user_id=?`;
-  const target = [user_id];
-  try {
+router.get(
+  "/get_fav_file",
+  asyncHandler(async (req, res) => {
+    const { user_id } = (req.user as { user_id: number }[])[0];
+    const query = `SELECT * FROM voca_file WHERE favorites=1 AND user_id=?`;
+    const target = [user_id];
     const [result] = await db.query(query, target);
     res.json(result);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Internal server error");
-  }
-});
+  })
+);
 
-router.get("/get_recent_file", async (req, res) => {
-  const { user_id } = (req.user as { user_id: number }[])[0];
-  const query = `SELECT * FROM voca_file WHERE user_id=? ORDER BY current DESC;`;
-  const target = [user_id];
-  try {
+router.get(
+  "/get_recent_file",
+  asyncHandler(async (req, res) => {
+    const { user_id } = (req.user as { user_id: number }[])[0];
+    const query = `SELECT * FROM voca_file WHERE user_id=? ORDER BY current DESC;`;
+    const target = [user_id];
     const [result] = await db.query<RowDataPacket[]>(query, target);
     res.json(result.slice(0, 10));
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Internal server error");
-  }
-});
+  })
+);
 
-router.get("/get_share_file", async (req, res) => {
-  const query = `SELECT v.*, u.nickname
-  FROM voca_file v
-  JOIN localuser u ON v.user_id = u.user_id
-  WHERE v.shared = 1;`;
-  try {
+router.get(
+  "/get_share_file",
+  asyncHandler(async (req, res) => {
+    const query = `SELECT v.*, u.nickname
+    FROM voca_file v
+    JOIN localuser u ON v.user_id = u.user_id
+    WHERE v.shared = 1;`;
     const [result] = await db.query(query);
     res.json(result);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Internal server error");
-  }
-});
+  })
+);
 
 router.get("/get_data/:id", async (req, res) => {
   const file_id = req.params.id;
@@ -158,64 +136,59 @@ router.get("/get_data/:id", async (req, res) => {
   }
 });
 
-router.get("/user", async (req, res) => {
-  if (!req.user) {
-    res.send(false);
-    return;
-  }
-  const { user_id } = (req.user as { user_id: number }[])[0];
+router.get(
+  "/user",
+  asyncHandler(async (req, res) => {
+    if (!req.user) {
+      res.send(false);
+      return;
+    }
+    const { user_id } = (req.user as { user_id: number }[])[0];
 
-  const query = `SELECT * FROM localuser WHERE user_id=?`;
-  const target = [user_id];
-  try {
+    const query = `SELECT * FROM localuser WHERE user_id=?`;
+    const target = [user_id];
     const [result] = await db.query<RowDataPacket[]>(query, target);
     res.send(result[0]);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Internal server error");
-  }
-});
+  })
+);
 
-router.post("/tts", async (req, res) => {
-  const { text } = req.body;
-  const params = {
-    Text: text,
-    OutputFormat: "mp3",
-    VoiceId: "Matthew",
-  };
+router.post(
+  "/tts",
+  asyncHandler(async (req, res) => {
+    const { text } = req.body;
+    const params = {
+      Text: text,
+      OutputFormat: "mp3",
+      VoiceId: "Matthew",
+    };
 
-  try {
     const data = await Polly.synthesizeSpeech(params).promise();
     if (data?.AudioStream instanceof Buffer) {
       res.send(data.AudioStream);
     }
-  } catch (err: any) {
-    console.log(err.code);
-    res.status(500).send("Internal server error");
-  }
-});
+  })
+);
 
-router.post("/search", async (req, res) => {
-  const { word } = req.body;
-  const { user_id } = (req.user as { user_id: number }[])[0];
-  const query = `SELECT * FROM voca_data WHERE voca REGEXP ? AND voca_data.user_id=? OR voca_mean REGEXP ? AND voca_data.user_id=?`;
-  const target = [word, user_id, word, user_id];
-  try {
+router.post(
+  "/search",
+  asyncHandler(async (req, res) => {
+    const { word } = req.body;
+    const { user_id } = (req.user as { user_id: number }[])[0];
+    const query = `SELECT * FROM voca_data WHERE voca REGEXP ? AND voca_data.user_id=? OR voca_mean REGEXP ? AND voca_data.user_id=?`;
+    const target = [word, user_id, word, user_id];
     const [result] = await db.query(query, target);
     res.send(result);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Internal server error");
-  }
-});
+  })
+);
 
-router.post("/find_password", async (req, res) => {
-  const { email } = req.body;
-  const query = [
-    "SELECT email FROM localuser WHERE email=?",
-    "UPDATE localuser SET password=? WHERE email=?",
-  ];
-  try {
+router.post(
+  "/find_password",
+  asyncHandler(async (req, res) => {
+    const { email } = req.body;
+    const query = [
+      "SELECT email FROM localuser WHERE email=?",
+      "UPDATE localuser SET password=? WHERE email=?",
+    ];
     const isExist = await db.query<RowDataPacket[]>(query[0], [email]);
     if (Boolean(isExist[0][0].email)) {
       const newPassword = Math.random().toString(36).slice(2);
@@ -246,10 +219,7 @@ router.post("/find_password", async (req, res) => {
       AWS_SES.sendEmail(params).promise();
       res.send(true);
     }
-  } catch (err) {
-    console.error(err);
-    res.send(false);
-  }
-});
+  })
+);
 
 export default router;

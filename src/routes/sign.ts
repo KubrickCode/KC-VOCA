@@ -5,6 +5,8 @@ import bcrypt from "bcrypt";
 import { initializePassport } from "../lib/passport";
 import { user } from "../lib/config";
 import dotenv from "dotenv";
+import isLogin from "../middlewares/isLogin";
+import asyncHandler from "../middlewares/asyncHandler";
 
 const router = express.Router();
 const db = mysql.createPool(user);
@@ -16,30 +18,27 @@ const url: string = process.env.REDIRECT_ROOT ?? "/";
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 
-router.get("/islogin", async (req, res) => {
-  try {
+router.get(
+  "/islogin",
+  asyncHandler(async (req, res) => {
     res.send(req.user ? true : false);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Internal server error");
-  }
-});
+  })
+);
 
-router.get("/logout", async (req, res, next) => {
-  try {
+router.get(
+  "/logout",
+  isLogin,
+  asyncHandler(async (req, res, next) => {
     req.logout((err) => {
       if (err) {
         return next(err);
       }
       res.redirect(url);
     });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Internal server error");
-  }
-});
+  })
+);
 
-router.post("/check_duplicate", async (req, res) => {
+router.post("/check_duplicate", async (req, res, next) => {
   const { email, nickname } = req.body;
   const query = `SELECT * FROM localuser WHERE email = ? OR nickname = ?`;
   const target = [email, nickname];
@@ -90,7 +89,7 @@ router.post("/signup_process", async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    return res.status(500).send("err");
+    return res.status(500).send("Internal server error");
   }
 });
 
@@ -103,16 +102,14 @@ router.post(
   })
 );
 
-router.get("/login_process", async (req, res) => {
-  const fmsg = req.flash();
-  const feedback = fmsg.error ? fmsg.error[0] : "";
-  try {
+router.get(
+  "/login_process",
+  asyncHandler(async (req, res) => {
+    const fmsg = req.flash();
+    const feedback = fmsg.error ? fmsg.error[0] : "";
     res.json({ feedback });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Internal server error");
-  }
-});
+  })
+);
 
 router.get(
   "/google",

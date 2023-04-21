@@ -7,6 +7,6 @@ const express_1 = __importDefault(require("express"));
 const router = express_1.default.Router();
 /* GET home page. */
 router.get("/", (req, res, next) => {
-    res.render("index.jade", { title: "Express" });
+    res.render("index.pug", { title: "Express" });
 });
 exports.default = router;

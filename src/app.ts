@@ -8,10 +8,12 @@ import { sessionstore } from "./lib/config";
 import passport from "passport";
 import flash from "connect-flash";
 import dotenv from "dotenv";
+import isLogin from "./middlewares/isLogin";
 dotenv.config();
+
+const app = express();
 const MySQLStoreFactory = require("express-mysql-session");
 const MySQLStore = MySQLStoreFactory(session);
-const app = express();
 
 const link = process.env.REDIRECT_ROOT;
 
@@ -70,10 +72,10 @@ import deleteRouter from "./routes/delete";
 
 app.use("/", indexRouter);
 app.use("/api/signpage", signRouter);
-app.use("/api/getdata", getDataRouter);
-app.use("/api/create", createRouter);
-app.use("/api/modify", modifyRouter);
-app.use("/api/delete", deleteRouter);
+app.use("/api/getdata", isLogin, getDataRouter);
+app.use("/api/create", isLogin, createRouter);
+app.use("/api/modify", isLogin, modifyRouter);
+app.use("/api/delete", isLogin, deleteRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
@@ -83,12 +85,11 @@ app.use((req, res, next) => {
 // error handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
-
-  // render the error page
-  res.status(err.hasOwnProperty("status") ? err.status : 500);
-  res.render("error.jade");
+  res.status(err.status || 500);
+  res.render("error", {
+    errorMessage: err.message,
+    errorStatus: err.status || 500,
+  });
 });
 
 export default app;

@@ -13,10 +13,11 @@ const config_1 = require("./lib/config");
 const passport_1 = __importDefault(require("passport"));
 const connect_flash_1 = __importDefault(require("connect-flash"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const isLogin_1 = __importDefault(require("./middlewares/isLogin"));
 dotenv_1.default.config();
+const app = (0, express_1.default)();
 const MySQLStoreFactory = require("express-mysql-session");
 const MySQLStore = MySQLStoreFactory(express_session_1.default);
-const app = (0, express_1.default)();
 const link = process.env.REDIRECT_ROOT;
 const cors_1 = __importDefault(require("cors"));
 app.use((0, cors_1.default)({
@@ -59,10 +60,10 @@ const modify_1 = __importDefault(require("./routes/modify"));
 const delete_1 = __importDefault(require("./routes/delete"));
 app.use("/", index_1.default);
 app.use("/api/signpage", sign_1.default);
-app.use("/api/getdata", getdata_1.default);
-app.use("/api/create", create_1.default);
-app.use("/api/modify", modify_1.default);
-app.use("/api/delete", delete_1.default);
+app.use("/api/getdata", isLogin_1.default, getdata_1.default);
+app.use("/api/create", isLogin_1.default, create_1.default);
+app.use("/api/modify", isLogin_1.default, modify_1.default);
+app.use("/api/delete", isLogin_1.default, delete_1.default);
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
     next((0, http_errors_1.default)(404));
@@ -70,10 +71,10 @@ app.use((req, res, next) => {
 // error handler
 app.use((err, req, res, next) => {
     // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get("env") === "development" ? err : {};
-    // render the error page
-    res.status(err.hasOwnProperty("status") ? err.status : 500);
-    res.render("error.jade");
+    res.status(err.status || 500);
+    res.render("error", {
+        errorMessage: err.message,
+        errorStatus: err.status || 500,
+    });
 });
 exports.default = app;

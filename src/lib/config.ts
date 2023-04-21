@@ -54,7 +54,7 @@ export const sessionstore: DatabaseConfig = {
   expiration: 1000 * 60 * 60 * 24 * 30,
 };
 
-export const aws: AwsConfig = {
+export const awsConfig: AwsConfig = {
   accessKeyId: process.env.ACCESSKEYID,
   secretAccessKey: process.env.SECRETACCESSKEY,
   signatureVersion: process.env.SIGNATUREVERSION,

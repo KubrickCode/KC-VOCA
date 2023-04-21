@@ -10,17 +10,13 @@ if (!kakao.kakao_id || !kakao.kakao_callback) {
 
 const db = mysql.createPool(user);
 
-const kakaoPassport = new Strategy(
-  {
-    clientID: kakao.kakao_id,
-    callbackURL: kakao.kakao_callback,
-  },
-  async (
-    accessToken: any,
-    refreshToken: any,
-    profile: { id: string; displayName: string },
-    done: Function
-  ) => {
+const verifyCallback = async (
+  accessToken: any,
+  refreshToken: any,
+  profile: { id: string; displayName: string },
+  done: Function
+) => {
+  try {
     const newProfile = { email: profile.id + "@kakao.email" };
     const checked = await db.query("SELECT * FROM localuser WHERE email=?", [
       newProfile.email,
@@ -42,15 +38,25 @@ const kakaoPassport = new Strategy(
         ]
       )) as unknown as [mysql.OkPacket, { user_id: number }[]];
 
-      const uid = topics[1][0].user_id;
+      const { user_id } = topics[1][0];
       await db.query(
         "INSERT INTO voca_folder(user_id,folder_name,parent_id) VALUES(?,'Home',0)",
-        [uid]
+        [user_id]
       );
 
       return done(null, newProfile);
     }
+  } catch (err) {
+    done(err);
   }
+};
+
+const kakaoPassport = new Strategy(
+  {
+    clientID: kakao.kakao_id,
+    callbackURL: kakao.kakao_callback,
+  },
+  verifyCallback
 );
 
 export default kakaoPassport;

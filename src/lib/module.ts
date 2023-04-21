@@ -1,7 +1,9 @@
 import mysql, { RowDataPacket } from "mysql2/promise";
-const db = mysql.createPool(require("./config").user);
+import { user as userConfig } from "./config";
 
-const checkDuplicate = async (
+const db = mysql.createPool(userConfig);
+
+export const checkDuplicate = async (
   type: string,
   folder: number,
   name: string
@@ -14,4 +16,21 @@ const checkDuplicate = async (
   return result;
 };
 
-export default checkDuplicate;
+export const isDescendantFolder = async (childId: number, parentId: number) => {
+  let currentParentId = parentId;
+
+  while (currentParentId !== 0) {
+    const [rows] = await db.query<RowDataPacket[]>(
+      "SELECT parent_id FROM voca_folder WHERE folder_id=?",
+      [currentParentId]
+    );
+
+    currentParentId = rows[0].parent_id;
+    console.log(currentParentId);
+
+    if (currentParentId == childId) {
+      return true;
+    }
+  }
+  return false;
+};

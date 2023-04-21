@@ -10,20 +10,14 @@ if (!google.google_id || !google.google_secret || !google.google_callback) {
 
 const db = mysql.createPool(user);
 
-const googlePassport = new Strategy(
-  {
-    clientID: google.google_id,
-    clientSecret: google.google_secret,
-    callbackURL: google.google_callback,
-    passReqToCallback: true,
-  },
-  async (
-    request: any,
-    accessToken: any,
-    refreshToken: any,
-    profile: { email: string; displayName: string },
-    done: Function
-  ) => {
+const verifyCallback = async (
+  request: any,
+  accessToken: any,
+  refreshToken: any,
+  profile: { email: string; displayName: string },
+  done: Function
+) => {
+  try {
     const result = await db.query("SELECT * FROM localuser WHERE email=?", [
       profile.email,
     ]);
@@ -33,19 +27,31 @@ const googlePassport = new Strategy(
       const hashedPassword = await bcrypt.hash(shortid.generate(), 10);
       const topics = (await db.query(
         `INSERT INTO localuser(email, password, nickname) VALUES(?,?,?);
-      SELECT user_id FROM localuser WHERE email=?
-      `,
+        SELECT user_id FROM localuser WHERE email=?
+        `,
         [profile.email, hashedPassword, profile.displayName, profile.email]
       )) as unknown as [mysql.OkPacket, { user_id: number }[]];
 
-      const uid = topics[1][0].user_id;
+      const { user_id } = topics[1][0];
       await db.query(
         "INSERT INTO voca_folder(user_id,folder_name,parent_id) VALUES(?,'Home',0)",
-        [uid]
+        [user_id]
       );
       return done(null, profile);
     }
+  } catch (err) {
+    done(err);
   }
+};
+
+const googlePassport = new Strategy(
+  {
+    clientID: google.google_id,
+    clientSecret: google.google_secret,
+    callbackURL: google.google_callback,
+    passReqToCallback: true,
+  },
+  verifyCallback
 );
 
 export default googlePassport;

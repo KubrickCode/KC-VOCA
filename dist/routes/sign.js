@@ -7,37 +7,30 @@ const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const promise_1 = __importDefault(require("mysql2/promise"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const passport_1 = require("../lib/passport");
+const config_1 = require("../lib/config");
+const dotenv_1 = __importDefault(require("dotenv"));
+const isLogin_1 = __importDefault(require("../middlewares/isLogin"));
+const asyncHandler_1 = __importDefault(require("../middlewares/asyncHandler"));
 const router = express_1.default.Router();
-const passport = require("../lib/passport")();
-const db = promise_1.default.createPool(require("../lib/config").user);
-require("dotenv").config();
+const db = promise_1.default.createPool(config_1.user);
+const passport = (0, passport_1.initializePassport)();
+dotenv_1.default.config();
 const url = process.env.REDIRECT_ROOT ?? "/";
 router.use(body_parser_1.default.json());
 router.use(body_parser_1.default.urlencoded({ extended: true }));
-router.get("/islogin", async (req, res) => {
-    try {
-        res.send(req.user ? true : false);
-    }
-    catch (err) {
-        console.error(err);
-        res.status(500).send("Internal server error");
-    }
-});
-router.get("/logout", async (req, res, next) => {
-    try {
-        req.logout((err) => {
-            if (err) {
-                return next(err);
-            }
-            res.redirect(url);
-        });
-    }
-    catch (err) {
-        console.error(err);
-        res.status(500).send("Internal server error");
-    }
-});
-router.post("/check_duplicate", async (req, res) => {
+router.get("/islogin", (0, asyncHandler_1.default)(async (req, res) => {
+    res.send(req.user ? true : false);
+}));
+router.get("/logout", isLogin_1.default, (0, asyncHandler_1.default)(async (req, res, next) => {
+    req.logout((err) => {
+        if (err) {
+            return next(err);
+        }
+        res.redirect(url);
+    });
+}));
+router.post("/check_duplicate", async (req, res, next) => {
     const { email, nickname } = req.body;
     const query = `SELECT * FROM localuser WHERE email = ? OR nickname = ?`;
     const target = [email, nickname];
@@ -87,7 +80,7 @@ router.post("/signup_process", async (req, res) => {
     }
     catch (err) {
         console.error(err);
-        return res.status(500).send("err");
+        return res.status(500).send("Internal server error");
     }
 });
 router.post("/login_process", passport.authenticate("local", {
@@ -95,17 +88,11 @@ router.post("/login_process", passport.authenticate("local", {
     failureRedirect: url,
     failureFlash: true,
 }));
-router.get("/login_process", async (req, res) => {
+router.get("/login_process", (0, asyncHandler_1.default)(async (req, res) => {
     const fmsg = req.flash();
     const feedback = fmsg.error ? fmsg.error[0] : "";
-    try {
-        res.json({ feedback });
-    }
-    catch (err) {
-        console.error(err);
-        res.status(500).send("Internal server error");
-    }
-});
+    res.json({ feedback });
+}));
 router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 router.get("/google/callback", passport.authenticate("google", {
     successRedirect: url,

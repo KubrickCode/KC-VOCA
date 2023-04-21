@@ -13,12 +13,16 @@ export const initializePassport = () => {
   });
 
   passport.deserializeUser(async (email: string, done: Function) => {
-    const result = await db.query(
-      "SELECT user_id FROM localuser WHERE email=?",
-      [email]
-    );
+    try {
+      const result = await db.query(
+        "SELECT user_id FROM localuser WHERE email=?",
+        [email]
+      );
 
-    await done(null, result[0]);
+      await done(null, result[0]);
+    } catch (err) {
+      done(err);
+    }
   });
 
   passport.use(localPassport);
