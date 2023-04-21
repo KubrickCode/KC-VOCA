@@ -1,11 +1,12 @@
 import dotenv from "dotenv";
+import { PoolOptions } from "mysql2/promise";
 dotenv.config();
 
 type DatabaseConfig = {
   host: string | undefined;
   user: string | undefined;
   password: string | undefined;
-  port: string | undefined;
+  port: number | undefined;
   database: string | undefined;
   multipleStatements: boolean;
   dateStrings?: string | undefined;
@@ -32,20 +33,20 @@ type KakaoConfig = {
   kakao_callback: string | undefined;
 };
 
-export const user: DatabaseConfig = {
+export const user: PoolOptions = {
   host: process.env.DB_host,
   user: process.env.DB_user,
   password: process.env.DB_password,
-  port: process.env.DB_port,
+  port: Number(process.env.DB_port),
   database: process.env.DB_database,
   multipleStatements: true,
-  dateStrings: process.env.DB_dateStrings,
+  dateStrings: ["DATE"],
 };
 
 export const sessionstore: DatabaseConfig = {
   host: process.env.DB_host,
   user: process.env.DB_user,
-  port: process.env.DB_port,
+  port: Number(process.env.DB_port),
   password: process.env.DB_password,
   database: process.env.DB_database,
   multipleStatements: true,

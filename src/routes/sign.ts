@@ -2,11 +2,14 @@ import express from "express";
 import bodyParser from "body-parser";
 import mysql, { RowDataPacket } from "mysql2/promise";
 import bcrypt from "bcrypt";
+import { initializePassport } from "../lib/passport";
+import { user } from "../lib/config";
+import dotenv from "dotenv";
 
 const router = express.Router();
-const passport = require("../lib/passport")();
-const db = mysql.createPool(require("../lib/config").user);
-require("dotenv").config();
+const db = mysql.createPool(user);
+const passport = initializePassport();
+dotenv.config();
 
 const url: string = process.env.REDIRECT_ROOT ?? "/";
 

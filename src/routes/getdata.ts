@@ -159,7 +159,12 @@ router.get("/get_data/:id", async (req, res) => {
 });
 
 router.get("/user", async (req, res) => {
+  if (!req.user) {
+    res.send(false);
+    return;
+  }
   const { user_id } = (req.user as { user_id: number }[])[0];
+
   const query = `SELECT * FROM localuser WHERE user_id=?`;
   const target = [user_id];
   try {
