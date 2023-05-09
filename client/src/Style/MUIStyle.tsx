@@ -1,4 +1,4 @@
-import { usePersistStore } from "../State/GlobalStore";
+import { usePersistStore } from "../Store/GlobalStore";
 import { styled, createTheme } from "@mui/material/styles";
 import TreeItem, { treeItemClasses } from "@mui/lab/TreeItem";
 import Paper from "@mui/material/Paper";
