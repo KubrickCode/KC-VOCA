@@ -13,7 +13,7 @@ export const addUser = async (req: Request, res: Response) => {
 };
 
 export const updateUser = async (req: Request, res: Response) => {
-  const { email, nickname, password } = req.body;
+  const { nickname, password } = req.body;
   const { id } = req.params;
 
   const fieldsToUpdate: Partial<UserType> = {};

@@ -1,5 +1,7 @@
 import pool from "../db";
 import { UserType } from "../types";
+import { RowDataPacket, ResultSetHeader } from "mysql2";
+import Folder from "./Folder";
 
 class User {
   async getUserById(id: number) {
@@ -13,23 +15,37 @@ class User {
     password: string;
   }) {
     const { email, nickname, password } = user;
-    const result = await pool.query(
+    const [checkEmail] = await pool.query<RowDataPacket[]>(
+      "SELECT email FROM Users WHERE email = ?",
+      [email]
+    );
+    const [checkNickname] = await pool.query<RowDataPacket[]>(
+      "SELECT nickname FROM Users WHERE nickname = ?",
+      [nickname]
+    );
+    if (checkEmail.length > 0) {
+      return "이미 존재하는 이메일 입니다.";
+    }
+    if (checkNickname.length > 0) {
+      return "이미 존재하는 닉네임 입니다.";
+    }
+    const [userData] = await pool.query(
       "INSERT INTO Users (email, nickname, password) VALUES (?, ?, ?)",
       [email, nickname, password]
     );
+    const { insertId } = userData as ResultSetHeader;
+    const result = await Folder.createFolder(insertId, 0, "Home");
     return result;
   }
 
   async updateUser(id: number, fieldsToUpdate: Partial<UserType>) {
     const setClause = Object.keys(fieldsToUpdate)
-      .map((field, i) => `${field} = ?`)
+      .map((field) => `${field} = ?`)
       .join(", ");
 
-    // Generate SQL statement
-    const sql = `UPDATE Users SET ${setClause} WHERE id = ?`;
+    const query = `UPDATE Users SET ${setClause} WHERE id = ?`;
 
-    // Execute query
-    const [rows] = await pool.query(sql, [
+    const [rows] = await pool.query(query, [
       ...Object.values(fieldsToUpdate),
       id,
     ]);

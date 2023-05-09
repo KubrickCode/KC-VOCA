@@ -9,7 +9,7 @@ import passport from "passport";
 import flash from "connect-flash";
 import dotenv from "dotenv";
 import isLogin from "./middlewares/isLogin";
-import userRoutes from "./routes/user.route";
+import Routes from "./routes";
 dotenv.config();
 
 const app = express();
@@ -36,7 +36,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.get("/", (req, res) => res.send("Hello, Express"));
 
-app.use("/api", userRoutes);
+app.use("/api", Routes);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
