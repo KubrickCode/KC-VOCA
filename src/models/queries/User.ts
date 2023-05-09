@@ -9,6 +9,22 @@ class User {
     return rows[0];
   }
 
+  async getUserByEmail(email: string): Promise<UserType> {
+    const rows = await pool.query("SELECT * FROM Users WHERE email = ?", [
+      email,
+    ]);
+    const row = rows[0] as RowDataPacket;
+
+    const user: UserType = {
+      id: row[0].id,
+      email: row[0].email,
+      nickname: row[0].nickname,
+      password: row[0].password,
+      registration_date: row[0].registration_date,
+    };
+    return user;
+  }
+
   async createUser(user: {
     email: string;
     nickname: string;

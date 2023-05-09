@@ -1,10 +1,9 @@
 import { Request, Response } from "express";
 import Folder from "../models/queries/Folder";
-import { FolderType } from "./../models/types";
 
 export const getFolders = async (req: Request, res: Response) => {
-  const folders = await Folder.getFolders(Number(req.params.id));
-  res.json(folders);
+  const folders = await Folder.getFolders(Number(req.user?.id));
+  res.json({ folders });
 };
 
 export const createFolder = async (req: Request, res: Response) => {

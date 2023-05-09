@@ -8,7 +8,7 @@ import {
 
 const router = express.Router();
 
-router.get("/:id", getFolders);
+router.get("/", getFolders);
 router.post("/", createFolder);
 router.patch("/:id", renameFolder);
 router.delete("/:id", deleteFolder);

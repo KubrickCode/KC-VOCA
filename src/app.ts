@@ -5,7 +5,6 @@ import cookieParser from "cookie-parser";
 import logger from "morgan";
 import session from "express-session";
 import { sessionstore } from "./lib/config";
-import passport from "passport";
 import flash from "connect-flash";
 import dotenv from "dotenv";
 import isLogin from "./middlewares/isLogin";
@@ -19,12 +18,16 @@ const MySQLStore = MySQLStoreFactory(session);
 const link = process.env.REDIRECT_ROOT;
 
 import cors from "cors";
+import { initializePassport } from "./middlewares/passport";
 app.use(
   cors({
     origin: link,
     credentials: true,
   })
 );
+
+const passport = initializePassport();
+app.use(passport.initialize());
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));

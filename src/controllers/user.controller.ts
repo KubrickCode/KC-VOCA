@@ -7,11 +7,6 @@ export const getUser = async (req: Request, res: Response) => {
   res.json(user);
 };
 
-export const addUser = async (req: Request, res: Response) => {
-  const newUser = await User.createUser(req.body);
-  res.json(newUser);
-};
-
 export const updateUser = async (req: Request, res: Response) => {
   const { nickname, password } = req.body;
   const { id } = req.params;
