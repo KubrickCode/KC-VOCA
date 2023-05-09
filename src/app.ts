@@ -1,5 +1,5 @@
 import createError from "http-errors";
-import express, { Request, Response, NextFunction } from "express";
+import express, { ErrorRequestHandler } from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
@@ -9,6 +9,7 @@ import passport from "passport";
 import flash from "connect-flash";
 import dotenv from "dotenv";
 import isLogin from "./middlewares/isLogin";
+import userRoutes from "./routes/user.route";
 dotenv.config();
 
 const app = express();
@@ -32,50 +33,10 @@ app.set("view engine", "pug");
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", link as string);
-  res.header("Access-Control-Allow-Credentials", "true");
-  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept"
-  );
-  next();
-});
+app.get("/", (req, res) => res.send("Hello, Express"));
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET as string,
-    store: new MySQLStore(sessionstore),
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-      secure: false,
-    },
-  })
-);
-
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(flash());
-
-import indexRouter from "./routes/index";
-import signRouter from "./routes/sign";
-import getDataRouter from "./routes/getdata";
-import createRouter from "./routes/create";
-import modifyRouter from "./routes/modify";
-import deleteRouter from "./routes/delete";
-
-app.use("/", indexRouter);
-app.use("/api/signpage", signRouter);
-app.use("/api/getdata", isLogin, getDataRouter);
-app.use("/api/create", isLogin, createRouter);
-app.use("/api/modify", isLogin, modifyRouter);
-app.use("/api/delete", isLogin, deleteRouter);
+app.use("/api", userRoutes);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
@@ -83,13 +44,9 @@ app.use((req, res, next) => {
 });
 
 // error handler
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  // set locals, only providing error in development
+app.use(((err, req, res, next) => {
   res.status(err.status || 500);
-  res.render("error", {
-    errorMessage: err.message,
-    errorStatus: err.status || 500,
-  });
-});
+  console.error(err.message);
+}) as ErrorRequestHandler);
 
-export default app;
+app.listen(3000);

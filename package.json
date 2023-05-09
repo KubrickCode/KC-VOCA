@@ -4,11 +4,12 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "server": "nodemon --watch \"src/**/*.ts\" --exec \"ts-node\" src/www.ts",
+    "server": "nodemon --watch \"src/**/*.ts\" --exec \"ts-node\" src/app.ts",
     "client": "cd client && yarn run dev",
     "dev": "concurrently --kill-others-on-fail \"yarn run server\" \"yarn run client\""
   },
   "dependencies": {
+    "@types/jsonwebtoken": "^9.0.1",
     "@types/passport-google-oauth2": "^0.1.5",
     "@types/passport-kakao": "^1.0.0",
     "@types/passport-local": "^1.0.35",
@@ -27,6 +28,7 @@
     "express-session": "^1.17.3",
     "http-errors": "~1.6.3",
     "jade": "^0.29.0",
+    "jsonwebtoken": "^9.0.0",
     "morgan": "~1.9.1",
     "mysql": "^2.18.1",
     "mysql2": "^3.2.0",
