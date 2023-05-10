@@ -4,7 +4,7 @@ import FileDial from "./Dialog/FileDial";
 import { usePersistStore } from "../../Store/GlobalStore";
 import { useMainStore } from "../../Store/MainStore";
 import { Item } from "../../Style/MUIStyle";
-import LoadingOverlay from "../Loading";
+import LoadingOverlay from "../Layout/Loading";
 import TextSnippetIcon from "@mui/icons-material/TextSnippet";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Typography from "@mui/material/Typography";

@@ -52,7 +52,11 @@ const VocaLoad = () => {
 
   const matches = useMediaQuery("(max-width:830px)");
 
-  const { data } = useQueryGet(`/getdata/get_data/${location.id}`, "getData");
+  const { data } = useQueryGet(`/word-data/${location.id}`, "getData");
+
+  useEffect(()=>{
+    console.log(data)
+  },[data])
 
   useEffect(() => {
     setShare(Boolean(data[2]));

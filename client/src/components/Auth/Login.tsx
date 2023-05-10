@@ -19,7 +19,7 @@ import {
 } from "@mui/material";
 import { EmailAlertProps, FormDialogProps } from "../ComponentsType";
 import { useQueryPatch } from "../../ReactQuery/UseQuery";
-import LoadingOverlay from "../Loading";
+import LoadingOverlay from "../Layout/Loading";
 
 const Copyright = () => {
   return (

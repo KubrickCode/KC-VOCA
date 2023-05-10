@@ -2,7 +2,7 @@ import { useState, useMemo, lazy, Suspense, useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { usePersistStore } from "../../Store/GlobalStore";
 import { useMainStore } from "../../Store/MainStore";
-import LoadingOverlay from "../Loading";
+import LoadingOverlay from "./Loading";
 import Content from "../Main/Content";
 import MySnackBar from "../Main/Dialog/MySnackbar";
 import SetDialog from "../Main/Dialog/SetDialog";

@@ -25,7 +25,7 @@ export const createWordData = async (req: Request, res: Response) => {
     example_sentence,
     example_sentence_meaning
   );
-  res.json(result);
+  res.json({result});
 };
 
 export const updateWordData = async (req: Request, res: Response) => {

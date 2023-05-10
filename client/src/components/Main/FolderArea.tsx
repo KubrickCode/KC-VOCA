@@ -1,7 +1,7 @@
 import { Suspense, useEffect } from "react";
 import { usePersistStore } from "../../Store/GlobalStore";
 import { useMainStore } from "../../Store/MainStore";
-import LoadingOverlay from "../Loading";
+import LoadingOverlay from "../Layout/Loading";
 import { StyledTreeItemRoot } from "../../Style/MUIStyle";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
