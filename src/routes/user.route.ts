@@ -7,7 +7,7 @@ import {
 
 const router = express.Router();
 
-router.get("/:id", getUser);
+router.get("/", getUser);
 router.patch("/:id", updateUser);
 router.delete("/:id", deleteUser);
 

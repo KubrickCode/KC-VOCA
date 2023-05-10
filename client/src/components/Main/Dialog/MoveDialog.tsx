@@ -7,7 +7,10 @@ import { useQueryPatch } from "../../../ReactQuery/UseQuery";
 
 const MoveDial = () => {
   const state = useMainStore((state) => state);
-  const { mutate } = useQueryPatch(state.moveDialog.link, "post");
+  const { mutate: moveFolder } = useQueryPatch(
+    `/folders/move?id=${state.selectedFolder}&parent_id=${state.moveSelectedFolder}`,
+    "patch"
+  );
   const queryClient = useQueryClient();
   const theme = usePersistStore((state) => !state.theme);
 
@@ -33,23 +36,39 @@ const MoveDial = () => {
   };
 
   const submitForm = () => {
-    mutate(requsetData, {
-      onSuccess: (data) => {
-        handleOpen();
-        state.setSnackBar({
-          text: data[0],
-          type: data[1],
-        });
-
-        if (data[2] === "folder") {
-          queryClient.invalidateQueries("getFolder");
-        } else if (data[2] === "file") {
-          queryClient.invalidateQueries("getFile");
+    if (state.moveDialog.type === "folder") {
+      moveFolder(
+        {},
+        {
+          onSuccess: () => {
+            state.setSnackBar({
+              text: "폴더가 이동되었습니다",
+              type: "success",
+            });
+            queryClient.invalidateQueries("getFolder");
+            state.setSnackBarOpen(true);
+          },
         }
+      );
+    }
 
-        state.setSnackBarOpen(true);
-      },
-    });
+    // mutate(requsetData, {
+    //   onSuccess: (data) => {
+    //     handleOpen();
+    //     state.setSnackBar({
+    //       text: data[0],
+    //       type: data[1],
+    //     });
+
+    //     if (data[2] === "folder") {
+    //       queryClient.invalidateQueries("getFolder");
+    //     } else if (data[2] === "file") {
+    //       queryClient.invalidateQueries("getFile");
+    //     }
+
+    //     state.setSnackBarOpen(true);
+    //   },
+    // });
   };
 
   return (

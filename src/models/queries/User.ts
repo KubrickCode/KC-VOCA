@@ -5,7 +5,10 @@ import Folder from "./Folder";
 
 class User {
   async getUserById(id: number) {
-    const rows = await pool.query("SELECT * FROM Users WHERE id = ?", [id]);
+    const rows = await pool.query<RowDataPacket[]>(
+      "SELECT * FROM Users WHERE id = ?",
+      [id]
+    );
     return rows[0];
   }
 
@@ -15,14 +18,7 @@ class User {
     ]);
     const row = rows[0] as RowDataPacket;
 
-    const user: UserType = {
-      id: row[0].id,
-      email: row[0].email,
-      nickname: row[0].nickname,
-      password: row[0].password,
-      registration_date: row[0].registration_date,
-    };
-    return user;
+    return row[0];
   }
 
   async createUser(user: {

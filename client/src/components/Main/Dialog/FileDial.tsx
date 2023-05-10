@@ -46,19 +46,23 @@ const FileDial = ({ open, setOpen }: FormDialogProps) => {
 
     setFavObject({
       ...favObject,
-      title: state.selectedFile.fav === 0 ? "즐겨찾기 등록" : "즐겨찾기 해제",
+      title:
+        state.selectedFile.is_favorite === 0
+          ? "즐겨찾기 등록"
+          : "즐겨찾기 해제",
       text:
-        state.selectedFile.fav === 0
+        state.selectedFile.is_favorite === 0
           ? "단어장을 즐겨찾기에 등록하시겠습니까?"
           : "단어장을 즐겨찾기에서 해제하시겠습니까?",
-      color: state.selectedFile.fav === 0 ? "skyblue" : "yellow",
+      color: state.selectedFile.is_favorite === 0 ? "skyblue" : "yellow",
     });
 
     setShaObject({
       ...shaObject,
-      title: state.selectedFile.sha === 0 ? "단어장 공유" : "단어장 공유 해제",
+      title:
+        state.selectedFile.is_shared === 0 ? "단어장 공유" : "단어장 공유 해제",
       text:
-        state.selectedFile.sha === 0
+        state.selectedFile.is_shared === 0
           ? "단어장을 다른 회원들과 공유하시겠습니까?"
           : "단어장을 공유 해제하시겠습니까?",
     });
@@ -81,9 +85,8 @@ const FileDial = ({ open, setOpen }: FormDialogProps) => {
         setOpen(!open);
         state.setPostDialog({
           isOpen: true,
-          title: "단어장 변경",
+          title: "단어장명 변경",
           label: "단어장명을 입력해 주세요",
-          link: `${url}/modify/rename_file`,
           content: "basic",
         });
       },
@@ -95,7 +98,6 @@ const FileDial = ({ open, setOpen }: FormDialogProps) => {
         setOpen(!open);
         state.setMoveDialog({
           isOpen: true,
-          link: `${url}/modify/move_file`,
         });
       },
     },
@@ -108,7 +110,6 @@ const FileDial = ({ open, setOpen }: FormDialogProps) => {
           isOpen: true,
           title: favObject.title,
           text: favObject.text,
-          link: `${url}/modify/favorites`,
         });
       },
     },
@@ -121,7 +122,6 @@ const FileDial = ({ open, setOpen }: FormDialogProps) => {
           isOpen: true,
           title: shaObject.title,
           text: shaObject.text,
-          link: `${url}/modify/shared`,
         });
       },
     },
@@ -134,7 +134,6 @@ const FileDial = ({ open, setOpen }: FormDialogProps) => {
           isOpen: true,
           title: "단어장 삭제",
           text: "정말 단어장을 삭제하시겠습니까?",
-          link: `${url}/delete/delete_file`,
         });
       },
     },

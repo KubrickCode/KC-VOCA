@@ -4,7 +4,7 @@ import axios from "axios";
 const host = import.meta.env.VITE_SERVER_HOST;
 const token = localStorage.getItem("token") ?? null;
 
-type method = "post" | "patch" | "put";
+export type method = "post" | "patch" | "put";
 
 const api = axios.create({
   baseURL: host,
@@ -41,8 +41,8 @@ export const useQueryPatch = (link: string, method: method) => {
 };
 
 export const useQueryDelete = (link: string) => {
-  const mutation = useMutation(async (_id) => {
-    const response = await api.delete(`${link}/${_id}`);
+  const mutation = useMutation(async (id: string) => {
+    const response = await api.delete(`${link}/${id}`);
     return response.data;
   });
 

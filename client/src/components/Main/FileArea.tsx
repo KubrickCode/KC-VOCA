@@ -1,4 +1,4 @@
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FileDial from "./Dialog/FileDial";
 import { usePersistStore } from "../../Store/GlobalStore";
@@ -14,11 +14,10 @@ import { useQueryGet } from "../../ReactQuery/UseQuery";
 
 const FileArea = () => {
   const theme = usePersistStore((state) => !state.theme);
-
   const state = useMainStore((state) => state);
-  const { data } = useQueryGet(`/words`, "getFile");
+  const { data } = useQueryGet(`/words/${state.selectedFolder}`, "getFile");
 
-  if (data?.length > 0) {
+  if (data?.words?.length > 0) {
     return (
       <Suspense fallback={<LoadingOverlay />}>
         <Grid
@@ -27,14 +26,14 @@ const FileArea = () => {
           columns={{ xs: 4, sm: 6, md: 10 }}
           sx={{ clear: "right" }}
         >
-          {data.map((file: File) => (
+          {data.words.map((file: File) => (
             <FileBody
-              key={file.file_id}
-              file_id={file.file_id}
-              file_name={file.file_name}
+              key={file.id}
+              id={file.id}
+              name={file.name}
               nickname={file.nickname}
-              favorites={file.favorites}
-              shared={file.shared}
+              is_favorite={file.is_favorite}
+              is_shared={file.is_shared}
             />
           ))}
         </Grid>
@@ -49,13 +48,7 @@ const FileArea = () => {
   }
 };
 
-const FileBody = ({
-  file_id,
-  file_name,
-  nickname,
-  favorites,
-  shared,
-}: File) => {
+const FileBody = ({ id, name, nickname, is_favorite, is_shared }: File) => {
   const theme = usePersistStore((state) => !state.theme);
   const [open, setOpen] = useState(false);
 
@@ -83,7 +76,7 @@ const FileBody = ({
           textAlign: "center",
         }}
         onClick={() => {
-          navigate(`/load/${file_id}`);
+          navigate(`/load/${id}`);
         }}
       >
         <div>
@@ -91,7 +84,7 @@ const FileBody = ({
         </div>
         <div>
           <Typography variant="h6" gutterBottom sx={{ wordBreak: "break-all" }}>
-            {file_name}
+            {name}
           </Typography>
           <Typography
             variant="h6"
@@ -119,9 +112,9 @@ const FileBody = ({
         }}
         onClick={() => {
           state.setSelectedFile({
-            id: file_id,
-            fav: favorites,
-            sha: shared,
+            id,
+            is_favorite,
+            is_shared,
           });
           setOpen(!open);
         }}

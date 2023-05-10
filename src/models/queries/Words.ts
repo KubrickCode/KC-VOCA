@@ -1,3 +1,4 @@
+import { RowDataPacket } from "mysql2";
 import pool from "../db";
 
 class Words {
@@ -11,8 +12,31 @@ class Words {
 
   async getWords(folder_id: number) {
     const [result] = await pool.query(
-      "SELECT * FROM Words WHERE folder_id = ?",
+      `SELECT Words.*, Users.nickname
+      FROM Words 
+      JOIN Folders ON Words.folder_id = Folders.id
+      JOIN Users ON Folders.user_id = Users.id
+      WHERE Words.folder_id = ?`,
       [folder_id]
+    );
+
+    console.log(result);
+
+    return result;
+  }
+
+  async getRecentWords(user_id: number) {
+    const [result] = await pool.query<RowDataPacket[]>(
+      "SELECT * FROM Words WHERE user_id=? ORDER BY last_seen_time DESC",
+      [user_id]
+    );
+    return result.slice(0, 10);
+  }
+
+  async getFavWords(user_id: number) {
+    const [result] = await pool.query<RowDataPacket[]>(
+      "SELECT * FROM Words WHERE is_favorite=1 AND user_id=?",
+      [user_id]
     );
     return result;
   }

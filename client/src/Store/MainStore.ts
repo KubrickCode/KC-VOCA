@@ -13,18 +13,16 @@ const initialMainStore = {
     isOpen: false,
     title: "",
     label: "",
-    link: "",
-    content: "",
+    content: "basic",
   },
   checkDialog: {
     isOpen: false,
     title: "",
     text: "",
-    link: "",
   },
   moveDialog: {
     isOpen: false,
-    link: "",
+    type: "",
   },
   setDialog: {
     isOpen: false,
@@ -33,8 +31,8 @@ const initialMainStore = {
   moveSelectedFolder: "",
   selectedFile: {
     id: null,
-    fav: 0,
-    sha: 0,
+    is_favorite: 0,
+    is_shared: 0,
   },
   selectedData: {
     id: null,

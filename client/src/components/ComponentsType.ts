@@ -25,11 +25,11 @@ export interface DialBodyProps {
 }
 
 export interface File {
-  file_id: number;
-  file_name: string;
+  id: number;
+  name: string;
   nickname: string;
-  favorites: number;
-  shared: number;
+  is_favorite: number;
+  is_shared: number;
 } // filearea
 
 export interface StyledTreeItemProps extends Omit<TreeItemProps, "onClick"> {

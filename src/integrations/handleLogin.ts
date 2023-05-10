@@ -30,7 +30,7 @@ export const loginAuthenticate = (email: string, password: string) => {
         if (err) {
           reject(err);
         } else if (!user) {
-          reject({ status: 400, message: info.message });
+          resolve({ message: info.message });
         } else {
           const { id, email, nickname } = user;
           const payload = { id, email, nickname };
