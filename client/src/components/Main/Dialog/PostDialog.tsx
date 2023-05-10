@@ -154,7 +154,7 @@ const PostDialog = () => {
           },
           {
             onSuccess: () => {
-              queryClient.invalidateQueries("getFile");
+              queryClient.invalidateQueries("getWords");
               state.setSnackBar({
                 text: "단어장이 추가되었습니다",
                 type: "success",
@@ -170,7 +170,7 @@ const PostDialog = () => {
           { body: { name: formData.value1 } },
           {
             onSuccess: () => {
-              queryClient.invalidateQueries("getFile");
+              queryClient.invalidateQueries("getWords");
               state.setSnackBar({
                 text: "단어장명이 변경되었습니다",
                 type: "success",

@@ -32,3 +32,24 @@ export const deleteWords = async (req: Request, res: Response) => {
   const result = await Words.deleteWords(Number(req.params.id));
   res.json(result);
 };
+
+export const moveWords = async (req: Request, res: Response) => {
+  const { id, folder_id } = req.query;
+  const result = await Words.moveWords(Number(id), Number(folder_id));
+  res.json(result);
+};
+
+export const changeStats = async(req: Request, res: Response) => {
+  const {id} = req.params;
+  const { is_favorite, is_shared } = req.body;
+  let message
+  if(is_favorite !== undefined){
+    await Words.changeStatus("favorite",Number(id),is_favorite);
+    message = is_favorite === 0 ? "즐겨찾기에 등록되었습니다" : "즐겨찾기에서 해제되었습니다"
+  }else if(is_shared !== undefined){
+    await Words.changeStatus("shared",Number(id),is_shared);
+    message =  is_shared === 0 ? "단어장이 공유되었습니다" : "단어장이 공유해제되었습니다"
+  }
+  
+  res.json({message});
+};

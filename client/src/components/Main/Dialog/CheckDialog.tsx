@@ -15,6 +15,8 @@ const CheckDialog = () => {
   const state = useMainStore((state) => state);
 
   const { deleteMutate: deleteFolder } = useQueryDelete("/folders");
+  const { deleteMutate: deleteWords}  = useQueryDelete("/words");
+  const { mutate: changeStatus } = useQueryPatch(`/words/status/${state.selectedFile.id}`,"patch");
   const queryClient = useQueryClient();
   const theme = usePersistStore((state) => !state.theme);
 
@@ -36,16 +38,6 @@ const CheckDialog = () => {
   };
 
   const submitForm = () => {
-    const requsetData = {
-      body: {
-        folder_id: state.selectedFolder,
-        file_id: state.selectedFile.id,
-        file_favorites: state.selectedFile.fav,
-        file_shared: state.selectedFile.sha,
-        data_id: state.selectedData.id,
-      },
-    };
-
     switch (state.checkDialog.title) {
       case "폴더 삭제":
         deleteFolder(state.selectedFolder, {
@@ -60,6 +52,48 @@ const CheckDialog = () => {
           },
         });
         break;
+      case "단어장 삭제":
+        deleteWords(String(state.selectedFile.id), {
+          onSuccess: () => {
+            queryClient.invalidateQueries("getWords");
+            handleOpen();
+            state.setSnackBar({
+              text: "단어장이 삭제되었습니다",
+              type: "success",
+            });
+            state.setSnackBarOpen(true);
+          },
+        });
+        break;
+      case "즐겨찾기 등록":
+      case "즐겨찾기 해제":
+        changeStatus({body:{is_favorite:state.selectedFile.is_favorite}}, {
+          onSuccess: (data) => {
+            queryClient.invalidateQueries("getWords");
+            handleOpen();
+            state.setSnackBar({
+              text: data.message,
+              type: "success",
+            });
+            state.setSnackBarOpen(true);
+          },
+        });
+        break;
+      case "단어장 공유":
+      case "단어장 공유 해제":
+        changeStatus({body:{is_shared:state.selectedFile.is_shared}}, {
+          onSuccess: (data) => {
+            queryClient.invalidateQueries("getWords");
+            handleOpen();
+            state.setSnackBar({
+              text: data.message,
+              type: "success",
+            });
+            state.setSnackBarOpen(true);
+          },
+        });
+        break;
+        
     }
 
     // mutate(requsetData, {

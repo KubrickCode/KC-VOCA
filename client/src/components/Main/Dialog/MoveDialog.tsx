@@ -11,6 +11,10 @@ const MoveDial = () => {
     `/folders/move?id=${state.selectedFolder}&parent_id=${state.moveSelectedFolder}`,
     "patch"
   );
+  const { mutate: moveWords } = useQueryPatch(
+    `/words/move?id=${state.selectedFile.id}&folder_id=${state.moveSelectedFolder}`,
+    "patch"
+  );
   const queryClient = useQueryClient();
   const theme = usePersistStore((state) => !state.theme);
 
@@ -50,6 +54,15 @@ const MoveDial = () => {
           },
         }
       );
+    }else{
+      moveWords({},{onSuccess:()=>{
+        state.setSnackBar({
+          text: "단어장이 이동되었습니다",
+          type: "success",
+        });
+        queryClient.invalidateQueries("getWords");
+        state.setSnackBarOpen(true);
+      }})
     }
 
     // mutate(requsetData, {

@@ -56,6 +56,19 @@ class Words {
 
     return result;
   }
+
+  async moveWords(id: number, folder_id: number) {
+    const [result] = await pool.query(
+      "UPDATE Words SET folder_id=? WHERE id=?",
+      [folder_id, id]
+    );
+    return result;
+  }
+
+  async changeStatus(type:string,id:number,status:number){
+    const [result] = await pool.query(`UPDATE Words SET is_${type}=? WHERE id=?`,[status === 0 ? 1 : 0,id]);
+    return result;
+  }
 }
 
 export default new Words();

@@ -15,7 +15,7 @@ import { useQueryGet } from "../../ReactQuery/UseQuery";
 const FileArea = () => {
   const theme = usePersistStore((state) => !state.theme);
   const state = useMainStore((state) => state);
-  const { data } = useQueryGet(`/words/${state.selectedFolder}`, "getFile");
+  const { data } = useQueryGet(`/words/${state.selectedFolder}`, "getWords");
 
   if (data?.words?.length > 0) {
     return (
