@@ -1,4 +1,4 @@
-import { useState, useMemo, lazy, Suspense } from "react";
+import { useState, useMemo, lazy, Suspense, useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { usePersistStore } from "../../Store/GlobalStore";
 import { useMainStore } from "../../Store/MainStore";
@@ -48,7 +48,7 @@ const PersistentDrawerLeft = () => {
   const VocaLoad = lazy(() => import("../Main/VocaLoad"));
   const SearchPage = lazy(() => import("../Main/SearchPage"));
   const SharePage = lazy(() => import("../Main/SharePage"));
-  const { data } = useQueryGet(`/getdata/user`, "getUser");
+  const { data } = useQueryGet(`/user`, "getUser");
 
   const handleOpen = () => setOpen(!open);
 

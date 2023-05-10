@@ -23,7 +23,6 @@ const SpeedDialComp = () => {
           isOpen: true,
           title: "단어장 추가",
           label: "단어장명을 입력해 주세요",
-          link: `${url}/create/create_file`,
           content: "basic",
         }),
     },
@@ -35,7 +34,6 @@ const SpeedDialComp = () => {
           isOpen: true,
           title: "폴더 추가",
           label: "폴더명을 입력해 주세요",
-          link: `${url}/create/create_folder`,
           content: "basic",
         }),
     },
@@ -47,7 +45,6 @@ const SpeedDialComp = () => {
           isOpen: true,
           title: "폴더 삭제",
           text: "정말 폴더를 삭제하시겠습니까?",
-          link: `${url}/delete/delete_folder`,
         }),
     },
     {
@@ -58,7 +55,6 @@ const SpeedDialComp = () => {
           isOpen: true,
           title: "폴더명 변경",
           label: "폴더명을 입력해 주세요",
-          link: `${url}/modify/rename_folder`,
           content: "basic",
         }),
     },
@@ -68,7 +64,7 @@ const SpeedDialComp = () => {
       dialog: () =>
         state.setMoveDialog({
           isOpen: true,
-          link: `${url}/modify/move_folder`,
+          type: "folder",
         }),
     },
   ];

@@ -22,8 +22,8 @@ import { useQueryGet } from "../../../ReactQuery/UseQuery";
 const SetDialog = () => {
   const state = useMainStore((state) => state);
   const url = import.meta.env.VITE_SERVER_HOST;
-  const { data } = useQueryGet(`/getdata/user`, "getUser");
   const theme = usePersistStore((state) => !state.theme);
+  const { data } = useQueryGet(`/user`, "getUser");
 
   const toggleStyle = {
     backgroundColor: theme ? "hsl(0, 0%, 30%)" : "white",
@@ -65,7 +65,7 @@ const SetDialog = () => {
           <Stack direction="row" spacing={1}>
             <ContactPageIcon /> <Typography>회원 정보</Typography>
           </Stack>
-          <p>이메일 : {data.email}</p> <p>닉네임 : {data.nickname}</p>
+          <p>이메일 : {data?.email}</p> <p>닉네임 : {data?.nickname}</p>
         </Paper>
         <ButtonGroup
           orientation="vertical"
@@ -74,7 +74,10 @@ const SetDialog = () => {
         >
           <Button
             startIcon={<LogoutIcon />}
-            onClick={() => (window.location.href = `${url}/signpage/logout`)}
+            onClick={() => {
+              localStorage.removeItem("token");
+              location.href = "/";
+            }}
             sx={toggleBtnGroupStyle}
           >
             로그아웃

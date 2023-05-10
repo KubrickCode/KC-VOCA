@@ -14,7 +14,16 @@ import { useQueryPatch } from "../../../ReactQuery/UseQuery";
 
 const PostDialog = () => {
   const state = useMainStore((state) => state);
-  const { mutate } = useQueryPatch(state.postDialog.link, "post");
+  const { mutate: addFolder } = useQueryPatch("/folders", "post");
+  const { mutate: addWords } = useQueryPatch("/words", "post");
+  const { mutate: renameFolder } = useQueryPatch(
+    `/folders/${state.selectedFolder}`,
+    "patch"
+  );
+  const { mutate: renameWords } = useQueryPatch(
+    `/words/${state.selectedFile.id}`,
+    "patch"
+  );
   const [formData, setFormData] = useState({
     value1: "",
     value2: "",
@@ -53,33 +62,31 @@ const PostDialog = () => {
   }, [state.postDialog]);
 
   useEffect(() => {
-    const { content, title } = state.postDialog;
+    const { title } = state.postDialog;
     const { value1, value2, voca } = formData;
     const formPwd = RegExp(
       /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,18}$/
     );
     const formNick = RegExp(/^[a-zA-Z0-9가-힣]{2,10}$/);
 
-    if (content === "basic") {
-      let isValid;
-      switch (title) {
-        case "비밀번호 변경":
-          isValid =
-            value1.length > 5 && value2.length > 5 && formPwd.test(value2);
-          setSubmitBtn(!isValid);
-          break;
-        case "닉네임 변경":
-          isValid = value1.length > 1 && formNick.test(value1);
-          setSubmitBtn(!isValid);
-          break;
-        default:
-          isValid = value1.length > 0;
-          setSubmitBtn(!isValid);
-          break;
-      }
-    } else if (content === "data") {
-      let isValid = voca.length > 0;
-      setSubmitBtn(!isValid);
+    let isValid;
+    switch (title) {
+      case "비밀번호 변경":
+        isValid =
+          value1.length > 5 && value2.length > 5 && formPwd.test(value2);
+        setSubmitBtn(!isValid);
+        break;
+      case "닉네임 변경":
+        isValid = value1.length > 1 && formNick.test(value1);
+        setSubmitBtn(!isValid);
+        break;
+      case "데이터 추가" || "데이터 수정":
+        isValid = voca.length > 0;
+        setSubmitBtn(!isValid);
+      default:
+        isValid = value1.length > 0;
+        setSubmitBtn(!isValid);
+        break;
     }
   }, [formData]);
 
@@ -96,34 +103,114 @@ const PostDialog = () => {
         data_id: state.selectedData.id,
       },
     };
-    mutate(requsetData, {
-      onSuccess: (data) => {
-        if (
-          state.postDialog.title === "정말 회원에서 탈퇴하시겠습니까?" &&
-          data === "success"
-        ) {
-          location.reload();
-        }
-        handleOpen();
 
-        state.setSnackBar({
-          text: data[0],
-          type: data[1],
-        });
+    const { title } = state.postDialog;
 
-        if (data[2] === "folder") {
-          queryClient.invalidateQueries("getFolder");
-        } else if (data[2] === "file") {
-          queryClient.invalidateQueries("getFile");
-        } else if (data[2] === "data") {
-          queryClient.invalidateQueries("getData");
-        } else {
-          queryClient.invalidateQueries("getUser");
-        }
+    switch (title) {
+      case "폴더 추가":
+        addFolder(
+          {
+            body: {
+              parent_id: state.selectedFolder,
+              name: formData.value1,
+            },
+          },
+          {
+            onSuccess: () => {
+              queryClient.invalidateQueries("getFolder");
+              state.setSnackBar({
+                text: "폴더가 추가되었습니다",
+                type: "success",
+              });
+              state.setSnackBarOpen(true);
+              handleOpen();
+            },
+          }
+        );
+        break;
+      case "폴더명 변경":
+        renameFolder(
+          { body: { name: formData.value1 } },
+          {
+            onSuccess: () => {
+              queryClient.invalidateQueries("getFolder");
+              state.setSnackBar({
+                text: "폴더명이 변경되었습니다",
+                type: "success",
+              });
+              state.setSnackBarOpen(true);
+              handleOpen();
+            },
+          }
+        );
+        break;
+      case "단어장 추가":
+        addWords(
+          {
+            body: {
+              folder_id: state.selectedFolder,
+              name: formData.value1,
+            },
+          },
+          {
+            onSuccess: () => {
+              queryClient.invalidateQueries("getFile");
+              state.setSnackBar({
+                text: "단어장이 추가되었습니다",
+                type: "success",
+              });
+              state.setSnackBarOpen(true);
+              handleOpen();
+            },
+          }
+        );
+        break;
+      case "단어장명 변경":
+        renameWords(
+          { body: { name: formData.value1 } },
+          {
+            onSuccess: () => {
+              queryClient.invalidateQueries("getFile");
+              state.setSnackBar({
+                text: "단어장명이 변경되었습니다",
+                type: "success",
+              });
+              state.setSnackBarOpen(true);
+              handleOpen();
+            },
+          }
+        );
+        break;
+    }
 
-        state.setSnackBarOpen(true);
-      },
-    });
+    // mutate(requsetData, {
+    //   onSuccess: (data) => {
+    //     if (
+    //       state.postDialog.title === "정말 회원에서 탈퇴하시겠습니까?" &&
+    //       data === "success"
+    //     ) {
+    //       location.reload();
+    //     }
+    //     handleOpen();
+
+    //     state.setSnackBar({
+    //       text: data[0],
+    //       type: data[1],
+    //     });
+
+    //     if (data[2] === "folder") {
+    //       queryClient.invalidateQueries("getFolder");
+    //     } else if (data[2] === "file") {
+    //       queryClient.invalidateQueries("getFile");
+    //     } else if (data[2] === "data") {
+    //       queryClient.invalidateQueries("getData");
+    //     } else {
+    //       queryClient.invalidateQueries("getUser");
+    //     }
+
+    //     state.setSnackBarOpen(true);
+    //   },
+    // });
   };
 
   const basicContent = () => {

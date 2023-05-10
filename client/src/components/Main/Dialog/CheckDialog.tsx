@@ -9,12 +9,12 @@ import {
   DialogContentText,
   Button,
 } from "@mui/material";
-import { useQueryPatch } from "../../../ReactQuery/UseQuery";
+import { useQueryDelete, useQueryPatch } from "../../../ReactQuery/UseQuery";
 
 const CheckDialog = () => {
   const state = useMainStore((state) => state);
 
-  const { mutate } = useQueryPatch(state.checkDialog.link, "post");
+  const { deleteMutate: deleteFolder } = useQueryDelete("/folders");
   const queryClient = useQueryClient();
   const theme = usePersistStore((state) => !state.theme);
 
@@ -45,30 +45,47 @@ const CheckDialog = () => {
         data_id: state.selectedData.id,
       },
     };
-    mutate(requsetData, {
-      onSuccess: (data) => {
-        state.setSnackBar({
-          text: data[0],
-          type: data[1],
+
+    switch (state.checkDialog.title) {
+      case "폴더 삭제":
+        deleteFolder(state.selectedFolder, {
+          onSuccess: () => {
+            queryClient.invalidateQueries("getFolder");
+            handleOpen();
+            state.setSnackBar({
+              text: "폴더가 삭제되었습니다",
+              type: "success",
+            });
+            state.setSnackBarOpen(true);
+          },
         });
+        break;
+    }
 
-        if (data[2] === "folder") {
-          queryClient.invalidateQueries("getFolder");
-        } else if (data[2] === "file") {
-          queryClient.invalidateQueries("getFile");
-        } else if (data[2] === "data") {
-          queryClient.invalidateQueries("getData");
-        } else {
-          queryClient.invalidateQueries("getData");
-        }
-        state.setSnackBarOpen(true);
+    // mutate(requsetData, {
+    //   onSuccess: (data) => {
+    //     state.setSnackBar({
+    //       text: data[0],
+    //       type: data[1],
+    //     });
 
-        if (data[3]) {
-          state.setSelectedFolder(data[3]);
-        }
-        handleOpen();
-      },
-    });
+    //     if (data[2] === "folder") {
+    //       queryClient.invalidateQueries("getFolder");
+    //     } else if (data[2] === "file") {
+    //       queryClient.invalidateQueries("getFile");
+    //     } else if (data[2] === "data") {
+    //       queryClient.invalidateQueries("getData");
+    //     } else {
+    //       queryClient.invalidateQueries("getData");
+    //     }
+    //     state.setSnackBarOpen(true);
+
+    //     if (data[3]) {
+    //       state.setSelectedFolder(data[3]);
+    //     }
+    //     handleOpen();
+    //   },
+    // });
   };
 
   return (

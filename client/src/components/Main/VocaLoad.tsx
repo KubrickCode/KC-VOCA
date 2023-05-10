@@ -110,14 +110,12 @@ const VocaLoad = () => {
       ? state["setCheckDialog"]({
           isOpen: true,
           title,
-          link,
           text,
         })
       : state["setPostDialog"]({
           isOpen: true,
           title,
-          link,
-          content: "data",
+          label: "데이터 변경",
         });
 
     state.setSelectedData({

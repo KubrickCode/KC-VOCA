@@ -5,8 +5,8 @@ import { hashPassword } from "../integrations/handlePassword";
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
-  const token = await loginAuthenticate(email, password);
-  res.json({ token });
+  const result = await loginAuthenticate(email, password);
+  res.json({ result });
 };
 
 export const addUser = async (req: Request, res: Response) => {

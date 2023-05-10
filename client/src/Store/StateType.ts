@@ -1,3 +1,5 @@
+import { method } from "../ReactQuery/UseQuery";
+
 export type PersistStoreType = {
   theme: boolean;
   toggleTheme: () => void;
@@ -18,18 +20,16 @@ export interface StateType {
     isOpen: boolean;
     title: string;
     label: string;
-    link: string;
     content: string;
   };
   checkDialog: {
     isOpen: boolean;
     title: string;
     text: string;
-    link: string;
   };
   moveDialog: {
     isOpen: boolean;
-    link: string;
+    type: string;
   };
   setDialog: {
     isOpen: boolean;
@@ -38,8 +38,8 @@ export interface StateType {
   moveSelectedFolder: string;
   selectedFile: {
     id: null | number;
-    fav: number;
-    sha: number;
+    is_favorite: number;
+    is_shared: number;
   };
   selectedData: {
     id: null | number;

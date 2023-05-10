@@ -34,6 +34,14 @@ class Folder {
 
     return result;
   }
+
+  async moveFolder(id: number, parent_id: number) {
+    const [result] = await pool.query(
+      "UPDATE Folders SET parent_id=? WHERE id=?",
+      [parent_id, id]
+    );
+    return result;
+  }
 }
 
 export default new Folder();

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, Suspense } from "react";
+import { useState, useRef, Suspense } from "react";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import "@fontsource/roboto/500.css";
 import {
@@ -18,7 +18,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { EmailAlertProps, FormDialogProps } from "../ComponentsType";
-import { useQueryGet, useQueryPatch } from "../../ReactQuery/UseQuery";
+import { useQueryPatch } from "../../ReactQuery/UseQuery";
 import LoadingOverlay from "../Loading";
 
 const Copyright = () => {
@@ -40,17 +40,29 @@ const Copyright = () => {
 };
 
 const SignIn = () => {
-  const isTokenExist = localStorage.getItem("token");
   const [errmsg, setErrMsg] = useState("");
   const [open, setOpen] = useState<boolean>(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const url = import.meta.env.VITE_SERVER_HOST;
-  const { data } = useQueryGet("/auth/login", "doLogin", {
-    enabled: !!isTokenExist,
-  });
+  const { mutate } = useQueryPatch("/auth/login", "post");
 
-  useEffect(() => {
-    setErrMsg(data?.feedback);
-  }, [data]);
+  const login = (e: any) => {
+    e.preventDefault();
+    mutate(
+      { body: { email, password } },
+      {
+        onSuccess: (data) => {
+          if (data.result.message) {
+            setErrMsg(data.result.message);
+          } else {
+            localStorage.setItem("token", data.result);
+            location.href = "/";
+          }
+        },
+      }
+    );
+  };
 
   return (
     <Suspense fallback={<LoadingOverlay />}>
@@ -75,6 +87,7 @@ const SignIn = () => {
           label="이메일 주소"
           type="email"
           autoComplete="email"
+          onChange={(e) => setEmail(e.target.value)}
         />
         <TextField
           margin="normal"
@@ -84,6 +97,7 @@ const SignIn = () => {
           label="비밀번호"
           type="password"
           autoComplete="current-password"
+          onChange={(e) => setPassword(e.target.value)}
         />
         {errmsg && <Alert severity="warning">{errmsg}</Alert>}
         <Button
@@ -91,6 +105,7 @@ const SignIn = () => {
           fullWidth
           variant="contained"
           sx={{ boxShadow: 1, mt: 3, mb: 2 }}
+          onClick={login}
         >
           <Typography>로그인</Typography>
         </Button>

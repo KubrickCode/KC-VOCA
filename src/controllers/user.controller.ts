@@ -3,8 +3,10 @@ import User from "../models/queries/User";
 import { UserType } from "./../models/types";
 
 export const getUser = async (req: Request, res: Response) => {
-  const user = await User.getUserById(Number(req.params.id));
-  res.json(user);
+  const { id: user_id } = req.user as UserType;
+  const [user] = await User.getUserById(Number(user_id));
+  const { id, email, nickname, registration_date } = user;
+  res.json({ id, email, nickname, registration_date });
 };
 
 export const updateUser = async (req: Request, res: Response) => {
