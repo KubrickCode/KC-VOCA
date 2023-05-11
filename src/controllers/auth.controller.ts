@@ -5,7 +5,6 @@ import {
   kakaoAuthenticate,
   kakaoCallbackAuthenticate,
   loginAuthenticate,
-  signJWT,
 } from "../integrations/handleLogin";
 import User from "../models/queries/User";
 import { hashPassword } from "../integrations/handlePassword";

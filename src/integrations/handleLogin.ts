@@ -10,11 +10,8 @@ export const signJWT = (payload: {
   email: string;
   nickname: string;
 }) => {
-  const secret = process.env.JWT_SECRET;
+  const secret = process.env.JWT_SECRET!;
 
-  if (!secret) {
-    throw new Error("JWT 시크릿 키가 없습니다");
-  }
   const token = jwt.sign(payload, secret, {
     expiresIn: "30d",
   });

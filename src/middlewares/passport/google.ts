@@ -1,10 +1,9 @@
-// googleStrategy.ts
-import jwt from "jsonwebtoken";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import User from "../../models/queries/User";
 import { googleConfig } from "../../shared/config";
 import { hashPassword } from "../../integrations/handlePassword";
-import { getRandomPassword } from "..//../integrations/getRandomPassword";
+import { getRandomPassword } from "../../integrations/getRandomPassword";
+import { signJWT } from "../../integrations/handleLogin";
 
 const googleStrategy = new GoogleStrategy(
   googleConfig,
@@ -17,9 +16,8 @@ const googleStrategy = new GoogleStrategy(
       );
 
       if (existingUser) {
-        const token = jwt.sign(existingUser, process.env.JWT_SECRET!, {
-          expiresIn: "30d",
-        });
+        const { id } = existingUser;
+        const token = signJWT({ id, email, nickname: name });
         return done(null, { ...existingUser, token });
       }
 
@@ -35,9 +33,9 @@ const googleStrategy = new GoogleStrategy(
         profile._json.email as string
       );
 
-      const token = jwt.sign(savedUser, process.env.JWT_SECRET!, {
-        expiresIn: "30d",
-      });
+      const { id } = savedUser;
+
+      const token = signJWT({ id, email, nickname: name });
 
       done(null, { ...savedUser, token });
     } catch (err: any) {
