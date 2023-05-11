@@ -13,7 +13,7 @@ const SharePage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    state.setSelectedFolder("get_share_file");
+    state.setSelectedFolder("get_shared_file");
   }, []);
 
   return (

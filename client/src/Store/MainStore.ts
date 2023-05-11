@@ -36,10 +36,10 @@ const initialMainStore = {
   },
   selectedData: {
     id: null,
-    voca: "",
-    voca_mean: "",
-    exam: "",
-    exam_mean: "",
+    word: "",
+    meaning: "",
+    example_sentence: "",
+    example_sentence_meaning: "",
   },
 };
 

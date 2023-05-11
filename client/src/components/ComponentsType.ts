@@ -58,11 +58,11 @@ export interface FolderTreeProps {
 }
 
 export interface SearchDataItem {
-  data_id: number | null;
-  voca: string;
-  voca_mean: string;
-  exam: string;
-  exam_mean: string;
+  id: number | null;
+  word: string;
+  meaning: string;
+  example_sentence: string;
+  example_sentence_meaning: string;
 }
 
 export interface SearchMyTableRowProps {

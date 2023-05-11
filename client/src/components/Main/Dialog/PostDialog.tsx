@@ -24,13 +24,19 @@ const PostDialog = () => {
     `/words/${state.selectedFile.id}`,
     "patch"
   );
+  const { mutate: addData } = useQueryPatch("/word-data", "post");
+  const { mutate: changeData } = useQueryPatch(
+    `/word-data/${state.selectedData.id}`,
+    "patch"
+  );
+
   const [formData, setFormData] = useState({
     value1: "",
     value2: "",
-    voca: "",
-    voca_mean: "",
-    exam: "",
-    exam_mean: "",
+    word: "",
+    meaning: "",
+    example_sentence: "",
+    example_sentence_meaning: "",
   });
   const [submitBtn, setSubmitBtn] = useState(true);
   const queryClient = useQueryClient();
@@ -54,16 +60,16 @@ const PostDialog = () => {
       ...formData,
       value1: "",
       value2: "",
-      voca: state.selectedData.voca,
-      voca_mean: state.selectedData.voca_mean,
-      exam: state.selectedData.exam,
-      exam_mean: state.selectedData.exam_mean,
+      word: state.selectedData.word,
+      meaning: state.selectedData.meaning,
+      example_sentence: state.selectedData.example_sentence,
+      example_sentence_meaning: state.selectedData.example_sentence_meaning,
     });
   }, [state.postDialog]);
 
   useEffect(() => {
     const { title } = state.postDialog;
-    const { value1, value2, voca } = formData;
+    const { value1, value2, word } = formData;
     const formPwd = RegExp(
       /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,18}$/
     );
@@ -80,30 +86,23 @@ const PostDialog = () => {
         isValid = value1.length > 1 && formNick.test(value1);
         setSubmitBtn(!isValid);
         break;
-      case "데이터 추가" || "데이터 수정":
-        isValid = voca.length > 0;
+      case "데이터 추가":
+      case "데이터 수정":
+        isValid = word.length > 0;
         setSubmitBtn(!isValid);
+        break;
       default:
         isValid = value1.length > 0;
         setSubmitBtn(!isValid);
         break;
     }
-  }, [formData]);
+  }, [formData, state.postDialog]);
 
   const handleOpen = () => {
     state.setPostDialog({ isOpen: false });
   };
 
   const submitForm = async () => {
-    const requsetData = {
-      body: {
-        formData: formData,
-        folder_id: state.selectedFolder,
-        file_id: state.selectedFile.id,
-        data_id: state.selectedData.id,
-      },
-    };
-
     const { title } = state.postDialog;
 
     switch (title) {
@@ -173,6 +172,53 @@ const PostDialog = () => {
               queryClient.invalidateQueries("getWords");
               state.setSnackBar({
                 text: "단어장명이 변경되었습니다",
+                type: "success",
+              });
+              state.setSnackBarOpen(true);
+              handleOpen();
+            },
+          }
+        );
+        break;
+      case "데이터 추가":
+        addData(
+          {
+            body: {
+              words_id: state.selectedFile.id,
+              word: formData.word,
+              meaning: formData.meaning,
+              example_sentence: formData.example_sentence,
+              example_sentence_meaning: formData.example_sentence_meaning,
+            },
+          },
+          {
+            onSuccess: () => {
+              queryClient.invalidateQueries("getData");
+              state.setSnackBar({
+                text: "데이터가 추가되었습니다",
+                type: "success",
+              });
+              state.setSnackBarOpen(true);
+              handleOpen();
+            },
+          }
+        );
+        break;
+      case "데이터 수정":
+        changeData(
+          {
+            body: {
+              word: formData.word,
+              meaning: formData.meaning,
+              example_sentence: formData.example_sentence,
+              example_sentence_meaning: formData.example_sentence_meaning,
+            },
+          },
+          {
+            onSuccess: () => {
+              queryClient.invalidateQueries("getData");
+              state.setSnackBar({
+                text: "데이터가 수정되었습니다",
                 type: "success",
               });
               state.setSnackBarOpen(true);
@@ -277,14 +323,14 @@ const PostDialog = () => {
         <TextField
           autoFocus
           margin="dense"
-          id="voca"
+          id="word"
           type="text"
-          value={formData.voca}
+          value={formData.word}
           label="단어"
           fullWidth
           variant="standard"
           onChange={(e) => {
-            setFormData({ ...formData, voca: e.target.value });
+            setFormData({ ...formData, word: e.target.value });
           }}
           inputProps={{ minLength: 1, maxLength: 100, style: toggleInputStyle }}
           InputLabelProps={{
@@ -294,14 +340,14 @@ const PostDialog = () => {
         />
         <TextField
           margin="dense"
-          id="voca_mean"
+          id="meaning"
           type="text"
           label="단어 뜻"
-          value={formData.voca_mean}
+          value={formData.meaning}
           fullWidth
           variant="standard"
           onChange={(e) => {
-            setFormData({ ...formData, voca_mean: e.target.value });
+            setFormData({ ...formData, meaning: e.target.value });
           }}
           inputProps={{ maxLength: 100, style: toggleInputStyle }}
           InputLabelProps={{
@@ -311,14 +357,14 @@ const PostDialog = () => {
         />
         <TextField
           margin="dense"
-          id="exam"
+          id="example_sentence"
           type="textarea"
           label="예문"
-          value={formData.exam}
+          value={formData.example_sentence}
           fullWidth
           variant="standard"
           onChange={(e) => {
-            setFormData({ ...formData, exam: e.target.value });
+            setFormData({ ...formData, example_sentence: e.target.value });
           }}
           inputProps={{ maxLength: 1000, style: toggleInputStyle }}
           InputLabelProps={{
@@ -328,14 +374,17 @@ const PostDialog = () => {
         />
         <TextField
           margin="dense"
-          id="exam_mean"
+          id="example_sentence_meaning"
           type="textarea"
           label="예문 뜻"
-          value={formData.exam_mean}
+          value={formData.example_sentence_meaning}
           fullWidth
           variant="standard"
           onChange={(e) => {
-            setFormData({ ...formData, exam_mean: e.target.value });
+            setFormData({
+              ...formData,
+              example_sentence_meaning: e.target.value,
+            });
           }}
           inputProps={{ maxLength: 1000, style: toggleInputStyle }}
           InputLabelProps={{

@@ -10,7 +10,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Unstable_Grid2";
 import { File } from "../ComponentsType";
-import { useQueryGet } from "../../ReactQuery/UseQuery";
+import { useQueryGet, useQueryPatch } from "../../ReactQuery/UseQuery";
 
 const FileArea = () => {
   const theme = usePersistStore((state) => !state.theme);
@@ -54,6 +54,7 @@ const FileBody = ({ id, name, nickname, is_favorite, is_shared }: File) => {
 
   const state = useMainStore((state) => state);
   const navigate = useNavigate();
+  const { mutate } = useQueryPatch(`/words/recent/${id}`, "patch");
 
   return (
     <Grid
@@ -76,7 +77,14 @@ const FileBody = ({ id, name, nickname, is_favorite, is_shared }: File) => {
           textAlign: "center",
         }}
         onClick={() => {
-          navigate(`/load/${id}`);
+          navigate(
+            state.selectedFolder === "get_shared_file"
+              ? `/shared/${id}`
+              : `/load/${id}`
+          );
+          if (state.selectedFolder !== "get_shared_file") {
+            mutate({});
+          }
         }}
       >
         <div>
@@ -91,7 +99,7 @@ const FileBody = ({ id, name, nickname, is_favorite, is_shared }: File) => {
             gutterBottom
             sx={{
               display:
-                state.selectedFolder === "get_share_file" ? "block" : "none",
+                state.selectedFolder === "get_shared_file" ? "block" : "none",
             }}
           >
             by {nickname}
@@ -104,7 +112,8 @@ const FileBody = ({ id, name, nickname, is_favorite, is_shared }: File) => {
           right: 10,
           top: 15,
           color: theme ? "lightgray" : "hsl(0, 0%, 20%)",
-          display: state.selectedFolder === "get_share_file" ? "none" : "block",
+          display:
+            state.selectedFolder === "get_shared_file" ? "none" : "block",
           "&:hover": {
             backgroundColor: theme ? "hsl(0, 0%, 45%)" : "lightgray",
             cursor: "pointer",

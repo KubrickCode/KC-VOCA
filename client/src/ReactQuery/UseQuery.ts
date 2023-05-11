@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "react-query";
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 
 const host = import.meta.env.VITE_SERVER_HOST;
 const token = localStorage.getItem("token") ?? null;
@@ -21,16 +21,17 @@ export const useQueryGet = (link: string, key: string, queryOptions = {}) => {
 
   return useQuery([key, host + link], queryFunc, {
     refetchOnWindowFocus: false,
-    staleTime: 1000 * 60 * 3,
     ...queryOptions,
   });
 };
 
 export const useQueryPatch = (link: string, method: method) => {
-  const mutation = useMutation(async (req: any) => {
-    const response = await api[method](link, req?.body);
-    return response.data;
-  });
+  const mutation = useMutation(
+    async (req: { body?: any; config?: AxiosRequestConfig }) => {
+      const response = await api[method](link, req?.body, req?.config);
+      return response.data;
+    }
+  );
 
   return {
     data: mutation,

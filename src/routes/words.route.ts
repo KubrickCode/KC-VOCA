@@ -5,7 +5,8 @@ import {
   getWords,
   renameWords,
   moveWords,
-  changeStats
+  changeStats,
+  updateRecentView,
 } from "../controllers/words.controller";
 
 const router = express.Router();
@@ -13,7 +14,8 @@ const router = express.Router();
 router.get("/:id", getWords);
 router.post("/", createWords);
 router.patch("/move", moveWords);
-router.patch("/status/:id",changeStats)
+router.patch("/status/:id", changeStats);
+router.patch("/recent/:id", updateRecentView);
 router.patch("/:id", renameWords);
 router.delete("/:id", deleteWords);
 

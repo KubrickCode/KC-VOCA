@@ -1,3 +1,4 @@
+import { RowDataPacket } from "mysql2";
 import pool from "../db";
 
 interface WordDataUpdate {
@@ -32,10 +33,22 @@ class WordData {
     return result;
   }
 
-  async getWordData(file_id: number) {
-    const [result] = await pool.query("SELECT * FROM Words WHERE file_id = ?", [
-      file_id,
-    ]);
+  async getWordData(words_id: number) {
+    const [userResult] = await pool.query<RowDataPacket[]>(
+      "SELECT name FROM Words WHERE id = ?",
+      [words_id]
+    );
+    const [wordDataResult] = await pool.query<RowDataPacket[]>(
+      "SELECT * FROM WordData WHERE words_id = ?",
+      [words_id]
+    );
+
+    const result = {
+      name: userResult[0].name,
+      user_id: userResult[0].user_id,
+      wordData: wordDataResult,
+    };
+
     return result;
   }
 

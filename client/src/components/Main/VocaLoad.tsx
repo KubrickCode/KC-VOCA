@@ -35,6 +35,7 @@ import {
   handleDataProps,
 } from "../ComponentsType";
 import { useQueryGet, useQueryPatch } from "../../ReactQuery/UseQuery";
+import { useQueryClient } from "react-query";
 
 const VocaLoad = () => {
   const state = useMainStore((state) => state);
@@ -54,17 +55,13 @@ const VocaLoad = () => {
 
   const { data } = useQueryGet(`/word-data/${location.id}`, "getData");
 
-  useEffect(()=>{
-    console.log(data)
-  },[data])
-
   useEffect(() => {
-    setShare(Boolean(data[2]));
-    state.setSelectedFolder(String(data[1][0].folder_id));
-    state.setSelectedFile({
-      id: data[1][0].file_id,
-    });
-  }, []);
+    if (viewMode.pathname.includes("/shared/")) {
+      setShare(true);
+    } else {
+      setShare(false);
+    }
+  }, [viewMode]);
 
   useEffect(() => {
     view.state
@@ -75,30 +72,26 @@ const VocaLoad = () => {
   const options = {
     modify: {
       title: "데이터 수정",
-      link: `${url}/modify/modify_data`,
     },
     create: {
       title: "데이터 추가",
-      link: `${url}/create/create_data`,
     },
     delete: {
       title: "데이터 삭제",
-      link: `${url}/delete/delete_data`,
       text: "정말 데이터를 삭제하시겠습니까?",
     },
   };
 
   const handleData = ({
     type,
-    data_id,
-    voca,
-    voca_mean,
-    exam,
-    exam_mean,
+    id,
+    word,
+    meaning,
+    example_sentence,
+    example_sentence_meaning,
   }: handleDataProps) => {
-    let typeData: { title: string; link: string; text?: string } = {
+    let typeData: { title: string; text?: string } = {
       title: "",
-      link: "",
     };
 
     if (type === "modify") {
@@ -109,7 +102,7 @@ const VocaLoad = () => {
       typeData = options.delete;
     }
 
-    const { title, link, text } = typeData;
+    const { title, text } = typeData;
     type === "delete"
       ? state["setCheckDialog"]({
           isOpen: true,
@@ -120,14 +113,19 @@ const VocaLoad = () => {
           isOpen: true,
           title,
           label: "데이터 변경",
+          content: "data",
         });
 
+    state.setSelectedFile({
+      id: Number(location.id),
+    });
+
     state.setSelectedData({
-      id: data_id || null,
-      voca: voca || "",
-      voca_mean: voca_mean || "",
-      exam: exam || "",
-      exam_mean: exam_mean || "",
+      id: id || null,
+      word: word || "",
+      meaning: meaning || "",
+      example_sentence: example_sentence || "",
+      example_sentence_meaning: example_sentence_meaning || "",
     });
   };
 
@@ -141,23 +139,24 @@ const VocaLoad = () => {
         textColor={textColor}
         theme={theme}
         navigate={navigate}
-        fileName={data[1][0].file_name}
+        fileName={data?.name}
         handleData={handleData}
         share={share}
         view={view}
         setView={setView}
         bgColor={bgColor}
       />
-      {data &&
-        data[0].map((item: DataItem, index: number) => (
+      {data?.wordData?.length > 0 ? (
+        data?.wordData?.map((item: DataItem, index: number) => (
           <DataBody
-            data_id={item.data_id}
-            voca={item.voca}
-            voca_mean={item.voca_mean}
-            exam={item.exam}
-            exam_mean={item.exam_mean}
+            id={item.id}
+            word={item.word}
+            meaning={item.meaning}
+            example_sentence={item.example_sentence}
+            example_sentence_meaning={item.example_sentence_meaning}
             index={index}
-            key={item.data_id}
+            key={item.id}
+            share={share}
             handleData={handleData}
             view={view}
             bgColor={bgColor}
@@ -166,7 +165,10 @@ const VocaLoad = () => {
             setView={setView}
             url={url}
           />
-        ))}
+        ))
+      ) : (
+        <Typography>아직 추가된 단어 데이터가 없습니다</Typography>
+      )}
     </div>
   );
 };
@@ -183,6 +185,7 @@ const MyHeader = ({
   setView,
 }: MyHeaderProps) => {
   const state = useMainStore((state) => state);
+  const queryClient = useQueryClient();
   return (
     <Stack direction={matches ? "column" : "row"} spacing={2} mb={2} mt={10}>
       <Stack direction="row" spacing={2}>
@@ -196,6 +199,7 @@ const MyHeader = ({
           }}
           onClick={() => {
             navigate("/");
+            queryClient.invalidateQueries("getWords");
             state.setSelectedFolder("get_recent_file");
           }}
         >
@@ -218,11 +222,11 @@ const MyHeader = ({
           onClick={() => {
             handleData({
               type: "create",
-              data_id: null,
-              voca: "",
-              voca_mean: "",
-              exam: "",
-              exam_mean: "",
+              id: null,
+              word: "",
+              meaning: "",
+              example_sentence: "",
+              example_sentence_meaning: "",
             });
           }}
           sx={{ display: share ? "none" : "inlineBlock" }}
@@ -248,11 +252,11 @@ const MyHeader = ({
 };
 
 const DataBody = ({
-  data_id,
-  voca,
-  voca_mean,
-  exam,
-  exam_mean,
+  id,
+  word,
+  meaning,
+  example_sentence,
+  example_sentence_meaning,
   index,
   handleData,
   view,
@@ -268,34 +272,34 @@ const DataBody = ({
   const rows = [
     {
       title: "단어",
-      label: voca,
+      label: word,
       url: url,
-      key: "voca" + index,
+      key: "word" + index,
     },
     {
       title: "단어 뜻",
-      label: voca_mean,
+      label: meaning,
       url: url,
-      key: "voca_mean" + index,
+      key: "meaning" + index,
     },
     {
       title: "예문",
-      label: exam,
+      label: example_sentence,
       url: url,
-      key: "exam" + index,
+      key: "example_sentence" + index,
     },
     {
       title: "예문 뜻",
-      label: exam_mean,
+      label: example_sentence,
       url: url,
-      key: "exam_mean" + index,
+      key: "example_sentence_meaning" + index,
     },
   ];
 
   return (
     <TableContainer
       component={Paper}
-      key={data_id}
+      key={id}
       sx={{
         mb: "20px",
         overflow: "hidden",
@@ -319,11 +323,11 @@ const DataBody = ({
               onClick={() =>
                 handleData({
                   type: "modify",
-                  data_id,
-                  voca,
-                  voca_mean,
-                  exam,
-                  exam_mean,
+                  id,
+                  word,
+                  meaning,
+                  example_sentence,
+                  example_sentence_meaning,
                 })
               }
             >
@@ -335,11 +339,11 @@ const DataBody = ({
               onClick={() =>
                 handleData({
                   type: "delete",
-                  data_id,
-                  voca,
-                  voca_mean,
-                  exam,
-                  exam_mean,
+                  id,
+                  word,
+                  meaning,
+                  example_sentence,
+                  example_sentence_meaning,
                 })
               }
             >
@@ -354,20 +358,20 @@ const DataBody = ({
               marginLeft: "10px",
             }}
             checked={
-              Boolean(checked["voca" + index]) &&
-              Boolean(checked["voca_mean" + index]) &&
-              Boolean(checked["exam" + index]) &&
-              Boolean(checked["exam_mean" + index])
+              Boolean(checked["word" + index]) &&
+              Boolean(checked["meaning" + index]) &&
+              Boolean(checked["example_sentence" + index]) &&
+              Boolean(checked["example_sentence_meaning" + index])
             }
             icon={<VisibilityIcon />}
             checkedIcon={<VisibilityOffIcon />}
             onChange={(e) => {
               setChecked({
                 ...checked,
-                ["voca" + index]: e.target.checked,
-                ["voca_mean" + index]: e.target.checked,
-                ["exam" + index]: e.target.checked,
-                ["exam_mean" + index]: e.target.checked,
+                ["word" + index]: e.target.checked,
+                ["meaning" + index]: e.target.checked,
+                ["example_sentence" + index]: e.target.checked,
+                ["example_sentence_meaning" + index]: e.target.checked,
               });
             }}
           />
@@ -464,12 +468,12 @@ const MyTableRow = ({
   const matches2 = useMediaQuery("(max-width:1092px)");
   const matches3 = useMediaQuery("(max-width:554px)");
   const width = matches3 ? "35%" : matches2 ? "20%" : "10%";
-  const { mutate } = useQueryPatch(`${url}/getdata/tts`, "post");
+  const { mutate } = useQueryPatch(`/word-data/tts`, "post");
 
   const onListen = async (text: string) => {
     const requestData = {
       body: { text },
-      responseType: { responseType: "arraybuffer" },
+      config: { responseType: "arraybuffer" as const },
     };
     mutate(requestData, {
       onSuccess: (data) => {

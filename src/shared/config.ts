@@ -24,3 +24,11 @@ export const googleConfig: StrategyOptions = {
   clientSecret: process.env.GOOGLE_SECRET as string,
   callbackURL: process.env.GOOGLE_CALLBACK as string,
 };
+
+export const awsConfig = {
+  accessKeyId: process.env.ACCESSKEYID,
+  secretAccessKey: process.env.SECRETACCESSKEY,
+  signatureVersion: process.env.SIGNATUREVERSION,
+  region: process.env.REGION,
+  k_region: process.env.K_REGION,
+};
