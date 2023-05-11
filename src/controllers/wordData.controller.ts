@@ -46,3 +46,10 @@ export const ttsService = async (req: Request, res: Response) => {
   const result = await playSound(req.body.text);
   res.send(result);
 };
+
+export const search = async (req: Request, res: Response) => {
+  const { id } = req.user as UserType;
+  const { keyword } = req.body;
+  const result = await WordData.searchData(id, keyword);
+  res.json(result);
+};

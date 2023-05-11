@@ -73,6 +73,14 @@ class WordData {
 
     return result;
   }
+
+  async searchData(id: number, keyword: string) {
+    const [result] = await pool.query(
+      "SELECT * FROM WordData WHERE word REGEXP ? AND WordData.user_id=? OR meaning REGEXP ? AND WordData.user_id=?",
+      [keyword, id, keyword, id]
+    );
+    return result;
+  }
 }
 
 export default new WordData();
