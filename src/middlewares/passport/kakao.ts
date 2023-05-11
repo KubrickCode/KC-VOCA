@@ -1,8 +1,10 @@
+import jwt from "jsonwebtoken";
 import { Strategy as KakaoStrategy } from "passport-kakao";
 import User from "../../models/queries/User";
 import { kakaoConfig } from "../../shared/config";
 import dotenv from "dotenv";
 import { hashPassword } from "../../integrations/handlePassword";
+import { getRandomPassword } from "../../integrations/getRandomPassword";
 dotenv.config();
 
 const kakaoStrategy = new KakaoStrategy(
@@ -15,18 +17,27 @@ const kakaoStrategy = new KakaoStrategy(
       const existingUser = await User.getUserByEmail(email);
 
       if (existingUser) {
-        return done(null, existingUser);
+        const token = jwt.sign(existingUser, process.env.JWT_SECRET!, {
+          expiresIn: "30d",
+        });
+        return done(null, { ...existingUser, token });
       }
 
-      const hashedPassword = await hashPassword(profile.id);
+      const hashedPassword = await hashPassword(getRandomPassword());
 
-      const savedUser = await User.createUser({
+      await User.createUser({
         email,
         nickname: displayName,
         password: hashedPassword,
       });
 
-      done(null, savedUser);
+      const savedUser = await User.getUserByEmail(email as string);
+
+      const token = jwt.sign(savedUser, process.env.JWT_SECRET!, {
+        expiresIn: "30d",
+      });
+
+      done(null, { ...savedUser, token });
     } catch (err) {
       done(err);
     }

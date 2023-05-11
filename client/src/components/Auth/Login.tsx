@@ -113,7 +113,7 @@ const SignIn = () => {
           fullWidth
           sx={{ boxShadow: 1, marginBottom: "10px" }}
           component={Link}
-          href={`${url}/signpage/google`}
+          href={`${url}/auth/google`}
         >
           <img height="20px" src={"google.png"} />
           <Typography
@@ -134,7 +134,7 @@ const SignIn = () => {
             },
           }}
           component={Link}
-          href={`${url}/signpage/kakao`}
+          href={`${url}/auth/kakao`}
         >
           <img height="20px" src={"kakao.png"} />
           <Typography color="black" sx={{ marginLeft: "10px" }}>
