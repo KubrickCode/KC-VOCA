@@ -4,6 +4,7 @@ import { devtools } from "zustand/middleware";
 import { StateType } from "./StateType";
 
 const initialMainStore = {
+  isHome: false,
   snackBarOpen: false,
   snackBar: {
     text: "",
@@ -83,6 +84,12 @@ const mainStore: StateCreator<StateType> = (set) => ({
       ...state,
       selectedData: { ...state.selectedData, ...selectedData },
     })),
+  setIsHome: (isHome: boolean) => {
+    set((state) => ({
+      ...state,
+      isHome,
+    }));
+  },
 });
 
 export const useMainStore = create<StateType>(

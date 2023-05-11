@@ -248,8 +248,8 @@ const PostDialog = () => {
               state.setSnackBarOpen(true);
               handleOpen();
             },
-            onError: (error: any) => {
-              setErrMsg(error.response.data.message);
+            onError: (err: any) => {
+              setErrMsg(err.response.data.message);
             },
           }
         );

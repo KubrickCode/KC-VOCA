@@ -144,6 +144,7 @@ const FolderTree: React.FC<FolderTreeProps> = ({ data, parent_id }) => {
           labelText={folder.name}
           labelIcon={FolderIcon}
           onClick={() => {
+            state.setIsHome(folder.parent_id === 0 ? true : false);
             clickFolder(folder.id);
           }}
           children={children}

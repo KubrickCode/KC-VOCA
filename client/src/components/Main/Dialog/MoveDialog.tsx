@@ -52,17 +52,29 @@ const MoveDial = () => {
             queryClient.invalidateQueries("getFolder");
             state.setSnackBarOpen(true);
           },
+          onError: (err: any) => {
+            state.setSnackBar({
+              text: "해당 위치로 이동할 수 없습니다",
+              type: "warning",
+            });
+            state.setSnackBarOpen(true);
+          },
         }
       );
-    }else{
-      moveWords({},{onSuccess:()=>{
-        state.setSnackBar({
-          text: "단어장이 이동되었습니다",
-          type: "success",
-        });
-        queryClient.invalidateQueries("getWords");
-        state.setSnackBarOpen(true);
-      }})
+    } else {
+      moveWords(
+        {},
+        {
+          onSuccess: () => {
+            state.setSnackBar({
+              text: "단어장이 이동되었습니다",
+              type: "success",
+            });
+            queryClient.invalidateQueries("getWords");
+            state.setSnackBarOpen(true);
+          },
+        }
+      );
     }
 
     // mutate(requsetData, {

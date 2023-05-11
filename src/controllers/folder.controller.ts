@@ -29,6 +29,14 @@ export const deleteFolder = async (req: Request, res: Response) => {
 
 export const moveFolder = async (req: Request, res: Response) => {
   const { id, parent_id } = req.query;
-  const result = await Folder.moveFolder(Number(id), Number(parent_id));
-  res.json(result);
+  if (id === parent_id) {
+    res.status(403).json({ message: "해당 위치로 이동할 수 없습니다" });
+  } else {
+    const result = await Folder.moveFolder(Number(id), Number(parent_id));
+    if (!result) {
+      res.status(403).json({ message: "해당 위치로 이동할 수 없습니다" });
+    } else {
+      res.json(true);
+    }
+  }
 };

@@ -36,11 +36,10 @@ const Content = () => {
       </Grid>
       <Box
         sx={{
-          height: 320,
           transform: "translateZ(0px)",
           flexGrow: 1,
           position: "fixed",
-          bottom: "100px",
+          bottom: "50px",
           right: "50px",
         }}
       >
