@@ -9,6 +9,7 @@ import {
   DialogActions,
   DialogContent,
   Button,
+  Alert,
 } from "@mui/material";
 import { useQueryPatch } from "../../../ReactQuery/UseQuery";
 
@@ -29,6 +30,8 @@ const PostDialog = () => {
     `/word-data/${state.selectedData.id}`,
     "patch"
   );
+  const { mutate: changeUser } = useQueryPatch("/user", "patch");
+  const { mutate: deleteUser } = useQueryPatch("/user", "post");
 
   const [formData, setFormData] = useState({
     value1: "",
@@ -41,6 +44,7 @@ const PostDialog = () => {
   const [submitBtn, setSubmitBtn] = useState(true);
   const queryClient = useQueryClient();
   const theme = usePersistStore((state) => !state.theme);
+  const [errMsg, setErrMsg] = useState("");
 
   const toggleStyle = {
     backgroundColor: theme ? "hsl(0, 0%, 30%)" : "white",
@@ -227,6 +231,70 @@ const PostDialog = () => {
           }
         );
         break;
+      case "닉네임 변경":
+        changeUser(
+          {
+            body: {
+              nickname: formData.value1,
+            },
+          },
+          {
+            onSuccess: () => {
+              queryClient.invalidateQueries("getUser");
+              state.setSnackBar({
+                text: "닉네임이 수정되었습니다",
+                type: "success",
+              });
+              state.setSnackBarOpen(true);
+              handleOpen();
+            },
+            onError: (error: any) => {
+              setErrMsg(error.response.data.message);
+            },
+          }
+        );
+        break;
+      case "비밀번호 변경":
+        changeUser(
+          {
+            body: {
+              prevPassword: formData.value1,
+              password: formData.value2,
+            },
+          },
+          {
+            onSuccess: () => {
+              state.setSnackBar({
+                text: "비밀번호가 변경되었습니다",
+                type: "success",
+              });
+              state.setSnackBarOpen(true);
+              handleOpen();
+            },
+            onError: (error: any) => {
+              setErrMsg(error.response.data.message);
+            },
+          }
+        );
+        break;
+      case "정말 회원에서 탈퇴하시겠습니까?":
+        deleteUser(
+          {
+            body: {
+              password: formData.value1,
+            },
+          },
+          {
+            onSuccess: () => {
+              localStorage.removeItem("token");
+              location.href = "/";
+            },
+            onError: (error: any) => {
+              setErrMsg(error.response.data.message);
+            },
+          }
+        );
+        break;
     }
 
     // mutate(requsetData, {
@@ -313,6 +381,7 @@ const PostDialog = () => {
             }}
           />
         )}
+        {errMsg && <Alert severity="warning">{errMsg}</Alert>}
       </div>
     );
   };
