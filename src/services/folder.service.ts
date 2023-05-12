@@ -9,15 +9,15 @@ export const createFolderService = async (
   parent_id: number,
   name: string
 ) => {
-  return await Folder.createFolder(id, parent_id, name);
+  await Folder.createFolder(id, parent_id, name);
 };
 
 export const renameFolderService = async (id: number, name: string) => {
-  return await Folder.renameFolder(id, name);
+  await Folder.renameFolder(id, name);
 };
 
 export const deleteFolderService = async (id: number) => {
-  return await Folder.deleteFolder(id);
+  await Folder.deleteFolder(id);
 };
 
 export const moveFolderService = async (id: number, parent_id: number) => {

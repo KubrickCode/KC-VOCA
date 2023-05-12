@@ -3,20 +3,23 @@ import express, { ErrorRequestHandler } from "express";
 import logger from "morgan";
 import dotenv from "dotenv";
 import Routes from "./routes";
+import helmet from "helmet";
+import cors from "cors";
+import { initializePassport } from "./middlewares/passport";
+import "express-async-errors";
 dotenv.config();
 
 const app = express();
 
 const link = process.env.REDIRECT_ROOT;
 
-import cors from "cors";
-import { initializePassport } from "./middlewares/passport";
 app.use(
   cors({
     origin: link,
     credentials: true,
   })
 );
+app.use(helmet());
 
 const passport = initializePassport();
 app.use(passport.initialize());
@@ -34,8 +37,12 @@ app.use((req, res, next) => {
 });
 
 app.use(((err, req, res, next) => {
-  res.status(err.status || 500);
   console.error(err.message);
+  res
+    .status(err.status || 500)
+    .json({ message: err.message || "서버 실행 오류" });
 }) as ErrorRequestHandler);
 
-app.listen(3000);
+app.listen(3000, () => {
+  console.log("3000번 포트에서 서버 실행");
+});

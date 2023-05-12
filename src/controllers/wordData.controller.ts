@@ -11,7 +11,7 @@ import {
 
 export const getWordData = async (req: Request, res: Response) => {
   const wordData = await getWordDataService(Number(req.params.id));
-  res.json(wordData);
+  res.status(200).json(wordData);
 };
 
 export const createWordData = async (req: Request, res: Response) => {
@@ -31,27 +31,27 @@ export const createWordData = async (req: Request, res: Response) => {
     example_sentence,
     example_sentence_meaning
   );
-  res.json(true);
+  res.status(204).send();
 };
 
 export const updateWordData = async (req: Request, res: Response) => {
   await updateWordDataService(Number(req.params.id), req.body);
-  res.json(true);
+  res.status(204).send();
 };
 
 export const deleteWordData = async (req: Request, res: Response) => {
   await deleteWordDataService(Number(req.params.id));
-  res.json(true);
+  res.status(204).send();
 };
 
 export const ttsService = async (req: Request, res: Response) => {
   const result = await ttsServiceService(req.body.text);
-  res.send(result);
+  res.status(201).send(result);
 };
 
 export const search = async (req: Request, res: Response) => {
   const { id } = req.user as UserType;
   const { keyword } = req.body;
   const result = await searchService(id, keyword);
-  res.json(result);
+  res.status(200).json(result);
 };

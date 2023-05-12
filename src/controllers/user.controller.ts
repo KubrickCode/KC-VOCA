@@ -11,7 +11,7 @@ export const getUser = async (req: Request, res: Response) => {
   const { id, email, nickname, registration_date } = await getUserService(
     Number(user_id)
   );
-  res.json({ id, email, nickname, registration_date });
+  res.status(200).json({ id, email, nickname, registration_date });
 };
 
 export const updateUser = async (req: Request, res: Response) => {
@@ -28,7 +28,7 @@ export const updateUser = async (req: Request, res: Response) => {
     const { message } = result;
     res.status(403).json({ message });
   } else {
-    res.json(true);
+    res.status(204).send();
   }
 };
 
@@ -37,7 +37,7 @@ export const deleteUser = async (req: Request, res: Response) => {
   const { password } = req.body;
   const result = await deleteUserService(id, password);
   if (result) {
-    res.json(true);
+    res.status(204).send();
   } else {
     res.status(403).json({ message: "비밀번호를 확인해주세요" });
   }

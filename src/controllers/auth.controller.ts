@@ -14,13 +14,13 @@ dotenv.config();
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const result = await loginService(email, password);
-  res.json({ result });
+  res.status(201).json({ result });
 };
 
 export const addUser = async (req: Request, res: Response) => {
   const { email, nickname, password } = req.body;
   const token = await addUserService(email, nickname, password);
-  res.json({ token });
+  res.status(201).json({ token });
 };
 
 export const findPassword = async (req: Request, res: Response) => {
@@ -30,7 +30,7 @@ export const findPassword = async (req: Request, res: Response) => {
   if (!result) {
     res.status(404).json({ message: "존재하지 않는 계정입니다" });
   } else {
-    res.json(true);
+    res.status(204).send();
   }
 };
 
@@ -52,7 +52,9 @@ export const googleCallback = async (
     res,
     next
   )) as UserType;
-  res.redirect(`${process.env.REDIRECT_ROOT}/authorize?token=${token}`);
+  res
+    .status(303)
+    .redirect(`${process.env.REDIRECT_ROOT}/authorize?token=${token}`);
 };
 
 export const kakaoLogin = async (
@@ -73,5 +75,7 @@ export const kakaoCallback = async (
     res,
     next
   )) as UserType;
-  res.redirect(`${process.env.REDIRECT_ROOT}/authorize?token=${token}`);
+  res
+    .status(303)
+    .redirect(`${process.env.REDIRECT_ROOT}/authorize?token=${token}`);
 };
