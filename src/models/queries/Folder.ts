@@ -1,4 +1,5 @@
-import pool from "../db";
+import { RowDataPacket } from "mysql2";
+import pool from "../DB";
 
 class Folder {
   async createFolder(user_id: number, parent_id: number, name: string) {
@@ -35,12 +36,30 @@ class Folder {
     return result;
   }
 
-  async moveFolder(id: number, parent_id: number) {
-    const [result] = await pool.query(
-      "UPDATE Folders SET parent_id=? WHERE id=?",
-      [parent_id, id]
+  async getChildFolders(id: number): Promise<number[]> {
+    const [rows] = await pool.query<RowDataPacket[]>(
+      "SELECT id FROM Folders WHERE parent_id = ?",
+      [id]
     );
-    return result;
+    const children = rows.map((row) => row.id);
+    for (const childId of children) {
+      const grandChildren = await this.getChildFolders(childId);
+      children.push(...grandChildren);
+    }
+    return children;
+  }
+
+  async moveFolder(id: number, parent_id: number) {
+    const childFolderIds = await this.getChildFolders(id);
+    if (childFolderIds.includes(parent_id)) {
+      return false;
+    }
+
+    await pool.query("UPDATE Folders SET parent_id=? WHERE id=?", [
+      parent_id,
+      id,
+    ]);
+    return true;
   }
 }
 

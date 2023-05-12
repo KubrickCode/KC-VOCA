@@ -1,31 +1,57 @@
 import { Request, Response } from "express";
-import User from "../models/queries/User";
-import { UserType } from "./../models/types";
+import { UserType } from "../models/Entity.type";
+import {
+  changeNicknameService,
+  changePasswordService,
+  deleteUserService,
+  getUserService,
+} from "../services/user.service";
 
 export const getUser = async (req: Request, res: Response) => {
   const { id: user_id } = req.user as UserType;
-  const [user] = await User.getUserById(Number(user_id));
-  const { id, email, nickname, registration_date } = user;
-  res.json({ id, email, nickname, registration_date });
+  const { id, email, nickname, registration_date } = await getUserService(
+    Number(user_id)
+  );
+  res.status(200).json({ id, email, nickname, registration_date });
 };
 
-export const updateUser = async (req: Request, res: Response) => {
-  const { nickname, password } = req.body;
-  const { id } = req.params;
+export const changeNickname = async (req: Request, res: Response) => {
+  const { nickname } = req.body;
+  const { id } = req?.user as UserType;
 
-  const fieldsToUpdate: Partial<UserType> = {};
+  const result = await changeNicknameService(Number(id), nickname);
+  if (result) {
+    const { message } = result;
+    res.status(403).json({ message });
+  } else {
+    res.status(204).send();
+  }
+};
 
-  if (nickname) {
-    fieldsToUpdate.nickname = nickname;
+export const changePassword = async (req: Request, res: Response) => {
+  const { password, prevPassword } = req.body;
+  const { id } = req?.user as UserType;
+
+  const result = await changePasswordService(
+    Number(id),
+    password,
+    prevPassword
+  );
+  if (result) {
+    const { message } = result;
+    res.status(403).json({ message });
+  } else {
+    res.status(204).send();
   }
-  if (password) {
-    fieldsToUpdate.password = password;
-  }
-  const result = await User.updateUser(Number(id), fieldsToUpdate);
-  res.json(result);
 };
 
 export const deleteUser = async (req: Request, res: Response) => {
-  await User.deleteUser(Number(req.params.id));
-  res.json({ message: "User deleted" });
+  const { id } = req?.user as UserType;
+  const { password } = req.body;
+  const result = await deleteUserService(id, password);
+  if (result) {
+    res.status(204).send();
+  } else {
+    res.status(403).json({ message: "비밀번호를 확인해주세요" });
+  }
 };

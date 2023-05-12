@@ -12,6 +12,8 @@ import {
   Paper,
 } from "@mui/material";
 import { CenteredTabsProps } from "../ComponentsType";
+import { Route, Routes } from "react-router-dom";
+import Authorize from "./Authorize";
 
 const CenteredTabs = ({ value, handleChange }: CenteredTabsProps) => {
   return (
@@ -80,6 +82,9 @@ const Auth = () => {
           </Box>
         </Grid>
       </Grid>
+      <Routes>
+        <Route path="/authorize" element={<Authorize />} />
+      </Routes>
     </ThemeProvider>
   );
 };

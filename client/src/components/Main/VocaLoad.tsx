@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef, ReactElement, Ref } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { usePersistStore } from "../../Store/GlobalStore";
 import { useMainStore } from "../../Store/MainStore";
@@ -6,7 +6,6 @@ import { StyledTableRow } from "../../Style/MUIStyle";
 import PlusOneIcon from "@mui/icons-material/PlusOne";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import HomeIcon from "@mui/icons-material/Home";
-import AddIcon from "@mui/icons-material/Add";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -25,9 +24,14 @@ import {
   IconButton,
   Checkbox,
   useMediaQuery,
+  Slide,
+  Dialog,
+  AppBar,
+  Toolbar,
 } from "@mui/material";
 import {
   CheckedState,
+  CompleteDialog,
   CountState,
   DataItem,
   MyHeaderProps,
@@ -35,6 +39,9 @@ import {
   handleDataProps,
 } from "../ComponentsType";
 import { useQueryGet, useQueryPatch } from "../../ReactQuery/UseQuery";
+import { useQueryClient } from "react-query";
+import { TransitionProps } from "@mui/material/transitions";
+import CloseIcon from "@mui/icons-material/Close";
 
 const VocaLoad = () => {
   const state = useMainStore((state) => state);
@@ -52,19 +59,30 @@ const VocaLoad = () => {
 
   const matches = useMediaQuery("(max-width:830px)");
 
-  const { data } = useQueryGet(`/word-data/${location.id}`, "getData");
+  const { data: loadData } = useQueryGet(
+    `/word-data/${location.id}`,
+    "getData"
+  );
+  const { mutate } = useQueryPatch("/word-data/complete", "patch");
+  const queryClient = useQueryClient();
 
-  useEffect(()=>{
-    console.log(data)
-  },[data])
+  const [data, setData] = useState([]);
+  const [completeData, setCompleteData] = useState([]);
 
   useEffect(() => {
-    setShare(Boolean(data[2]));
-    state.setSelectedFolder(String(data[1][0].folder_id));
-    state.setSelectedFile({
-      id: data[1][0].file_id,
-    });
-  }, []);
+    setData(loadData?.wordData?.filter((item: any) => item.is_complete === 0));
+    setCompleteData(
+      loadData?.wordData?.filter((item: any) => item.is_complete === 1)
+    );
+  }, [loadData]);
+
+  useEffect(() => {
+    if (viewMode.pathname.includes("/shared/")) {
+      setShare(true);
+    } else {
+      setShare(false);
+    }
+  }, [viewMode]);
 
   useEffect(() => {
     view.state
@@ -75,30 +93,26 @@ const VocaLoad = () => {
   const options = {
     modify: {
       title: "데이터 수정",
-      link: `${url}/modify/modify_data`,
     },
     create: {
       title: "데이터 추가",
-      link: `${url}/create/create_data`,
     },
     delete: {
       title: "데이터 삭제",
-      link: `${url}/delete/delete_data`,
       text: "정말 데이터를 삭제하시겠습니까?",
     },
   };
 
   const handleData = ({
     type,
-    data_id,
-    voca,
-    voca_mean,
-    exam,
-    exam_mean,
+    id,
+    word,
+    meaning,
+    example_sentence,
+    example_sentence_meaning,
   }: handleDataProps) => {
-    let typeData: { title: string; link: string; text?: string } = {
+    let typeData: { title: string; text?: string } = {
       title: "",
-      link: "",
     };
 
     if (type === "modify") {
@@ -109,7 +123,7 @@ const VocaLoad = () => {
       typeData = options.delete;
     }
 
-    const { title, link, text } = typeData;
+    const { title, text } = typeData;
     type === "delete"
       ? state["setCheckDialog"]({
           isOpen: true,
@@ -120,19 +134,42 @@ const VocaLoad = () => {
           isOpen: true,
           title,
           label: "데이터 변경",
+          content: "data",
         });
 
-    state.setSelectedData({
-      id: data_id || null,
-      voca: voca || "",
-      voca_mean: voca_mean || "",
-      exam: exam || "",
-      exam_mean: exam_mean || "",
+    state.setSelectedFile({
+      id: Number(location.id),
     });
+
+    state.setSelectedData({
+      id: id || null,
+      word: word || "",
+      meaning: meaning || "",
+      example_sentence: example_sentence || "",
+      example_sentence_meaning: example_sentence_meaning || "",
+    });
+  };
+
+  const onComplete = (id: number, is_complete: number) => {
+    mutate(
+      {
+        body: {
+          id,
+          is_complete,
+        },
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries("getData");
+        },
+      }
+    );
   };
 
   const bgColor = { backgroundColor: theme ? "hsl(0, 0%, 30%)" : "white" };
   const textColor = { color: theme ? "lightgray" : "hsl(0, 0%, 20%)" };
+
+  const [openComplete, setOpenComplete] = useState(false);
 
   return (
     <div>
@@ -141,23 +178,25 @@ const VocaLoad = () => {
         textColor={textColor}
         theme={theme}
         navigate={navigate}
-        fileName={data[1][0].file_name}
+        fileName={loadData?.name}
         handleData={handleData}
         share={share}
         view={view}
         setView={setView}
         bgColor={bgColor}
+        setOpenComplete={setOpenComplete}
       />
-      {data &&
-        data[0].map((item: DataItem, index: number) => (
+      {data?.length > 0 ? (
+        data?.map((item: DataItem, index: number) => (
           <DataBody
-            data_id={item.data_id}
-            voca={item.voca}
-            voca_mean={item.voca_mean}
-            exam={item.exam}
-            exam_mean={item.exam_mean}
+            id={item.id}
+            word={item.word}
+            meaning={item.meaning}
+            example_sentence={item.example_sentence}
+            example_sentence_meaning={item.example_sentence_meaning}
             index={index}
-            key={item.data_id}
+            key={item.id}
+            share={share}
             handleData={handleData}
             view={view}
             bgColor={bgColor}
@@ -165,8 +204,27 @@ const VocaLoad = () => {
             textColor={textColor}
             setView={setView}
             url={url}
+            is_complete={item.is_complete}
+            onComplete={onComplete}
           />
-        ))}
+        ))
+      ) : (
+        <Typography>아직 추가된 단어 데이터가 없습니다</Typography>
+      )}
+      <FullScreenDialog
+        openComplete={openComplete}
+        setOpenComplete={setOpenComplete}
+        completeData={completeData}
+        share={share}
+        handleData={handleData}
+        view={view}
+        bgColor={bgColor}
+        theme={theme}
+        textColor={textColor}
+        setView={setView}
+        url={url}
+        onComplete={onComplete}
+      />
     </div>
   );
 };
@@ -181,8 +239,11 @@ const MyHeader = ({
   share,
   view,
   setView,
+  setOpenComplete,
 }: MyHeaderProps) => {
   const state = useMainStore((state) => state);
+  const queryClient = useQueryClient();
+
   return (
     <Stack direction={matches ? "column" : "row"} spacing={2} mb={2} mt={10}>
       <Stack direction="row" spacing={2}>
@@ -196,6 +257,7 @@ const MyHeader = ({
           }}
           onClick={() => {
             navigate("/");
+            queryClient.invalidateQueries("getWords");
             state.setSelectedFolder("get_recent_file");
           }}
         >
@@ -214,15 +276,14 @@ const MyHeader = ({
       <Stack direction="row" spacing={2}>
         <Button
           variant={theme ? "contained" : "outlined"}
-          endIcon={<AddIcon />}
           onClick={() => {
             handleData({
               type: "create",
-              data_id: null,
-              voca: "",
-              voca_mean: "",
-              exam: "",
-              exam_mean: "",
+              id: null,
+              word: "",
+              meaning: "",
+              example_sentence: "",
+              example_sentence_meaning: "",
             });
           }}
           sx={{ display: share ? "none" : "inlineBlock" }}
@@ -231,8 +292,7 @@ const MyHeader = ({
         </Button>
         <Button
           variant={theme ? "contained" : "outlined"}
-          endIcon={view.toggleBtn}
-          color="secondary"
+          color="primary"
           onClick={() => {
             if (setView) {
               setView({ ...view, state: !view.state });
@@ -242,17 +302,25 @@ const MyHeader = ({
         >
           {view.text}
         </Button>
+        <Button
+          variant={theme ? "contained" : "outlined"}
+          color="primary"
+          onClick={() => setOpenComplete(true)}
+          sx={{ display: share ? "none" : "inlineBlock" }}
+        >
+          완료 목록
+        </Button>
       </Stack>
     </Stack>
   );
 };
 
 const DataBody = ({
-  data_id,
-  voca,
-  voca_mean,
-  exam,
-  exam_mean,
+  id,
+  word,
+  meaning,
+  example_sentence,
+  example_sentence_meaning,
   index,
   handleData,
   view,
@@ -261,6 +329,8 @@ const DataBody = ({
   textColor,
   share,
   url,
+  onComplete,
+  is_complete,
 }: DataItem) => {
   const [checked, setChecked] = useState<CheckedState>({});
   const [count, setCount] = useState<CountState>({});
@@ -268,34 +338,34 @@ const DataBody = ({
   const rows = [
     {
       title: "단어",
-      label: voca,
+      label: word,
       url: url,
-      key: "voca" + index,
+      key: "word" + index,
     },
     {
       title: "단어 뜻",
-      label: voca_mean,
+      label: meaning,
       url: url,
-      key: "voca_mean" + index,
+      key: "meaning" + index,
     },
     {
       title: "예문",
-      label: exam,
+      label: example_sentence,
       url: url,
-      key: "exam" + index,
+      key: "example_sentence" + index,
     },
     {
       title: "예문 뜻",
-      label: exam_mean,
+      label: example_sentence,
       url: url,
-      key: "exam_mean" + index,
+      key: "example_sentence_meaning" + index,
     },
   ];
 
   return (
     <TableContainer
       component={Paper}
-      key={data_id}
+      key={id}
       sx={{
         mb: "20px",
         overflow: "hidden",
@@ -315,15 +385,15 @@ const DataBody = ({
           >
             <Button
               sx={{ fontSize: 16 }}
-              color="success"
+              color="primary"
               onClick={() =>
                 handleData({
                   type: "modify",
-                  data_id,
-                  voca,
-                  voca_mean,
-                  exam,
-                  exam_mean,
+                  id,
+                  word,
+                  meaning,
+                  example_sentence,
+                  example_sentence_meaning,
                 })
               }
             >
@@ -335,11 +405,11 @@ const DataBody = ({
               onClick={() =>
                 handleData({
                   type: "delete",
-                  data_id,
-                  voca,
-                  voca_mean,
-                  exam,
-                  exam_mean,
+                  id,
+                  word,
+                  meaning,
+                  example_sentence,
+                  example_sentence_meaning,
                 })
               }
             >
@@ -354,23 +424,31 @@ const DataBody = ({
               marginLeft: "10px",
             }}
             checked={
-              Boolean(checked["voca" + index]) &&
-              Boolean(checked["voca_mean" + index]) &&
-              Boolean(checked["exam" + index]) &&
-              Boolean(checked["exam_mean" + index])
+              Boolean(checked["word" + index]) &&
+              Boolean(checked["meaning" + index]) &&
+              Boolean(checked["example_sentence" + index]) &&
+              Boolean(checked["example_sentence_meaning" + index])
             }
             icon={<VisibilityIcon />}
             checkedIcon={<VisibilityOffIcon />}
             onChange={(e) => {
               setChecked({
                 ...checked,
-                ["voca" + index]: e.target.checked,
-                ["voca_mean" + index]: e.target.checked,
-                ["exam" + index]: e.target.checked,
-                ["exam_mean" + index]: e.target.checked,
+                ["word" + index]: e.target.checked,
+                ["meaning" + index]: e.target.checked,
+                ["example_sentence" + index]: e.target.checked,
+                ["example_sentence_meaning" + index]: e.target.checked,
               });
             }}
           />
+          <Button
+            variant={theme ? "contained" : "outlined"}
+            sx={{ fontSize: 16, float: "right" }}
+            color="primary"
+            onClick={() => onComplete(id!, is_complete)}
+          >
+            {is_complete === 0 ? "학습 완료" : "완료 취소"}
+          </Button>
         </caption>
         <TableBody>
           {rows.map((row) => (
@@ -464,12 +542,12 @@ const MyTableRow = ({
   const matches2 = useMediaQuery("(max-width:1092px)");
   const matches3 = useMediaQuery("(max-width:554px)");
   const width = matches3 ? "35%" : matches2 ? "20%" : "10%";
-  const { mutate } = useQueryPatch(`${url}/getdata/tts`, "post");
+  const { mutate } = useQueryPatch(`/word-data/tts`, "post");
 
   const onListen = async (text: string) => {
     const requestData = {
       body: { text },
-      responseType: { responseType: "arraybuffer" },
+      config: { responseType: "arraybuffer" as const },
     };
     mutate(requestData, {
       onSuccess: (data) => {
@@ -545,6 +623,88 @@ const MyTableRow = ({
         </Stack>
       </TableCell>
     </StyledTableRow>
+  );
+};
+
+const Transition = forwardRef(function Transition(
+  props: TransitionProps & {
+    children: ReactElement;
+  },
+  ref: Ref<unknown>
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
+const FullScreenDialog = ({
+  openComplete,
+  setOpenComplete,
+  completeData,
+  share,
+  handleData,
+  view,
+  bgColor,
+  theme,
+  textColor,
+  setView,
+  url,
+  onComplete,
+}: CompleteDialog) => {
+  return (
+    <div>
+      <Dialog
+        fullScreen
+        open={openComplete}
+        onClose={() => setOpenComplete(!open)}
+        TransitionComponent={Transition}
+      >
+        <AppBar sx={{ position: "relative", backgroundColor: "black" }}>
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={() => setOpenComplete(!open)}
+              aria-label="close"
+            >
+              <CloseIcon />
+            </IconButton>
+            <Typography
+              sx={{ ml: 2, flex: 1, mt: 1 }}
+              variant="h6"
+              component="div"
+            >
+              학습 완료 목록
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <div style={{ padding: "10px" }}>
+          {completeData?.length > 0 ? (
+            completeData?.map((item: DataItem, index: number) => (
+              <DataBody
+                id={item.id}
+                word={item.word}
+                meaning={item.meaning}
+                example_sentence={item.example_sentence}
+                example_sentence_meaning={item.example_sentence_meaning}
+                index={index}
+                key={item.id}
+                share={share}
+                handleData={handleData}
+                view={view}
+                bgColor={bgColor}
+                theme={theme}
+                textColor={textColor}
+                setView={setView}
+                url={url}
+                is_complete={item.is_complete}
+                onComplete={onComplete}
+              />
+            ))
+          ) : (
+            <Typography>아직 추가된 단어 데이터가 없습니다</Typography>
+          )}
+        </div>
+      </Dialog>
+    </div>
   );
 };
 

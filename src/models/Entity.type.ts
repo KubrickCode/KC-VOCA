@@ -4,6 +4,7 @@ export interface UserType {
   nickname: string;
   password: string;
   registration_date: Date;
+  token?: string;
 }
 
 export interface FolderType {

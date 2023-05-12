@@ -1,5 +1,5 @@
 import { RowDataPacket } from "mysql2";
-import pool from "../db";
+import pool from "../DB";
 
 class Words {
   async createWords(user_id: number, folder_id: number, name: string) {
@@ -19,9 +19,6 @@ class Words {
       WHERE Words.folder_id = ?`,
       [folder_id]
     );
-
-    console.log(result);
-
     return result;
   }
 
@@ -37,6 +34,16 @@ class Words {
     const [result] = await pool.query<RowDataPacket[]>(
       "SELECT * FROM Words WHERE is_favorite=1 AND user_id=?",
       [user_id]
+    );
+    return result;
+  }
+
+  async getSharedWords() {
+    const [result] = await pool.query<RowDataPacket[]>(
+      `SELECT Words.*, Users.nickname 
+    FROM Words 
+    INNER JOIN Users ON Words.user_id = Users.id
+    WHERE Words.is_shared = 1`
     );
     return result;
   }
@@ -65,9 +72,27 @@ class Words {
     return result;
   }
 
-  async changeStatus(type:string,id:number,status:number){
-    const [result] = await pool.query(`UPDATE Words SET is_${type}=? WHERE id=?`,[status === 0 ? 1 : 0,id]);
+  async changeStatus(type: string, id: number, status: number) {
+    const [result] = await pool.query(
+      `UPDATE Words SET is_${type}=? WHERE id=?`,
+      [status === 0 ? 1 : 0, id]
+    );
     return result;
+  }
+
+  async getFolderIdFromWordsId(id: number) {
+    const [result] = await pool.query<RowDataPacket[]>(
+      "SELECT folder_id FROM Words WHERE id=?",
+      [id]
+    );
+    return result;
+  }
+
+  async updateRecentView(id: number) {
+    await pool.query(
+      "Update Words SET last_seen_time=CURRENT_TIMESTAMP WHERE id=?",
+      [id]
+    );
   }
 }
 

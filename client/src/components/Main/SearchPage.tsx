@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { usePersistStore } from "../../Store/GlobalStore";
 import { useMainStore } from "../../Store/MainStore";
@@ -22,20 +22,18 @@ import { useQueryPatch } from "../../ReactQuery/UseQuery";
 const SearchPage = () => {
   const location = useLocation();
   const state = useMainStore((state) => state);
-  const url = import.meta.env.VITE_SERVER_HOST;
   const theme = usePersistStore((state) => !state.theme);
   const navigate = useNavigate();
 
-  const { data, mutate } = useQueryPatch(`/getdata/search`, "post");
-  const memoizedMutate = useCallback(mutate, [location.state.value]);
-
-  const requsetData = {
-    body: { word: location.state.value },
-  };
+  const { mutate } = useQueryPatch(`/word-data/search`, "post");
+  const [data, setData] = useState<SearchDataItem[]>([]);
 
   useEffect(() => {
-    memoizedMutate(requsetData);
-  }, [location.state.value, memoizedMutate]);
+    mutate(
+      { body: { keyword: location.state.value } },
+      { onSuccess: (data) => setData(data) }
+    );
+  }, [location.state.value]);
 
   const textColor = { color: theme ? "lightgray" : "hsl(0, 0%, 20%)" };
 
@@ -61,19 +59,22 @@ const SearchPage = () => {
           검색 키워드 : {location.state.value}
         </Typography>
       </Stack>
-      {data.data &&
-        data.data.map((item: SearchDataItem) => {
+      {data.length > 0 ? (
+        data.map((item: SearchDataItem) => {
           return (
             <DataBody
-              data_id={item.data_id}
-              voca={item.voca}
-              voca_mean={item.voca_mean}
-              exam={item.exam}
-              exam_mean={item.exam_mean}
-              key={item.data_id}
+              id={item.id}
+              word={item.word}
+              meaning={item.meaning}
+              example_sentence={item.example_sentence}
+              example_sentence_meaning={item.example_sentence_meaning}
+              key={item.id}
             />
           );
-        })}
+        })
+      ) : (
+        <Typography>검색 결과가 없습니다</Typography>
+      )}
     </>
   );
 };
@@ -154,14 +155,19 @@ const MyTableRow = ({ title, label }: SearchMyTableRowProps) => {
   );
 };
 
-const DataBody = ({ voca, voca_mean, exam, exam_mean }: SearchDataItem) => (
+const DataBody = ({
+  word,
+  meaning,
+  example_sentence,
+  example_sentence_meaning,
+}: SearchDataItem) => (
   <TableContainer component={Paper} sx={{ mb: "20px" }}>
     <Table sx={{ minWidth: 650 }} aria-label="caption table">
       <TableBody>
-        <MyTableRow title="단어" label={voca} />
-        <MyTableRow title="단어 뜻" label={voca_mean} />
-        <MyTableRow title="예문" label={exam} />
-        <MyTableRow title="예문 뜻" label={exam_mean} />
+        <MyTableRow title="단어" label={word} />
+        <MyTableRow title="단어 뜻" label={meaning} />
+        <MyTableRow title="예문" label={example_sentence} />
+        <MyTableRow title="예문 뜻" label={example_sentence_meaning} />
       </TableBody>
     </Table>
   </TableContainer>

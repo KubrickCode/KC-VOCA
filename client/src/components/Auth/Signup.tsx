@@ -91,7 +91,7 @@ const SignUp = () => {
   useEffect(() => {
     const regEmail = RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
     const regPassword = RegExp(
-      /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,18}$/
+      /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,20}$/
     );
     const regNickname = RegExp(/^[a-zA-Z0-9가-힣]{2,10}$/);
 
@@ -157,6 +157,7 @@ const SignUp = () => {
               error={formErrors.emailError}
               helperText={formErrors.emailMsg}
               inputRef={emailInput}
+              inputProps={{ maxLength: 255 }}
             />
           </Grid>
           <Grid item xs={12}>
@@ -164,13 +165,14 @@ const SignUp = () => {
               required
               fullWidth
               name="password"
-              label="비밀번호(6~18자 영문+숫자+특수문자)"
+              label="비밀번호(6~20자 영문+숫자+특수문자)"
               type="password"
               id="password"
               autoComplete="new-password"
               error={formErrors.pwdError}
               helperText={formErrors.pwdMsg}
               inputRef={passwordInput}
+              inputProps={{ maxLength: 20 }}
             />
           </Grid>
           <Grid item xs={12}>
@@ -185,6 +187,7 @@ const SignUp = () => {
               error={formErrors.pwdError2}
               helperText={formErrors.pwdMsg2}
               inputRef={password2Input}
+              inputProps={{ maxLength: 20 }}
             />
           </Grid>
           <Grid item xs={12}>
@@ -198,6 +201,7 @@ const SignUp = () => {
               error={formErrors.nickError}
               helperText={formErrors.nickMsg}
               inputRef={nicknameInput}
+              inputProps={{ maxLength: 10 }}
             />
           </Grid>
         </Grid>

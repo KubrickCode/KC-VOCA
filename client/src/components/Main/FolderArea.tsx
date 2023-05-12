@@ -65,7 +65,7 @@ const StyledTreeItem = (props: StyledTreeItemProps) => {
   );
 };
 
-const FolderArea = () => {
+const FolderArea = ({ moveStatus }: { moveStatus: boolean }) => {
   const state = useMainStore((state) => state);
   const { data } = useQueryGet(`/folders`, "getFolder");
   const theme = usePersistStore((state) => !state.theme);
@@ -76,7 +76,7 @@ const FolderArea = () => {
   };
 
   const folderDisplay = {
-    display: !state.moveDialog.isOpen ? "block" : "none",
+    display: !moveStatus ? "block" : "none",
   };
 
   return (
@@ -144,6 +144,7 @@ const FolderTree: React.FC<FolderTreeProps> = ({ data, parent_id }) => {
           labelText={folder.name}
           labelIcon={FolderIcon}
           onClick={() => {
+            state.setIsHome(folder.parent_id === 0 ? true : false);
             clickFolder(folder.id);
           }}
           children={children}

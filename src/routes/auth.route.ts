@@ -1,9 +1,24 @@
 import express from "express";
-import { login, addUser } from "../controllers/auth.controller";
+import {
+  login,
+  addUser,
+  findPassword,
+  googleLogin,
+  googleCallback,
+  kakaoLogin,
+  kakaoCallback,
+} from "../controllers/auth.controller";
+import { validateDto } from "../middlewares/validateDto";
+import { addUserDto, findPasswordDto, loginDto } from "../dto/auth.dto";
 
 const router = express.Router();
 
-router.post("/login", login);
-router.post("/signup", addUser);
+router.post("/login", validateDto(loginDto), login);
+router.post("/signup", validateDto(addUserDto), addUser);
+router.post("/find-password", validateDto(findPasswordDto), findPassword);
+router.get("/google", googleLogin);
+router.get("/google/callback", googleCallback);
+router.get("/kakao", kakaoLogin);
+router.get("/kakao/callback", kakaoCallback);
 
 export default router;

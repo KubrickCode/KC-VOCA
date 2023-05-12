@@ -6,13 +6,15 @@ import {
   renameFolder,
   moveFolder,
 } from "../controllers/folder.controller";
+import { validateDto } from "../middlewares/validateDto";
+import { createFolderDto, renameFolderDto } from "../dto/folder.dto";
 
 const router = express.Router();
 
 router.get("/", getFolders);
-router.post("/", createFolder);
+router.post("/", validateDto(createFolderDto), createFolder);
 router.patch("/move", moveFolder);
-router.patch("/:id", renameFolder);
+router.patch("/:id", validateDto(renameFolderDto), renameFolder);
 router.delete("/:id", deleteFolder);
 
 export default router;

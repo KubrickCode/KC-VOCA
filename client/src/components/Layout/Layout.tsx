@@ -116,6 +116,7 @@ const PersistentDrawerLeft = () => {
         <Routes>
           <Route path="/" element={<Content />} />
           <Route path="/load/:id" element={<VocaLoad />} />
+          <Route path="/shared/:id" element={<VocaLoad />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/share" element={<SharePage />} />
         </Routes>

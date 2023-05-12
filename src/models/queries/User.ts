@@ -1,7 +1,11 @@
-import pool from "../db";
-import { UserType } from "../types";
+import pool from "../DB";
+import { UserType } from "../Entity.type";
 import { RowDataPacket, ResultSetHeader } from "mysql2";
 import Folder from "./Folder";
+import {
+  comparePassword,
+  hashPassword,
+} from "../../integrations/handlePassword";
 
 class User {
   async getUserById(id: number) {
@@ -50,24 +54,40 @@ class User {
     return result;
   }
 
-  async updateUser(id: number, fieldsToUpdate: Partial<UserType>) {
-    const setClause = Object.keys(fieldsToUpdate)
-      .map((field) => `${field} = ?`)
-      .join(", ");
+  async changeNickname(id: number, value: string) {
+    await pool.query(`UPDATE Users SET nickname=? WHERE id = ?`, [value, id]);
+  }
 
-    const query = `UPDATE Users SET ${setClause} WHERE id = ?`;
-
-    const [rows] = await pool.query(query, [
-      ...Object.values(fieldsToUpdate),
+  async changePassword(id: number, value: string) {
+    const hashedPassword = await hashPassword(value);
+    await pool.query(`UPDATE Users SET password=? WHERE id = ?`, [
+      hashedPassword,
       id,
     ]);
-
-    return rows;
   }
 
   async deleteUser(id: number) {
-    const [result] = await pool.query("DELETE FROM Users WHERE id = ?", [id]);
-    return result;
+    await pool.query("DELETE FROM WordData WHERE user_id = ?", [id]);
+    await pool.query("DELETE FROM Words WHERE user_id = ?", [id]);
+    await pool.query("DELETE FROM Folders WHERE user_id = ?", [id]);
+    await pool.query("DELETE FROM Users WHERE id = ?", [id]);
+  }
+
+  async checkPassword(id: number, password: string) {
+    const [result] = await pool.query<RowDataPacket[]>(
+      "SELECT password FROM Users WHERE id = ?",
+      [id]
+    );
+    const hashedPassword = result[0].password;
+    return await comparePassword(password, hashedPassword);
+  }
+
+  async checkNickname(nickname: string) {
+    const [result] = await pool.query<RowDataPacket[]>(
+      "SELECT nickname FROM Users WHERE nickname = ?",
+      [nickname]
+    );
+    return result.length === 0;
   }
 }
 

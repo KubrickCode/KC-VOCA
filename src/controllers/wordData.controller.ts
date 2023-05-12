@@ -1,39 +1,64 @@
 import { Request, Response } from "express";
-import WordData from "../models/queries/WordData";
+import { UserType } from "src/models/Entity.type";
+import {
+  createWordDataService,
+  deleteWordDataService,
+  getWordDataService,
+  searchService,
+  ttsServiceService,
+  updateCompleteService,
+  updateWordDataService,
+} from "../services/wordData.service";
 
 export const getWordData = async (req: Request, res: Response) => {
-  const wordData = await WordData.getWordData(Number(req.params.id));
-  res.json(wordData);
+  const wordData = await getWordDataService(Number(req.params.id));
+  res.status(200).json(wordData);
 };
 
 export const createWordData = async (req: Request, res: Response) => {
   const {
-    user_id,
-    folder_id,
     words_id,
     word,
     meaning,
     example_sentence,
     example_sentence_meaning,
   } = req.body;
-  const result = await WordData.createWordData(
+  const { id: user_id } = req.user as UserType;
+  await createWordDataService(
     user_id,
-    folder_id,
     words_id,
     word,
     meaning,
     example_sentence,
     example_sentence_meaning
   );
-  res.json({result});
+  res.status(204).send();
 };
 
 export const updateWordData = async (req: Request, res: Response) => {
-  const result = await WordData.updateWordData(Number(req.params.id), req.body);
-  res.json(result);
+  await updateWordDataService(Number(req.params.id), req.body);
+  res.status(204).send();
 };
 
 export const deleteWordData = async (req: Request, res: Response) => {
-  const result = await WordData.deleteWordData(Number(req.params.id));
-  res.json(result);
+  await deleteWordDataService(Number(req.params.id));
+  res.status(204).send();
+};
+
+export const ttsService = async (req: Request, res: Response) => {
+  const result = await ttsServiceService(req.body.text);
+  res.status(201).send(result);
+};
+
+export const search = async (req: Request, res: Response) => {
+  const { id } = req.user as UserType;
+  const { keyword } = req.body;
+  const result = await searchService(id, keyword);
+  res.status(200).json(result);
+};
+
+export const updateComplete = async (req: Request, res: Response) => {
+  const { id, is_complete } = req.body;
+  await updateCompleteService(id, is_complete);
+  res.status(204).send();
 };

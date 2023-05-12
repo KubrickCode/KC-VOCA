@@ -3,6 +3,8 @@ import User from "../../models/queries/User";
 import { kakaoConfig } from "../../shared/config";
 import dotenv from "dotenv";
 import { hashPassword } from "../../integrations/handlePassword";
+import { getRandomPassword } from "../../integrations/getRandomPassword";
+import { signJWT } from "../../integrations/handleLogin";
 dotenv.config();
 
 const kakaoStrategy = new KakaoStrategy(
@@ -15,18 +17,25 @@ const kakaoStrategy = new KakaoStrategy(
       const existingUser = await User.getUserByEmail(email);
 
       if (existingUser) {
-        return done(null, existingUser);
+        const { id } = existingUser;
+        const token = signJWT({ id, email, nickname: displayName });
+        return done(null, { ...existingUser, token });
       }
 
-      const hashedPassword = await hashPassword(profile.id);
+      const hashedPassword = await hashPassword(getRandomPassword());
 
-      const savedUser = await User.createUser({
+      await User.createUser({
         email,
         nickname: displayName,
         password: hashedPassword,
       });
 
-      done(null, savedUser);
+      const savedUser = await User.getUserByEmail(email as string);
+      const { id } = savedUser;
+
+      const token = signJWT({ id, email, nickname: displayName });
+
+      done(null, { ...savedUser, token });
     } catch (err) {
       done(err);
     }

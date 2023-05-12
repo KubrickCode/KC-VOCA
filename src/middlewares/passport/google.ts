@@ -1,27 +1,27 @@
-//담당 : 이승현
-
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import User from "../../models/queries/User";
 import { googleConfig } from "../../shared/config";
-import dotenv from "dotenv";
 import { hashPassword } from "../../integrations/handlePassword";
-dotenv.config();
+import { getRandomPassword } from "../../integrations/getRandomPassword";
+import { signJWT } from "../../integrations/handleLogin";
 
 const googleStrategy = new GoogleStrategy(
   googleConfig,
   async (accessToken, refreshToken, profile, done) => {
     try {
-      const name = profile.username as string;
+      const name = profile.displayName as string;
       const email = profile._json.email as string;
       const existingUser = await User.getUserByEmail(
         profile._json.email as string
       );
 
       if (existingUser) {
-        return done(null, existingUser);
+        const { id } = existingUser;
+        const token = signJWT({ id, email, nickname: name });
+        return done(null, { ...existingUser, token });
       }
 
-      const hashedPassword = await hashPassword(String(name));
+      const hashedPassword = await hashPassword(getRandomPassword());
 
       await User.createUser({
         email,
@@ -33,7 +33,11 @@ const googleStrategy = new GoogleStrategy(
         profile._json.email as string
       );
 
-      done(null, savedUser);
+      const { id } = savedUser;
+
+      const token = signJWT({ id, email, nickname: name });
+
+      done(null, { ...savedUser, token });
     } catch (err: any) {
       done(err);
     }

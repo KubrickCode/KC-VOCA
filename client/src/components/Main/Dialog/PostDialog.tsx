@@ -9,6 +9,7 @@ import {
   DialogActions,
   DialogContent,
   Button,
+  Alert,
 } from "@mui/material";
 import { useQueryPatch } from "../../../ReactQuery/UseQuery";
 
@@ -24,17 +25,27 @@ const PostDialog = () => {
     `/words/${state.selectedFile.id}`,
     "patch"
   );
+  const { mutate: addData } = useQueryPatch("/word-data", "post");
+  const { mutate: changeData } = useQueryPatch(
+    `/word-data/${state.selectedData.id}`,
+    "patch"
+  );
+  const { mutate: changePassword } = useQueryPatch("/user/password", "patch");
+  const { mutate: changeNickname } = useQueryPatch("/user/nickname", "patch");
+  const { mutate: deleteUser } = useQueryPatch("/user", "post");
+
   const [formData, setFormData] = useState({
     value1: "",
     value2: "",
-    voca: "",
-    voca_mean: "",
-    exam: "",
-    exam_mean: "",
+    word: "",
+    meaning: "",
+    example_sentence: "",
+    example_sentence_meaning: "",
   });
   const [submitBtn, setSubmitBtn] = useState(true);
   const queryClient = useQueryClient();
   const theme = usePersistStore((state) => !state.theme);
+  const [errMsg, setErrMsg] = useState("");
 
   const toggleStyle = {
     backgroundColor: theme ? "hsl(0, 0%, 30%)" : "white",
@@ -54,16 +65,16 @@ const PostDialog = () => {
       ...formData,
       value1: "",
       value2: "",
-      voca: state.selectedData.voca,
-      voca_mean: state.selectedData.voca_mean,
-      exam: state.selectedData.exam,
-      exam_mean: state.selectedData.exam_mean,
+      word: state.selectedData.word,
+      meaning: state.selectedData.meaning,
+      example_sentence: state.selectedData.example_sentence,
+      example_sentence_meaning: state.selectedData.example_sentence_meaning,
     });
   }, [state.postDialog]);
 
   useEffect(() => {
     const { title } = state.postDialog;
-    const { value1, value2, voca } = formData;
+    const { value1, value2, word } = formData;
     const formPwd = RegExp(
       /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,18}$/
     );
@@ -80,38 +91,30 @@ const PostDialog = () => {
         isValid = value1.length > 1 && formNick.test(value1);
         setSubmitBtn(!isValid);
         break;
-      case "데이터 추가" || "데이터 수정":
-        isValid = voca.length > 0;
+      case "데이터 추가":
+      case "데이터 수정":
+        isValid = word.length > 0;
         setSubmitBtn(!isValid);
+        break;
       default:
         isValid = value1.length > 0;
         setSubmitBtn(!isValid);
         break;
     }
-  }, [formData]);
+  }, [formData, state.postDialog]);
 
   const handleOpen = () => {
     state.setPostDialog({ isOpen: false });
   };
 
   const submitForm = async () => {
-    const requsetData = {
-      body: {
-        formData: formData,
-        folder_id: state.selectedFolder,
-        file_id: state.selectedFile.id,
-        data_id: state.selectedData.id,
-      },
-    };
-
     const { title } = state.postDialog;
-
     switch (title) {
       case "폴더 추가":
         addFolder(
           {
             body: {
-              parent_id: state.selectedFolder,
+              parent_id: Number(state.selectedFolder),
               name: formData.value1,
             },
           },
@@ -148,7 +151,7 @@ const PostDialog = () => {
         addWords(
           {
             body: {
-              folder_id: state.selectedFolder,
+              folder_id: Number(state.selectedFolder),
               name: formData.value1,
             },
           },
@@ -181,36 +184,118 @@ const PostDialog = () => {
           }
         );
         break;
+      case "데이터 추가":
+        addData(
+          {
+            body: {
+              words_id: Number(state.selectedFile.id),
+              word: formData.word,
+              meaning: formData.meaning,
+              example_sentence: formData.example_sentence,
+              example_sentence_meaning: formData.example_sentence_meaning,
+            },
+          },
+          {
+            onSuccess: () => {
+              queryClient.invalidateQueries("getData");
+              state.setSnackBar({
+                text: "데이터가 추가되었습니다",
+                type: "success",
+              });
+              state.setSnackBarOpen(true);
+              handleOpen();
+            },
+          }
+        );
+        break;
+      case "데이터 수정":
+        changeData(
+          {
+            body: {
+              word: formData.word,
+              meaning: formData.meaning,
+              example_sentence: formData.example_sentence,
+              example_sentence_meaning: formData.example_sentence_meaning,
+            },
+          },
+          {
+            onSuccess: () => {
+              queryClient.invalidateQueries("getData");
+              state.setSnackBar({
+                text: "데이터가 수정되었습니다",
+                type: "success",
+              });
+              state.setSnackBarOpen(true);
+              handleOpen();
+            },
+          }
+        );
+        break;
+      case "닉네임 변경":
+        changeNickname(
+          {
+            body: {
+              nickname: formData.value1,
+            },
+          },
+          {
+            onSuccess: () => {
+              queryClient.invalidateQueries("getUser");
+              state.setSnackBar({
+                text: "닉네임이 수정되었습니다",
+                type: "success",
+              });
+              state.setSnackBarOpen(true);
+              handleOpen();
+            },
+            onError: (err: any) => {
+              setErrMsg(err.response.data.message);
+            },
+          }
+        );
+        break;
+      case "비밀번호 변경":
+        changePassword(
+          {
+            body: {
+              prevPassword: formData.value1,
+              password: formData.value2,
+            },
+          },
+          {
+            onSuccess: () => {
+              state.setSnackBar({
+                text: "비밀번호가 변경되었습니다",
+                type: "success",
+              });
+              state.setSnackBarOpen(true);
+              handleOpen();
+            },
+            onError: (error: any) => {
+              setErrMsg(error.response.data.message);
+            },
+          }
+        );
+        break;
+      case "정말 회원에서 탈퇴하시겠습니까?":
+        deleteUser(
+          {
+            body: {
+              password: formData.value1,
+            },
+          },
+          {
+            onSuccess: () => {
+              localStorage.removeItem("token");
+              location.href = "/";
+            },
+            onError: (error: any) => {
+              setErrMsg(error.response.data.message);
+            },
+          }
+        );
+        break;
     }
-
-    // mutate(requsetData, {
-    //   onSuccess: (data) => {
-    //     if (
-    //       state.postDialog.title === "정말 회원에서 탈퇴하시겠습니까?" &&
-    //       data === "success"
-    //     ) {
-    //       location.reload();
-    //     }
-    //     handleOpen();
-
-    //     state.setSnackBar({
-    //       text: data[0],
-    //       type: data[1],
-    //     });
-
-    //     if (data[2] === "folder") {
-    //       queryClient.invalidateQueries("getFolder");
-    //     } else if (data[2] === "file") {
-    //       queryClient.invalidateQueries("getFile");
-    //     } else if (data[2] === "data") {
-    //       queryClient.invalidateQueries("getData");
-    //     } else {
-    //       queryClient.invalidateQueries("getUser");
-    //     }
-
-    //     state.setSnackBarOpen(true);
-    //   },
-    // });
   };
 
   const basicContent = () => {
@@ -267,6 +352,7 @@ const PostDialog = () => {
             }}
           />
         )}
+        {errMsg && <Alert severity="warning">{errMsg}</Alert>}
       </div>
     );
   };
@@ -277,14 +363,14 @@ const PostDialog = () => {
         <TextField
           autoFocus
           margin="dense"
-          id="voca"
+          id="word"
           type="text"
-          value={formData.voca}
+          value={formData.word}
           label="단어"
           fullWidth
           variant="standard"
           onChange={(e) => {
-            setFormData({ ...formData, voca: e.target.value });
+            setFormData({ ...formData, word: e.target.value });
           }}
           inputProps={{ minLength: 1, maxLength: 100, style: toggleInputStyle }}
           InputLabelProps={{
@@ -294,14 +380,14 @@ const PostDialog = () => {
         />
         <TextField
           margin="dense"
-          id="voca_mean"
+          id="meaning"
           type="text"
           label="단어 뜻"
-          value={formData.voca_mean}
+          value={formData.meaning}
           fullWidth
           variant="standard"
           onChange={(e) => {
-            setFormData({ ...formData, voca_mean: e.target.value });
+            setFormData({ ...formData, meaning: e.target.value });
           }}
           inputProps={{ maxLength: 100, style: toggleInputStyle }}
           InputLabelProps={{
@@ -311,14 +397,14 @@ const PostDialog = () => {
         />
         <TextField
           margin="dense"
-          id="exam"
+          id="example_sentence"
           type="textarea"
           label="예문"
-          value={formData.exam}
+          value={formData.example_sentence}
           fullWidth
           variant="standard"
           onChange={(e) => {
-            setFormData({ ...formData, exam: e.target.value });
+            setFormData({ ...formData, example_sentence: e.target.value });
           }}
           inputProps={{ maxLength: 1000, style: toggleInputStyle }}
           InputLabelProps={{
@@ -328,14 +414,17 @@ const PostDialog = () => {
         />
         <TextField
           margin="dense"
-          id="exam_mean"
+          id="example_sentence_meaning"
           type="textarea"
           label="예문 뜻"
-          value={formData.exam_mean}
+          value={formData.example_sentence_meaning}
           fullWidth
           variant="standard"
           onChange={(e) => {
-            setFormData({ ...formData, exam_mean: e.target.value });
+            setFormData({
+              ...formData,
+              example_sentence_meaning: e.target.value,
+            });
           }}
           inputProps={{ maxLength: 1000, style: toggleInputStyle }}
           InputLabelProps={{

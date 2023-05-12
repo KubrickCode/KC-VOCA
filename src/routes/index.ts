@@ -13,8 +13,5 @@ router.use("/folders", validateToken, folderRoutes);
 router.use("/words", validateToken, wordsRoutes);
 router.use("/word-data", validateToken, wordDataRoutes);
 router.use("/auth", authRoutes);
-router.get("/check", validateToken, async (req, res) => {
-  console.log(req.user);
-});
 
 export default router;

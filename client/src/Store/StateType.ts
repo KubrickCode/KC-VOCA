@@ -11,6 +11,7 @@ export type GlobalType = {
 };
 
 export interface StateType {
+  isHome: boolean;
   snackBarOpen: boolean;
   snackBar: {
     text: string;
@@ -43,12 +44,13 @@ export interface StateType {
   };
   selectedData: {
     id: null | number;
-    voca: string;
-    voca_mean: string;
-    exam: string;
-    exam_mean: string;
+    word: string;
+    meaning: string;
+    example_sentence: string;
+    example_sentence_meaning: string;
   };
   setSnackBarOpen: (snackBarOpen: boolean) => void;
+  setIsHome: (isHome: boolean) => void;
   setSnackBar: (snackBar: { text: string; type: string }) => void;
   setPostDialog: (postDialog: Partial<StateType["postDialog"]>) => void;
   setCheckDialog: (checkDialog: Partial<StateType["checkDialog"]>) => void;

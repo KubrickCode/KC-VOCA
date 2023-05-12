@@ -16,7 +16,7 @@ const verifyCallback = async (email: string, password: string, done: any) => {
       return done(null, user);
     } else {
       return done(null, false, {
-        message: "비밀번호를 확인해 주세요",
+        message: "비밀번호가 일치하지 않습니다",
       });
     }
   } catch (err) {

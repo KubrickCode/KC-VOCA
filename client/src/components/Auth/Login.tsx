@@ -60,6 +60,9 @@ const SignIn = () => {
             location.href = "/";
           }
         },
+        onError: (err: any) => {
+          setErrMsg(err.response.data.errors[0]);
+        },
       }
     );
   };
@@ -88,6 +91,7 @@ const SignIn = () => {
           type="email"
           autoComplete="email"
           onChange={(e) => setEmail(e.target.value)}
+          inputProps={{ maxLength: 255 }}
         />
         <TextField
           margin="normal"
@@ -98,6 +102,7 @@ const SignIn = () => {
           type="password"
           autoComplete="current-password"
           onChange={(e) => setPassword(e.target.value)}
+          inputProps={{ maxLength: 20 }}
         />
         {errmsg && <Alert severity="warning">{errmsg}</Alert>}
         <Button
@@ -113,7 +118,7 @@ const SignIn = () => {
           fullWidth
           sx={{ boxShadow: 1, marginBottom: "10px" }}
           component={Link}
-          href={`${url}/signpage/google`}
+          href={`${url}/auth/google`}
         >
           <img height="20px" src={"google.png"} />
           <Typography
@@ -134,7 +139,7 @@ const SignIn = () => {
             },
           }}
           component={Link}
-          href={`${url}/signpage/kakao`}
+          href={`${url}/auth/kakao`}
         >
           <img height="20px" src={"kakao.png"} />
           <Typography color="black" sx={{ marginLeft: "10px" }}>
@@ -164,7 +169,7 @@ const SignIn = () => {
 
 const FormDialog = ({ open, setOpen, url }: FormDialogProps) => {
   const emailRef = useRef<HTMLInputElement>();
-  const { mutate } = useQueryPatch("/getdata/find_password", "post");
+  const { mutate } = useQueryPatch("/auth/find-password", "post");
   const [emailState, setEmailState] = useState({
     open: false,
     type: "warning" as AlertColor,
@@ -173,22 +178,31 @@ const FormDialog = ({ open, setOpen, url }: FormDialogProps) => {
   const handleClose = () => {
     setOpen(false);
   };
-  // const submitForm = () => {
-  //   const requsetData = {
-  //     body: {
-  //       email: emailRef.current!.value,
-  //     },
-  //   };
-  //   mutate(requsetData);
-  //   const newState = {
-  //     ...emailState,
-  //     open: true,
-  //     type: data ? "success" : ("warning" as AlertColor),
-  //     text: data ? "이메일이 전송되었습니다." : "존재하지 않는 이메일 입니다.",
-  //   };
-
-  //   setEmailState(newState);
-  // };
+  const submitForm = () => {
+    const requsetData = {
+      body: {
+        email: emailRef.current!.value,
+      },
+    };
+    mutate(requsetData, {
+      onSuccess: () => {
+        setEmailState({
+          ...emailState,
+          open: true,
+          type: "success",
+          text: "이메일이 전송되었습니다",
+        });
+      },
+      onError: (err: any) => {
+        setEmailState({
+          ...emailState,
+          open: true,
+          type: "warning" as AlertColor,
+          text: err.response.data.message ?? err.response.data.errors[0],
+        });
+      },
+    });
+  };
 
   return (
     <div>
@@ -207,6 +221,7 @@ const FormDialog = ({ open, setOpen, url }: FormDialogProps) => {
             fullWidth
             variant="standard"
             inputRef={emailRef}
+            inputProps={{ maxLength: 255 }}
           />
           {emailState.open && (
             <EmailAlert type={emailState.type} text={emailState.text} />
@@ -214,7 +229,7 @@ const FormDialog = ({ open, setOpen, url }: FormDialogProps) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>닫기</Button>
-          {/* <Button onClick={submitForm}>확인</Button> */}
+          <Button onClick={submitForm}>확인</Button>
         </DialogActions>
       </Dialog>
     </div>

@@ -1,55 +1,52 @@
 import { Request, Response } from "express";
-import Words from "../models/queries/Words";
-import { UserType } from "src/models/types";
+import { UserType } from "src/models/Entity.type";
+import {
+  changeStatusService,
+  createWordsService,
+  deleteWordsService,
+  getWordsService,
+  moveWordsService,
+  renameWordsService,
+  updateRecentViewService,
+} from "../services/words.service";
 
 export const getWords = async (req: Request, res: Response) => {
   const { id: user_id } = req.user as UserType;
-  if (req.params.id === "get_recent_file") {
-    const words = await Words.getRecentWords(Number(user_id));
-    res.json({ words });
-  } else if (req.params.id === "get_fav_file") {
-    const words = await Words.getFavWords(Number(user_id));
-    res.json({ words });
-  } else {
-    const words = await Words.getWords(Number(req.params.id));
-    res.json({ words });
-  }
+  const result = await getWordsService(user_id, req.params.id);
+  res.status(200).json(result);
 };
 
 export const createWords = async (req: Request, res: Response) => {
   const { id } = req.user as UserType;
   const { folder_id, name } = req.body;
-  const result = await Words.createWords(id, folder_id, name);
-  res.json(result);
+  await createWordsService(id, folder_id, name);
+  res.status(204).send();
 };
 
 export const renameWords = async (req: Request, res: Response) => {
-  const result = await Words.renameWords(Number(req.params.id), req.body.name);
-  res.json(result);
+  await renameWordsService(Number(req.params.id), req.body.name);
+  res.status(204).send();
 };
 
 export const deleteWords = async (req: Request, res: Response) => {
-  const result = await Words.deleteWords(Number(req.params.id));
-  res.json(result);
+  await deleteWordsService(Number(req.params.id));
+  res.status(204).send();
 };
 
 export const moveWords = async (req: Request, res: Response) => {
   const { id, folder_id } = req.query;
-  const result = await Words.moveWords(Number(id), Number(folder_id));
-  res.json(result);
+  await moveWordsService(Number(id), Number(folder_id));
+  res.status(204).send();
 };
 
-export const changeStats = async(req: Request, res: Response) => {
-  const {id} = req.params;
+export const changeStatus = async (req: Request, res: Response) => {
+  const { id } = req.params;
   const { is_favorite, is_shared } = req.body;
-  let message
-  if(is_favorite !== undefined){
-    await Words.changeStatus("favorite",Number(id),is_favorite);
-    message = is_favorite === 0 ? "즐겨찾기에 등록되었습니다" : "즐겨찾기에서 해제되었습니다"
-  }else if(is_shared !== undefined){
-    await Words.changeStatus("shared",Number(id),is_shared);
-    message =  is_shared === 0 ? "단어장이 공유되었습니다" : "단어장이 공유해제되었습니다"
-  }
-  
-  res.json({message});
+  const message = await changeStatusService(Number(id), is_favorite, is_shared);
+  res.status(201).json({ message });
+};
+
+export const updateRecentView = async (req: Request, res: Response) => {
+  await updateRecentViewService(Number(req.params.id));
+  res.status(204).send();
 };

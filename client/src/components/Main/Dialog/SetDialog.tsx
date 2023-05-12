@@ -43,13 +43,8 @@ const SetDialog = () => {
     state.setSetDialog({ isOpen: false });
   };
 
-  const handleButtonClick = (
-    title: string,
-    label: string,
-    link: string,
-    content: string
-  ) => {
-    state.setPostDialog({ isOpen: true, title, label, link, content });
+  const handleButtonClick = (title: string, label: string, content: string) => {
+    state.setPostDialog({ isOpen: true, title, label, content });
   };
 
   return (
@@ -85,12 +80,7 @@ const SetDialog = () => {
           <Button
             startIcon={<ModeIcon />}
             onClick={() =>
-              handleButtonClick(
-                "닉네임 변경",
-                "변경할 닉네임",
-                `${url}/modify/nickname`,
-                "basic"
-              )
+              handleButtonClick("닉네임 변경", "변경할 닉네임", "basic")
             }
             sx={toggleBtnGroupStyle}
           >
@@ -99,12 +89,7 @@ const SetDialog = () => {
           <Button
             startIcon={<KeyIcon />}
             onClick={() =>
-              handleButtonClick(
-                "비밀번호 변경",
-                "비밀번호",
-                `${url}/modify/password`,
-                "basic"
-              )
+              handleButtonClick("비밀번호 변경", "비밀번호", "basic")
             }
             sx={toggleBtnGroupStyle}
           >
@@ -117,7 +102,6 @@ const SetDialog = () => {
               handleButtonClick(
                 "정말 회원에서 탈퇴하시겠습니까?",
                 "비밀번호 확인",
-                `${url}/delete/user`,
                 "basic"
               )
             }

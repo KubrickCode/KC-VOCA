@@ -9,7 +9,6 @@ import { SpeedDial, SpeedDialIcon, SpeedDialAction } from "@mui/material";
 
 const SpeedDialComp = () => {
   const state = useMainStore((state) => state);
-  const url = import.meta.env.VITE_SERVER_HOST;
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(!open);
@@ -17,6 +16,7 @@ const SpeedDialComp = () => {
   const speedDialActions = [
     {
       icon: <NoteAddIcon />,
+      view: "inlineBlock",
       name: "단어장 추가",
       dialog: () =>
         state.setPostDialog({
@@ -28,6 +28,7 @@ const SpeedDialComp = () => {
     },
     {
       icon: <CreateNewFolderIcon />,
+      view: "inlineBlock",
       name: "폴더 추가",
       dialog: () =>
         state.setPostDialog({
@@ -39,6 +40,7 @@ const SpeedDialComp = () => {
     },
     {
       icon: <DeleteIcon />,
+      view: state.isHome ? "none" : "inlineBlock",
       name: "폴더 삭제",
       dialog: () =>
         state.setCheckDialog({
@@ -49,6 +51,7 @@ const SpeedDialComp = () => {
     },
     {
       icon: <ChangeCircleIcon />,
+      view: state.isHome ? "none" : "inlineBlock",
       name: "폴더명 변경",
       dialog: () =>
         state.setPostDialog({
@@ -60,6 +63,7 @@ const SpeedDialComp = () => {
     },
     {
       icon: <DriveFileMoveIcon />,
+      view: state.isHome ? "none" : "inlineBlock",
       name: "폴더 이동",
       dialog: () =>
         state.setMoveDialog({
@@ -88,7 +92,7 @@ const SpeedDialComp = () => {
             icon={action.icon}
             tooltipTitle={action.name}
             tooltipOpen
-            sx={{ whiteSpace: "nowrap" }}
+            sx={{ whiteSpace: "nowrap", display: action.view }}
             onClick={action.dialog}
           />
         ))}
