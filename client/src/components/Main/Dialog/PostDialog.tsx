@@ -296,35 +296,6 @@ const PostDialog = () => {
         );
         break;
     }
-
-    // mutate(requsetData, {
-    //   onSuccess: (data) => {
-    //     if (
-    //       state.postDialog.title === "정말 회원에서 탈퇴하시겠습니까?" &&
-    //       data === "success"
-    //     ) {
-    //       location.reload();
-    //     }
-    //     handleOpen();
-
-    //     state.setSnackBar({
-    //       text: data[0],
-    //       type: data[1],
-    //     });
-
-    //     if (data[2] === "folder") {
-    //       queryClient.invalidateQueries("getFolder");
-    //     } else if (data[2] === "file") {
-    //       queryClient.invalidateQueries("getFile");
-    //     } else if (data[2] === "data") {
-    //       queryClient.invalidateQueries("getData");
-    //     } else {
-    //       queryClient.invalidateQueries("getUser");
-    //     }
-
-    //     state.setSnackBarOpen(true);
-    //   },
-    // });
   };
 
   const basicContent = () => {

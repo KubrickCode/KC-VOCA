@@ -157,6 +157,7 @@ const SignUp = () => {
               error={formErrors.emailError}
               helperText={formErrors.emailMsg}
               inputRef={emailInput}
+              inputProps={{ maxLength: 255 }}
             />
           </Grid>
           <Grid item xs={12}>
@@ -171,6 +172,7 @@ const SignUp = () => {
               error={formErrors.pwdError}
               helperText={formErrors.pwdMsg}
               inputRef={passwordInput}
+              inputProps={{ maxLength: 20 }}
             />
           </Grid>
           <Grid item xs={12}>
@@ -185,6 +187,7 @@ const SignUp = () => {
               error={formErrors.pwdError2}
               helperText={formErrors.pwdMsg2}
               inputRef={password2Input}
+              inputProps={{ maxLength: 20 }}
             />
           </Grid>
           <Grid item xs={12}>
@@ -198,6 +201,7 @@ const SignUp = () => {
               error={formErrors.nickError}
               helperText={formErrors.nickMsg}
               inputRef={nicknameInput}
+              inputProps={{ maxLength: 10 }}
             />
           </Grid>
         </Grid>

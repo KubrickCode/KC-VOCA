@@ -60,6 +60,9 @@ const SignIn = () => {
             location.href = "/";
           }
         },
+        onError: (err: any) => {
+          setErrMsg(err.response.data.errors[0]);
+        },
       }
     );
   };
@@ -88,6 +91,7 @@ const SignIn = () => {
           type="email"
           autoComplete="email"
           onChange={(e) => setEmail(e.target.value)}
+          inputProps={{ maxLength: 255 }}
         />
         <TextField
           margin="normal"
@@ -98,6 +102,7 @@ const SignIn = () => {
           type="password"
           autoComplete="current-password"
           onChange={(e) => setPassword(e.target.value)}
+          inputProps={{ maxLength: 20 }}
         />
         {errmsg && <Alert severity="warning">{errmsg}</Alert>}
         <Button
@@ -193,7 +198,7 @@ const FormDialog = ({ open, setOpen, url }: FormDialogProps) => {
           ...emailState,
           open: true,
           type: "warning" as AlertColor,
-          text: err.response.data.message,
+          text: err.response.data.message ?? err.response.data.errors[0],
         });
       },
     });
@@ -216,6 +221,7 @@ const FormDialog = ({ open, setOpen, url }: FormDialogProps) => {
             fullWidth
             variant="standard"
             inputRef={emailRef}
+            inputProps={{ maxLength: 255 }}
           />
           {emailState.open && (
             <EmailAlert type={emailState.type} text={emailState.text} />
