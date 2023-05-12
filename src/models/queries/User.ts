@@ -1,5 +1,5 @@
-import pool from "../db";
-import { UserType } from "../types";
+import pool from "../DB";
+import { UserType } from "../Entity.type";
 import { RowDataPacket, ResultSetHeader } from "mysql2";
 import Folder from "./Folder";
 import {

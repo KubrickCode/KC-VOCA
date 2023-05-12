@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { NextFunction, Request, Response } from "express";
-import { UserType } from "src/models/types";
+import { UserType } from "src/models/Entity.type";
 dotenv.config();
 
 const validateToken = (req: Request, res: Response, next: NextFunction) => {

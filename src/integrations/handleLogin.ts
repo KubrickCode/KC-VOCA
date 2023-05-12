@@ -1,7 +1,7 @@
 import passport from "passport";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { UserType } from "src/models/types";
+import { UserType } from "src/models/Entity.type";
 import { NextFunction, Request, Response } from "express";
 dotenv.config();
 

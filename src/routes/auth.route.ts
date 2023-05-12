@@ -8,12 +8,14 @@ import {
   kakaoLogin,
   kakaoCallback,
 } from "../controllers/auth.controller";
+import { validateDto } from "../middlewares/validateDto";
+import { addUserDto, findPasswordDto, loginDto } from "../dto/auth.dto";
 
 const router = express.Router();
 
-router.post("/login", login);
-router.post("/signup", addUser);
-router.post("/find-password", findPassword);
+router.post("/login", validateDto(loginDto), login);
+router.post("/signup", validateDto(addUserDto), addUser);
+router.post("/find-password", validateDto(findPasswordDto), findPassword);
 router.get("/google", googleLogin);
 router.get("/google/callback", googleCallback);
 router.get("/kakao", kakaoLogin);

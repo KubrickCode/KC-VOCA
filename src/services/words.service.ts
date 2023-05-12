@@ -36,7 +36,7 @@ export const moveWordsService = async (id: number, folder_id: number) => {
   await Words.moveWords(id, folder_id);
 };
 
-export const changeStatsService = async (
+export const changeStatusService = async (
   id: number,
   is_favorite: WordsStatus,
   is_shared: WordsStatus
@@ -62,4 +62,4 @@ export const updateRecentViewService = async (id: number) => {
   await Words.updateRecentView(id);
 };
 
-type WordsStatus = undefined | 0 | 1;
+export type WordsStatus = undefined | 0 | 1;

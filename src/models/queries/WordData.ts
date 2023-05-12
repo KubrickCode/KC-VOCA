@@ -1,6 +1,6 @@
 import { RowDataPacket } from "mysql2";
-import pool from "../db";
-import { WordDataType } from "../types";
+import pool from "../DB";
+import { WordDataType } from "../Entity.type";
 
 class WordData {
   async createWordData(

@@ -17,6 +17,8 @@
     "aws-sdk": "^2.1338.0",
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.2",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.0",
     "concurrently": "^7.6.0",
     "connect-flash": "^0.1.1",
     "cookie-parser": "~1.4.4",

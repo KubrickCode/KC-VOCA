@@ -1,5 +1,5 @@
 import { RowDataPacket } from "mysql2";
-import pool from "../db";
+import pool from "../DB";
 
 class Words {
   async createWords(user_id: number, folder_id: number, name: string) {

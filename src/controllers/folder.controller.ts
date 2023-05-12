@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { UserType } from "../models/types";
+import { UserType } from "../models/Entity.type";
 import {
   createFolderService,
   deleteFolderService,

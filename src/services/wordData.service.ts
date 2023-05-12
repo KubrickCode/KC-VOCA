@@ -1,6 +1,6 @@
 import Words from "../models/queries/Words";
 import WordData from "../models/queries/WordData";
-import { WordDataType } from "../models/types";
+import { WordDataType } from "../models/Entity.type";
 import { playSound } from "../integrations/playSound";
 
 export const getWordDataService = async (id: number) => {

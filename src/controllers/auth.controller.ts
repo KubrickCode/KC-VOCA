@@ -5,7 +5,7 @@ import {
   kakaoAuthenticate,
   kakaoCallbackAuthenticate,
 } from "../integrations/handleLogin";
-import { UserType } from "../models/types";
+import { UserType } from "../models/Entity.type";
 import dotenv from "dotenv";
 import { addUserService, loginService } from "../services/auth.service";
 import { findPasswordService } from "./../services/auth.service";

@@ -2,11 +2,11 @@ import createError from "http-errors";
 import express, { ErrorRequestHandler } from "express";
 import logger from "morgan";
 import dotenv from "dotenv";
-import Routes from "./routes";
 import helmet from "helmet";
 import cors from "cors";
 import { initializePassport } from "./middlewares/passport";
 import "express-async-errors";
+import Routes from "./routes";
 dotenv.config();
 
 const app = express();

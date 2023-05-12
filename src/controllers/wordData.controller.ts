@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { UserType } from "src/models/types";
+import { UserType } from "src/models/Entity.type";
 import {
   createWordDataService,
   deleteWordDataService,

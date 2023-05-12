@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { UserType } from "src/models/types";
+import { UserType } from "src/models/Entity.type";
 import {
-  changeStatsService,
+  changeStatusService,
   createWordsService,
   deleteWordsService,
   getWordsService,
@@ -39,10 +39,10 @@ export const moveWords = async (req: Request, res: Response) => {
   res.status(204).send();
 };
 
-export const changeStats = async (req: Request, res: Response) => {
+export const changeStatus = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { is_favorite, is_shared } = req.body;
-  const message = await changeStatsService(Number(id), is_favorite, is_shared);
+  const message = await changeStatusService(Number(id), is_favorite, is_shared);
   res.status(201).json({ message });
 };
 

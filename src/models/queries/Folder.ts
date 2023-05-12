@@ -1,5 +1,5 @@
 import { RowDataPacket } from "mysql2";
-import pool from "../db";
+import pool from "../DB";
 
 class Folder {
   async createFolder(user_id: number, parent_id: number, name: string) {
