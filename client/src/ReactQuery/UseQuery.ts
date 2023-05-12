@@ -20,6 +20,7 @@ export const useQueryGet = (link: string, key: string, queryOptions = {}) => {
   };
 
   return useQuery([key, host + link], queryFunc, {
+    staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
     ...queryOptions,
   });

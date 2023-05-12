@@ -1,12 +1,6 @@
 import { RowDataPacket } from "mysql2";
 import pool from "../db";
-
-interface WordDataUpdate {
-  word: string;
-  meaning: string;
-  example_sentence: string;
-  example_sentence_meaning: string;
-}
+import { WordDataType } from "../types";
 
 class WordData {
   async createWordData(
@@ -52,7 +46,7 @@ class WordData {
     return result;
   }
 
-  async updateWordData(id: number, data: WordDataUpdate) {
+  async updateWordData(id: number, data: Partial<WordDataType>) {
     const query = `UPDATE WordData SET word = ?, meaning = ?, example_sentence = ? , example_sentence_meaning = ? WHERE id = ?`;
     const params = [
       data.word,
