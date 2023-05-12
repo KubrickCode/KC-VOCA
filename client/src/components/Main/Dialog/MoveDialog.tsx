@@ -31,14 +31,6 @@ const MoveDial = () => {
     state.setMoveDialog({ isOpen: false });
   };
 
-  const requsetData = {
-    body: {
-      folder_id: state.selectedFolder,
-      file_id: state.selectedFile.id,
-      parent_folder: state.moveSelectedFolder,
-    },
-  };
-
   const submitForm = () => {
     if (state.moveDialog.type === "folder") {
       moveFolder(
@@ -76,30 +68,12 @@ const MoveDial = () => {
         }
       );
     }
-
-    // mutate(requsetData, {
-    //   onSuccess: (data) => {
-    //     handleOpen();
-    //     state.setSnackBar({
-    //       text: data[0],
-    //       type: data[1],
-    //     });
-
-    //     if (data[2] === "folder") {
-    //       queryClient.invalidateQueries("getFolder");
-    //     } else if (data[2] === "file") {
-    //       queryClient.invalidateQueries("getFile");
-    //     }
-
-    //     state.setSnackBarOpen(true);
-    //   },
-    // });
   };
 
   return (
     <Dialog onClose={handleOpen} open={state.moveDialog.isOpen}>
       <DialogTitle sx={toggleStyle}>선택하신 폴더 내로 이동합니다</DialogTitle>
-      <FolderArea />
+      <FolderArea moveStatus={true} />
       <DialogActions sx={toggleStyle}>
         <Button onClick={handleOpen} sx={toggleBtnStyle}>
           닫기

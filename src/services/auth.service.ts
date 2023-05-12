@@ -28,7 +28,7 @@ export const findPasswordService = async (email: string) => {
     return false;
   } else {
     const randomPassword = getRandomPassword();
-    await User.updateUser(userInfo.id, randomPassword, "password");
+    await User.changePassword(userInfo.id, randomPassword);
     await mailService(email, randomPassword);
     return true;
   }

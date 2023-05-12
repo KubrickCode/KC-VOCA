@@ -30,7 +30,8 @@ const PostDialog = () => {
     `/word-data/${state.selectedData.id}`,
     "patch"
   );
-  const { mutate: changeUser } = useQueryPatch("/user", "patch");
+  const { mutate: changePassword } = useQueryPatch("/user/password", "patch");
+  const { mutate: changeNickname } = useQueryPatch("/user/nickname", "patch");
   const { mutate: deleteUser } = useQueryPatch("/user", "post");
 
   const [formData, setFormData] = useState({
@@ -108,13 +109,12 @@ const PostDialog = () => {
 
   const submitForm = async () => {
     const { title } = state.postDialog;
-
     switch (title) {
       case "폴더 추가":
         addFolder(
           {
             body: {
-              parent_id: state.selectedFolder,
+              parent_id: Number(state.selectedFolder),
               name: formData.value1,
             },
           },
@@ -151,7 +151,7 @@ const PostDialog = () => {
         addWords(
           {
             body: {
-              folder_id: state.selectedFolder,
+              folder_id: Number(state.selectedFolder),
               name: formData.value1,
             },
           },
@@ -188,7 +188,7 @@ const PostDialog = () => {
         addData(
           {
             body: {
-              words_id: state.selectedFile.id,
+              words_id: Number(state.selectedFile.id),
               word: formData.word,
               meaning: formData.meaning,
               example_sentence: formData.example_sentence,
@@ -232,7 +232,7 @@ const PostDialog = () => {
         );
         break;
       case "닉네임 변경":
-        changeUser(
+        changeNickname(
           {
             body: {
               nickname: formData.value1,
@@ -255,7 +255,7 @@ const PostDialog = () => {
         );
         break;
       case "비밀번호 변경":
-        changeUser(
+        changePassword(
           {
             body: {
               prevPassword: formData.value1,

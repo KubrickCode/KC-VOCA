@@ -54,16 +54,16 @@ class User {
     return result;
   }
 
-  async updateUser(id: number, value: string, type: string) {
-    if (type === "nickname") {
-      await pool.query(`UPDATE Users SET nickname=? WHERE id = ?`, [value, id]);
-    } else {
-      const hashedPassword = await hashPassword(value);
-      await pool.query(`UPDATE Users SET password=? WHERE id = ?`, [
-        hashedPassword,
-        id,
-      ]);
-    }
+  async changeNickname(id: number, value: string) {
+    await pool.query(`UPDATE Users SET nickname=? WHERE id = ?`, [value, id]);
+  }
+
+  async changePassword(id: number, value: string) {
+    const hashedPassword = await hashPassword(value);
+    await pool.query(`UPDATE Users SET password=? WHERE id = ?`, [
+      hashedPassword,
+      id,
+    ]);
   }
 
   async deleteUser(id: number) {

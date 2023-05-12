@@ -5,13 +5,15 @@ export class deleteUserDto {
   password: string = "";
 }
 
-export class updateUserDto {
+export class changeNicknameDto {
+  @IsNickname()
+  nickname: string = "";
+}
+
+export class changePasswordDto {
   @IsPassword()
   password: string = "";
 
   @IsPassword()
   prevPassword: string = "";
-
-  @IsNickname()
-  nickname: string = "";
 }

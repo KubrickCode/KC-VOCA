@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import { UserType } from "../models/Entity.type";
 import {
+  changeNicknameService,
+  changePasswordService,
   deleteUserService,
   getUserService,
-  updateUserService,
 } from "../services/user.service";
 
 export const getUser = async (req: Request, res: Response) => {
@@ -14,13 +15,25 @@ export const getUser = async (req: Request, res: Response) => {
   res.status(200).json({ id, email, nickname, registration_date });
 };
 
-export const updateUser = async (req: Request, res: Response) => {
-  const { nickname, password, prevPassword } = req.body;
+export const changeNickname = async (req: Request, res: Response) => {
+  const { nickname } = req.body;
   const { id } = req?.user as UserType;
 
-  const result = await updateUserService(
+  const result = await changeNicknameService(Number(id), nickname);
+  if (result) {
+    const { message } = result;
+    res.status(403).json({ message });
+  } else {
+    res.status(204).send();
+  }
+};
+
+export const changePassword = async (req: Request, res: Response) => {
+  const { password, prevPassword } = req.body;
+  const { id } = req?.user as UserType;
+
+  const result = await changePasswordService(
     Number(id),
-    nickname,
     password,
     prevPassword
   );
