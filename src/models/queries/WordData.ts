@@ -13,7 +13,7 @@ class WordData {
     example_sentence_meaning: string
   ) {
     const result = await pool.query(
-      "INSERT INTO WordData (user_id, folder_id, words_id,word,meaning,example_sentence,example_sentence_meaning) VALUES (?, ?, ?,?,?,?,?)",
+      "INSERT INTO worddata (user_id, folder_id, words_id,word,meaning,example_sentence,example_sentence_meaning) VALUES (?, ?, ?,?,?,?,?)",
       [
         user_id,
         folder_id,
@@ -29,11 +29,11 @@ class WordData {
 
   async getWordData(words_id: number) {
     const [userResult] = await pool.query<RowDataPacket[]>(
-      "SELECT name FROM Words WHERE id = ?",
+      "SELECT name FROM words WHERE id = ?",
       [words_id]
     );
     const [wordDataResult] = await pool.query<RowDataPacket[]>(
-      "SELECT * FROM WordData WHERE words_id = ?",
+      "SELECT * FROM worddata WHERE words_id = ?",
       [words_id]
     );
 
@@ -47,7 +47,7 @@ class WordData {
   }
 
   async updateWordData(id: number, data: Partial<WordDataType>) {
-    const query = `UPDATE WordData SET word = ?, meaning = ?, example_sentence = ? , example_sentence_meaning = ? WHERE id = ?`;
+    const query = `UPDATE worddata SET word = ?, meaning = ?, example_sentence = ? , example_sentence_meaning = ? WHERE id = ?`;
     const params = [
       data.word,
       data.meaning,
@@ -61,7 +61,7 @@ class WordData {
   }
 
   async deleteWordData(id: number) {
-    const [result] = await pool.query("DELETE FROM WordData WHERE id = ?", [
+    const [result] = await pool.query("DELETE FROM worddata WHERE id = ?", [
       id,
     ]);
 
@@ -70,14 +70,14 @@ class WordData {
 
   async searchData(id: number, keyword: string) {
     const [result] = await pool.query(
-      "SELECT * FROM WordData WHERE word REGEXP ? AND WordData.user_id=? OR meaning REGEXP ? AND WordData.user_id=?",
+      "SELECT * FROM worddata WHERE word REGEXP ? AND worddata.user_id=? OR meaning REGEXP ? AND worddata.user_id=?",
       [keyword, id, keyword, id]
     );
     return result;
   }
 
   async updateComplete(id: number, is_complete: number) {
-    await pool.query("UPDATE WordData SET is_complete=? WHERE id=?", [
+    await pool.query("UPDATE worddata SET is_complete=? WHERE id=?", [
       is_complete === 0 ? 1 : 0,
       id,
     ]);

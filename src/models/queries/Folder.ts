@@ -4,7 +4,7 @@ import pool from "../DB";
 class Folder {
   async createFolder(user_id: number, parent_id: number, name: string) {
     const result = await pool.query(
-      "INSERT INTO Folders (user_id, parent_id, name) VALUES (?, ?, ?)",
+      "INSERT INTO folders (user_id, parent_id, name) VALUES (?, ?, ?)",
       [user_id, parent_id, name]
     );
     return result;
@@ -12,14 +12,14 @@ class Folder {
 
   async getFolders(user_id: number) {
     const [result] = await pool.query(
-      "SELECT * FROM Folders WHERE user_id = ?",
+      "SELECT * FROM folders WHERE user_id = ?",
       [user_id]
     );
     return result;
   }
 
   async renameFolder(id: number, name: string) {
-    const [result] = await pool.query("UPDATE Folders SET name=? WHERE id=?", [
+    const [result] = await pool.query("UPDATE folders SET name=? WHERE id=?", [
       name,
       id,
     ]);
@@ -27,18 +27,18 @@ class Folder {
   }
 
   async deleteFolder(id: number) {
-    await pool.query("DELETE FROM WordData WHERE folder_id = ?", [id]);
+    await pool.query("DELETE FROM worddata WHERE folder_id = ?", [id]);
 
-    await pool.query("DELETE FROM Words WHERE folder_id = ?", [id]);
+    await pool.query("DELETE FROM words WHERE folder_id = ?", [id]);
 
-    const [result] = await pool.query("DELETE FROM Folders WHERE id = ?", [id]);
+    const [result] = await pool.query("DELETE FROM folders WHERE id = ?", [id]);
 
     return result;
   }
 
   async getChildFolders(id: number): Promise<number[]> {
     const [rows] = await pool.query<RowDataPacket[]>(
-      "SELECT id FROM Folders WHERE parent_id = ?",
+      "SELECT id FROM folders WHERE parent_id = ?",
       [id]
     );
     const children = rows.map((row) => row.id);
@@ -55,7 +55,7 @@ class Folder {
       return false;
     }
 
-    await pool.query("UPDATE Folders SET parent_id=? WHERE id=?", [
+    await pool.query("UPDATE folders SET parent_id=? WHERE id=?", [
       parent_id,
       id,
     ]);

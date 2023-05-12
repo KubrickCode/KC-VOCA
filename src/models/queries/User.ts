@@ -10,14 +10,14 @@ import {
 class User {
   async getUserById(id: number) {
     const rows = await pool.query<RowDataPacket[]>(
-      "SELECT * FROM Users WHERE id = ?",
+      "SELECT * FROM users WHERE id = ?",
       [id]
     );
     return rows[0];
   }
 
   async getUserByEmail(email: string): Promise<UserType> {
-    const rows = await pool.query("SELECT * FROM Users WHERE email = ?", [
+    const rows = await pool.query("SELECT * FROM users WHERE email = ?", [
       email,
     ]);
     const row = rows[0] as RowDataPacket;
@@ -32,11 +32,11 @@ class User {
   }) {
     const { email, nickname, password } = user;
     const [checkEmail] = await pool.query<RowDataPacket[]>(
-      "SELECT email FROM Users WHERE email = ?",
+      "SELECT email FROM users WHERE email = ?",
       [email]
     );
     const [checkNickname] = await pool.query<RowDataPacket[]>(
-      "SELECT nickname FROM Users WHERE nickname = ?",
+      "SELECT nickname FROM users WHERE nickname = ?",
       [nickname]
     );
     if (checkEmail.length > 0) {
@@ -46,7 +46,7 @@ class User {
       return "이미 존재하는 닉네임 입니다.";
     }
     const [userData] = await pool.query(
-      "INSERT INTO Users (email, nickname, password) VALUES (?, ?, ?)",
+      "INSERT INTO users (email, nickname, password) VALUES (?, ?, ?)",
       [email, nickname, password]
     );
     const { insertId } = userData as ResultSetHeader;
@@ -55,27 +55,27 @@ class User {
   }
 
   async changeNickname(id: number, value: string) {
-    await pool.query(`UPDATE Users SET nickname=? WHERE id = ?`, [value, id]);
+    await pool.query(`UPDATE users SET nickname=? WHERE id = ?`, [value, id]);
   }
 
   async changePassword(id: number, value: string) {
     const hashedPassword = await hashPassword(value);
-    await pool.query(`UPDATE Users SET password=? WHERE id = ?`, [
+    await pool.query(`UPDATE users SET password=? WHERE id = ?`, [
       hashedPassword,
       id,
     ]);
   }
 
   async deleteUser(id: number) {
-    await pool.query("DELETE FROM WordData WHERE user_id = ?", [id]);
-    await pool.query("DELETE FROM Words WHERE user_id = ?", [id]);
-    await pool.query("DELETE FROM Folders WHERE user_id = ?", [id]);
-    await pool.query("DELETE FROM Users WHERE id = ?", [id]);
+    await pool.query("DELETE FROM worddata WHERE user_id = ?", [id]);
+    await pool.query("DELETE FROM words WHERE user_id = ?", [id]);
+    await pool.query("DELETE FROM folders WHERE user_id = ?", [id]);
+    await pool.query("DELETE FROM users WHERE id = ?", [id]);
   }
 
   async checkPassword(id: number, password: string) {
     const [result] = await pool.query<RowDataPacket[]>(
-      "SELECT password FROM Users WHERE id = ?",
+      "SELECT password FROM users WHERE id = ?",
       [id]
     );
     const hashedPassword = result[0].password;
@@ -84,7 +84,7 @@ class User {
 
   async checkNickname(nickname: string) {
     const [result] = await pool.query<RowDataPacket[]>(
-      "SELECT nickname FROM Users WHERE nickname = ?",
+      "SELECT nickname FROM users WHERE nickname = ?",
       [nickname]
     );
     return result.length === 0;
