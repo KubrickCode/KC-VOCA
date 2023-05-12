@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef, ReactElement, Ref } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { usePersistStore } from "../../Store/GlobalStore";
 import { useMainStore } from "../../Store/MainStore";
@@ -6,7 +6,6 @@ import { StyledTableRow } from "../../Style/MUIStyle";
 import PlusOneIcon from "@mui/icons-material/PlusOne";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import HomeIcon from "@mui/icons-material/Home";
-import AddIcon from "@mui/icons-material/Add";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -25,9 +24,14 @@ import {
   IconButton,
   Checkbox,
   useMediaQuery,
+  Slide,
+  Dialog,
+  AppBar,
+  Toolbar,
 } from "@mui/material";
 import {
   CheckedState,
+  CompleteDialog,
   CountState,
   DataItem,
   MyHeaderProps,
@@ -36,6 +40,8 @@ import {
 } from "../ComponentsType";
 import { useQueryGet, useQueryPatch } from "../../ReactQuery/UseQuery";
 import { useQueryClient } from "react-query";
+import { TransitionProps } from "@mui/material/transitions";
+import CloseIcon from "@mui/icons-material/Close";
 
 const VocaLoad = () => {
   const state = useMainStore((state) => state);
@@ -53,7 +59,22 @@ const VocaLoad = () => {
 
   const matches = useMediaQuery("(max-width:830px)");
 
-  const { data } = useQueryGet(`/word-data/${location.id}`, "getData");
+  const { data: loadData } = useQueryGet(
+    `/word-data/${location.id}`,
+    "getData"
+  );
+  const { mutate } = useQueryPatch("/word-data/complete", "patch");
+  const queryClient = useQueryClient();
+
+  const [data, setData] = useState([]);
+  const [completeData, setCompleteData] = useState([]);
+
+  useEffect(() => {
+    setData(loadData?.wordData?.filter((item: any) => item.is_complete === 0));
+    setCompleteData(
+      loadData?.wordData?.filter((item: any) => item.is_complete === 1)
+    );
+  }, [loadData]);
 
   useEffect(() => {
     if (viewMode.pathname.includes("/shared/")) {
@@ -129,8 +150,26 @@ const VocaLoad = () => {
     });
   };
 
+  const onComplete = (id: number, is_complete: number) => {
+    mutate(
+      {
+        body: {
+          id,
+          is_complete,
+        },
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries("getData");
+        },
+      }
+    );
+  };
+
   const bgColor = { backgroundColor: theme ? "hsl(0, 0%, 30%)" : "white" };
   const textColor = { color: theme ? "lightgray" : "hsl(0, 0%, 20%)" };
+
+  const [openComplete, setOpenComplete] = useState(false);
 
   return (
     <div>
@@ -139,15 +178,16 @@ const VocaLoad = () => {
         textColor={textColor}
         theme={theme}
         navigate={navigate}
-        fileName={data?.name}
+        fileName={loadData?.name}
         handleData={handleData}
         share={share}
         view={view}
         setView={setView}
         bgColor={bgColor}
+        setOpenComplete={setOpenComplete}
       />
-      {data?.wordData?.length > 0 ? (
-        data?.wordData?.map((item: DataItem, index: number) => (
+      {data?.length > 0 ? (
+        data?.map((item: DataItem, index: number) => (
           <DataBody
             id={item.id}
             word={item.word}
@@ -164,11 +204,27 @@ const VocaLoad = () => {
             textColor={textColor}
             setView={setView}
             url={url}
+            is_complete={item.is_complete}
+            onComplete={onComplete}
           />
         ))
       ) : (
         <Typography>아직 추가된 단어 데이터가 없습니다</Typography>
       )}
+      <FullScreenDialog
+        openComplete={openComplete}
+        setOpenComplete={setOpenComplete}
+        completeData={completeData}
+        share={share}
+        handleData={handleData}
+        view={view}
+        bgColor={bgColor}
+        theme={theme}
+        textColor={textColor}
+        setView={setView}
+        url={url}
+        onComplete={onComplete}
+      />
     </div>
   );
 };
@@ -183,9 +239,11 @@ const MyHeader = ({
   share,
   view,
   setView,
+  setOpenComplete,
 }: MyHeaderProps) => {
   const state = useMainStore((state) => state);
   const queryClient = useQueryClient();
+
   return (
     <Stack direction={matches ? "column" : "row"} spacing={2} mb={2} mt={10}>
       <Stack direction="row" spacing={2}>
@@ -218,7 +276,6 @@ const MyHeader = ({
       <Stack direction="row" spacing={2}>
         <Button
           variant={theme ? "contained" : "outlined"}
-          endIcon={<AddIcon />}
           onClick={() => {
             handleData({
               type: "create",
@@ -235,8 +292,7 @@ const MyHeader = ({
         </Button>
         <Button
           variant={theme ? "contained" : "outlined"}
-          endIcon={view.toggleBtn}
-          color="secondary"
+          color="primary"
           onClick={() => {
             if (setView) {
               setView({ ...view, state: !view.state });
@@ -245,6 +301,14 @@ const MyHeader = ({
           sx={{ display: share ? "none" : "inlineBlock" }}
         >
           {view.text}
+        </Button>
+        <Button
+          variant={theme ? "contained" : "outlined"}
+          color="primary"
+          onClick={() => setOpenComplete(true)}
+          sx={{ display: share ? "none" : "inlineBlock" }}
+        >
+          완료 목록
         </Button>
       </Stack>
     </Stack>
@@ -265,6 +329,8 @@ const DataBody = ({
   textColor,
   share,
   url,
+  onComplete,
+  is_complete,
 }: DataItem) => {
   const [checked, setChecked] = useState<CheckedState>({});
   const [count, setCount] = useState<CountState>({});
@@ -319,7 +385,7 @@ const DataBody = ({
           >
             <Button
               sx={{ fontSize: 16 }}
-              color="success"
+              color="primary"
               onClick={() =>
                 handleData({
                   type: "modify",
@@ -375,6 +441,14 @@ const DataBody = ({
               });
             }}
           />
+          <Button
+            variant={theme ? "contained" : "outlined"}
+            sx={{ fontSize: 16, float: "right" }}
+            color="primary"
+            onClick={() => onComplete(id!, is_complete)}
+          >
+            {is_complete === 0 ? "학습 완료" : "완료 취소"}
+          </Button>
         </caption>
         <TableBody>
           {rows.map((row) => (
@@ -549,6 +623,88 @@ const MyTableRow = ({
         </Stack>
       </TableCell>
     </StyledTableRow>
+  );
+};
+
+const Transition = forwardRef(function Transition(
+  props: TransitionProps & {
+    children: ReactElement;
+  },
+  ref: Ref<unknown>
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
+const FullScreenDialog = ({
+  openComplete,
+  setOpenComplete,
+  completeData,
+  share,
+  handleData,
+  view,
+  bgColor,
+  theme,
+  textColor,
+  setView,
+  url,
+  onComplete,
+}: CompleteDialog) => {
+  return (
+    <div>
+      <Dialog
+        fullScreen
+        open={openComplete}
+        onClose={() => setOpenComplete(!open)}
+        TransitionComponent={Transition}
+      >
+        <AppBar sx={{ position: "relative", backgroundColor: "black" }}>
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={() => setOpenComplete(!open)}
+              aria-label="close"
+            >
+              <CloseIcon />
+            </IconButton>
+            <Typography
+              sx={{ ml: 2, flex: 1, mt: 1 }}
+              variant="h6"
+              component="div"
+            >
+              학습 완료 목록
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <div style={{ padding: "10px" }}>
+          {completeData?.length > 0 ? (
+            completeData?.map((item: DataItem, index: number) => (
+              <DataBody
+                id={item.id}
+                word={item.word}
+                meaning={item.meaning}
+                example_sentence={item.example_sentence}
+                example_sentence_meaning={item.example_sentence_meaning}
+                index={index}
+                key={item.id}
+                share={share}
+                handleData={handleData}
+                view={view}
+                bgColor={bgColor}
+                theme={theme}
+                textColor={textColor}
+                setView={setView}
+                url={url}
+                is_complete={item.is_complete}
+                onComplete={onComplete}
+              />
+            ))
+          ) : (
+            <Typography>아직 추가된 단어 데이터가 없습니다</Typography>
+          )}
+        </div>
+      </Dialog>
+    </div>
   );
 };
 

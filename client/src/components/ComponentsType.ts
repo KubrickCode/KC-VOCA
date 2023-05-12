@@ -90,6 +90,16 @@ export interface DataItem extends SearchDataItem, DataEnv {
   index: number;
   handleData: ({}: handleDataProps) => void;
   view: ViewObject;
+  onComplete: (id: number, is_complete: number) => void;
+  is_complete: number;
+}
+
+export interface CompleteDialog extends DataEnv {
+  openComplete: boolean;
+  setOpenComplete: (boolean: boolean) => void;
+  completeData: never[];
+  handleData: ({}: handleDataProps) => void;
+  onComplete: (id: number, is_complete: number) => void;
 }
 
 export interface handleDataProps extends SearchDataItem {
@@ -101,6 +111,7 @@ export interface MyHeaderProps extends DataEnv {
   navigate: NavigateFunction;
   fileName: string;
   handleData: ({}: handleDataProps) => void;
+  setOpenComplete: (boolean: boolean) => void;
 }
 
 export interface MyTableRowProps extends DataEnv, SearchMyTableRowProps {

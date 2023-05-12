@@ -6,6 +6,7 @@ import {
   getWordDataService,
   searchService,
   ttsServiceService,
+  updateCompleteService,
   updateWordDataService,
 } from "../services/wordData.service";
 
@@ -54,4 +55,10 @@ export const search = async (req: Request, res: Response) => {
   const { keyword } = req.body;
   const result = await searchService(id, keyword);
   res.status(200).json(result);
+};
+
+export const updateComplete = async (req: Request, res: Response) => {
+  const { id, is_complete } = req.body;
+  await updateCompleteService(id, is_complete);
+  res.status(204).send();
 };

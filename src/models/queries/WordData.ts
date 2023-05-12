@@ -75,6 +75,13 @@ class WordData {
     );
     return result;
   }
+
+  async updateComplete(id: number, is_complete: number) {
+    await pool.query("UPDATE WordData SET is_complete=? WHERE id=?", [
+      is_complete === 0 ? 1 : 0,
+      id,
+    ]);
+  }
 }
 
 export default new WordData();

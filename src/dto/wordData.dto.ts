@@ -46,3 +46,13 @@ export class searchDto {
   @MaxLength(100)
   keyword: string = "";
 }
+
+export class updateCompleteDto {
+  @IsInt({ message: "유효하지 않은 요청입니다" })
+  @IsNotEmpty({ message: "유효하지 않은 요청입니다" })
+  id: number = 0;
+
+  @IsInt({ message: "유효하지 않은 요청입니다" })
+  @IsNotEmpty({ message: "유효하지 않은 요청입니다" })
+  is_complete: number = 0;
+}

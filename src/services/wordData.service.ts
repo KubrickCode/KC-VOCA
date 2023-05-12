@@ -46,3 +46,10 @@ export const ttsServiceService = async (text: string) => {
 export const searchService = async (id: number, keyword: string) => {
   return await WordData.searchData(id, keyword);
 };
+
+export const updateCompleteService = async (
+  id: number,
+  is_complete: number
+) => {
+  return await WordData.updateComplete(id, is_complete);
+};
