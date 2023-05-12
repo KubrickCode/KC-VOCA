@@ -25,7 +25,7 @@ const Content = () => {
       <Grid container spacing={2} mt={10}>
         <Grid xs={matches ? 12 : 3}>
           <Item sx={bgColor}>
-            <FolderArea />
+            <FolderArea moveStatus={false} />
           </Item>
         </Grid>
         <Grid xs={matches ? 12 : 9}>
