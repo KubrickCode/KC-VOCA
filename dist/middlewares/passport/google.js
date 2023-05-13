@@ -16,7 +16,7 @@ const googleStrategy = new passport_google_oauth20_1.Strategy(config_1.googleCon
         const existingUser = await User_1.default.getUserByEmail(profile._json.email);
         if (existingUser) {
             const { id } = existingUser;
-            const token = (0, handleLogin_1.signJWT)({ id, email, nickname: name });
+            const { token } = (0, handleLogin_1.signJWT)({ id, email, nickname: name });
             return done(null, { ...existingUser, token });
         }
         const hashedPassword = await (0, handlePassword_1.hashPassword)((0, getRandomPassword_1.getRandomPassword)());
@@ -27,7 +27,7 @@ const googleStrategy = new passport_google_oauth20_1.Strategy(config_1.googleCon
         });
         const savedUser = await User_1.default.getUserByEmail(profile._json.email);
         const { id } = savedUser;
-        const token = (0, handleLogin_1.signJWT)({ id, email, nickname: name });
+        const { token } = (0, handleLogin_1.signJWT)({ id, email, nickname: name });
         done(null, { ...savedUser, token });
     }
     catch (err) {

@@ -21,7 +21,6 @@ import { useQueryGet } from "../../../ReactQuery/UseQuery";
 
 const SetDialog = () => {
   const state = useMainStore((state) => state);
-  const url = import.meta.env.VITE_SERVER_HOST;
   const theme = usePersistStore((state) => !state.theme);
   const { data } = useQueryGet(`/user`, "getUser");
 
@@ -71,6 +70,7 @@ const SetDialog = () => {
             startIcon={<LogoutIcon />}
             onClick={() => {
               localStorage.removeItem("token");
+              localStorage.removeItem("refreshToken");
               location.href = "/";
             }}
             sx={toggleBtnGroupStyle}

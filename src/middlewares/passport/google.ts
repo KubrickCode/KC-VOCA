@@ -17,7 +17,7 @@ const googleStrategy = new GoogleStrategy(
 
       if (existingUser) {
         const { id } = existingUser;
-        const token = signJWT({ id, email, nickname: name });
+        const { token } = signJWT({ id, email, nickname: name });
         return done(null, { ...existingUser, token });
       }
 
@@ -35,7 +35,7 @@ const googleStrategy = new GoogleStrategy(
 
       const { id } = savedUser;
 
-      const token = signJWT({ id, email, nickname: name });
+      const { token } = signJWT({ id, email, nickname: name });
 
       done(null, { ...savedUser, token });
     } catch (err: any) {

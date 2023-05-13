@@ -7,7 +7,11 @@ import {
 } from "../integrations/handleLogin";
 import { UserType } from "../models/Entity.type";
 import dotenv from "dotenv";
-import { addUserService, loginService } from "../services/auth.service";
+import {
+  addUserService,
+  loginService,
+  refreshTokenService,
+} from "../services/auth.service";
 import { findPasswordService } from "./../services/auth.service";
 dotenv.config();
 
@@ -15,6 +19,16 @@ export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const result = await loginService(email, password);
   res.status(201).json({ result });
+};
+
+export const refreshToken = async (req: Request, res: Response) => {
+  const newToken = await refreshTokenService(
+    req.headers["x-refresh-token"] as string
+  );
+  if (!newToken) {
+    return res.status(401).json({ message: "리프레쉬 토큰이 만료되었습니다" });
+  }
+  res.json({ token: newToken });
 };
 
 export const addUser = async (req: Request, res: Response) => {

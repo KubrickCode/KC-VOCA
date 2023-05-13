@@ -13,6 +13,7 @@
     "@types/passport-google-oauth20": "^2.0.11",
     "@types/passport-kakao": "^1.0.0",
     "@types/passport-local": "^1.0.35",
+    "@types/redis": "^4.0.11",
     "@types/shortid": "^0.0.29",
     "aws-sdk": "^2.1338.0",
     "bcrypt": "^5.1.0",
@@ -43,6 +44,7 @@
     "passport-kakao": "^1.0.1",
     "passport-local": "^1.0.0",
     "pug": "^3.0.2",
+    "redis": "^4.6.6",
     "shortid": "^2.2.16",
     "util": "^0.12.5"
   },

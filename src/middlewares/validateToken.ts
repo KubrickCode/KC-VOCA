@@ -18,7 +18,11 @@ const validateToken = (req: Request, res: Response, next: NextFunction) => {
 
   jwt.verify(authHeader, secret, (err, decoded) => {
     if (err) {
-      return res.status(401).send({ message: "잘못된 토큰 형식입니다" });
+      if (err.name === "TokenExpiredError") {
+        return res.status(401).send({ message: "토큰이 만료되었습니다" });
+      } else {
+        return res.status(401).send({ message: "잘못된 토큰 형식입니다" });
+      }
     }
     req.user = decoded as UserType;
     return next();

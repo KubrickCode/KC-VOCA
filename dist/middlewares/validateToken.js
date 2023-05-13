@@ -17,7 +17,12 @@ const validateToken = (req, res, next) => {
     }
     jsonwebtoken_1.default.verify(authHeader, secret, (err, decoded) => {
         if (err) {
-            return res.status(401).send({ message: "잘못된 토큰 형식입니다" });
+            if (err.name === "TokenExpiredError") {
+                return res.status(401).send({ message: "토큰이 만료되었습니다" });
+            }
+            else {
+                return res.status(401).send({ message: "잘못된 토큰 형식입니다" });
+            }
         }
         req.user = decoded;
         return next();
