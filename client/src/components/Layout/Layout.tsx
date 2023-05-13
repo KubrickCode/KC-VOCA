@@ -37,7 +37,6 @@ import {
 import { useQueryGet } from "../../ReactQuery/UseQuery";
 
 const PersistentDrawerLeft = () => {
-  const url = import.meta.env.VITE_SERVER_HOST;
   const [searchValue, setSearchValue] = useState("");
   const theme = usePersistStore((state) => !state.theme);
   const toggleTheme = usePersistStore((state) => state.toggleTheme);

@@ -1,5 +1,8 @@
 import { hashPassword } from "../integrations/handlePassword";
-import { loginAuthenticate } from "../integrations/handleLogin";
+import {
+  loginAuthenticate,
+  verifyRefreshToken,
+} from "../integrations/handleLogin";
 import User from "../models/queries/User";
 import { getRandomPassword } from "../integrations/getRandomPassword";
 import { mailService } from "../integrations/mailService";
@@ -20,6 +23,10 @@ export const addUserService = async (
     password: hashedPassword,
   });
   return await loginAuthenticate(email, password);
+};
+
+export const refreshTokenService = async (refreshToken: string) => {
+  return await verifyRefreshToken(refreshToken);
 };
 
 export const findPasswordService = async (email: string) => {

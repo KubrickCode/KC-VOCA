@@ -56,7 +56,8 @@ const SignIn = () => {
           if (data.result.message) {
             setErrMsg(data.result.message);
           } else {
-            localStorage.setItem("token", data.result);
+            localStorage.setItem("token", data.result.token);
+            localStorage.setItem("refreshToken", data.result.refreshToken);
             location.href = "/";
           }
         },

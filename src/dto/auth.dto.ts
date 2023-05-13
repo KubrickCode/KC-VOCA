@@ -1,5 +1,6 @@
 import {
   IsEmail,
+  IsJWT,
   IsNotEmpty,
   IsString,
   Length,

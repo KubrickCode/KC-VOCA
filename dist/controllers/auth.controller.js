@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.kakaoCallback = exports.kakaoLogin = exports.googleCallback = exports.googleLogin = exports.findPassword = exports.addUser = exports.login = void 0;
+exports.kakaoCallback = exports.kakaoLogin = exports.googleCallback = exports.googleLogin = exports.findPassword = exports.addUser = exports.refreshToken = exports.login = void 0;
 const handleLogin_1 = require("../integrations/handleLogin");
 const dotenv_1 = __importDefault(require("dotenv"));
 const auth_service_1 = require("../services/auth.service");
@@ -15,6 +15,14 @@ const login = async (req, res) => {
     res.status(201).json({ result });
 };
 exports.login = login;
+const refreshToken = async (req, res) => {
+    const newToken = await (0, auth_service_1.refreshTokenService)(req.headers["x-refresh-token"]);
+    if (!newToken) {
+        return res.status(401).json({ message: "리프레쉬 토큰이 만료되었습니다" });
+    }
+    res.json({ token: newToken });
+};
+exports.refreshToken = refreshToken;
 const addUser = async (req, res) => {
     const { email, nickname, password } = req.body;
     const token = await (0, auth_service_1.addUserService)(email, nickname, password);

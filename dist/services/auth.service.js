@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findPasswordService = exports.addUserService = exports.loginService = void 0;
+exports.findPasswordService = exports.refreshTokenService = exports.addUserService = exports.loginService = void 0;
 const handlePassword_1 = require("../integrations/handlePassword");
 const handleLogin_1 = require("../integrations/handleLogin");
 const User_1 = __importDefault(require("../models/queries/User"));
@@ -23,6 +23,10 @@ const addUserService = async (email, nickname, password) => {
     return await (0, handleLogin_1.loginAuthenticate)(email, password);
 };
 exports.addUserService = addUserService;
+const refreshTokenService = async (refreshToken) => {
+    return await (0, handleLogin_1.verifyRefreshToken)(refreshToken);
+};
+exports.refreshTokenService = refreshTokenService;
 const findPasswordService = async (email) => {
     const userInfo = await User_1.default.getUserByEmail(email);
     if (!userInfo) {
