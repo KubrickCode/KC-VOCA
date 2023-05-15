@@ -16,7 +16,20 @@ const validateToken = (req: Request, res: Response, next: NextFunction) => {
     return res.status(401).json({ message: "인증 토큰이 없습니다" });
   }
 
-  jwt.verify(authHeader, secret, (err, decoded) => {
+  const parts = authHeader.split(" ");
+
+  if (parts.length !== 2) {
+    return res.status(401).send({ message: "토큰이 Bearer방식이 아닙니다" });
+  }
+
+  const scheme = parts[0];
+  const token = parts[1];
+
+  if (!/^Bearer$/i.test(scheme)) {
+    return res.status(401).send({ message: "토큰 유형이 잘못되었습니다" });
+  }
+
+  jwt.verify(token, secret, (err, decoded) => {
     if (err) {
       if (err.name === "TokenExpiredError") {
         return res.status(401).send({ message: "토큰이 만료되었습니다" });

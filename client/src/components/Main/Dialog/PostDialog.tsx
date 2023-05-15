@@ -287,6 +287,8 @@ const PostDialog = () => {
           {
             onSuccess: () => {
               localStorage.removeItem("token");
+              localStorage.removeItem("refreshToken");
+              localStorage.removeItem("persistStore");
               location.href = "/";
             },
             onError: (error: any) => {

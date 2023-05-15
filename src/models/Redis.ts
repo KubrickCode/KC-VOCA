@@ -12,9 +12,14 @@ export const redisClient = redis.createClient({
   legacyMode: true,
 });
 
-redisClient.connect().then(() => {
-  console.log("레디스 연결 성공");
-});
+export const connectRedis = async () => {
+  await redisClient.connect();
+  console.log("레디스 연결 완료");
+};
+
+if (process.env.NODE_ENV !== "test") {
+  connectRedis();
+}
 
 const getAsync = promisify(redisClient.get).bind(redisClient);
 const setAsync = promisify(redisClient.set).bind(redisClient);

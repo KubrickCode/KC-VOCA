@@ -61,14 +61,16 @@ export const googleCallback = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { token } = (await googleCallbackAuthenticate(
+  const { token, refreshToken } = (await googleCallbackAuthenticate(
     req,
     res,
     next
   )) as UserType;
   res
     .status(303)
-    .redirect(`${process.env.REDIRECT_ROOT}/authorize?token=${token}`);
+    .redirect(
+      `${process.env.REDIRECT_ROOT}/authorize?token=${token}&refreshToken=${refreshToken}`
+    );
 };
 
 export const kakaoLogin = async (
@@ -84,12 +86,14 @@ export const kakaoCallback = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { token } = (await kakaoCallbackAuthenticate(
+  const { token, refreshToken } = (await kakaoCallbackAuthenticate(
     req,
     res,
     next
   )) as UserType;
   res
     .status(303)
-    .redirect(`${process.env.REDIRECT_ROOT}/authorize?token=${token}`);
+    .redirect(
+      `${process.env.REDIRECT_ROOT}/authorize?token=${token}&refreshToken=${refreshToken}`
+    );
 };

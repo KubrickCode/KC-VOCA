@@ -18,8 +18,12 @@ const kakaoStrategy = new passport_kakao_1.Strategy(config_1.kakaoConfig, async 
         const existingUser = await User_1.default.getUserByEmail(email);
         if (existingUser) {
             const { id } = existingUser;
-            const token = (0, handleLogin_1.signJWT)({ id, email, nickname: displayName });
-            return done(null, { ...existingUser, token });
+            const { token, refreshToken } = (0, handleLogin_1.signJWT)({
+                id,
+                email,
+                nickname: displayName,
+            });
+            return done(null, { ...existingUser, token, refreshToken });
         }
         const hashedPassword = await (0, handlePassword_1.hashPassword)((0, getRandomPassword_1.getRandomPassword)());
         await User_1.default.createUser({
@@ -29,8 +33,12 @@ const kakaoStrategy = new passport_kakao_1.Strategy(config_1.kakaoConfig, async 
         });
         const savedUser = await User_1.default.getUserByEmail(email);
         const { id } = savedUser;
-        const token = (0, handleLogin_1.signJWT)({ id, email, nickname: displayName });
-        done(null, { ...savedUser, token });
+        const { token, refreshToken } = (0, handleLogin_1.signJWT)({
+            id,
+            email,
+            nickname: displayName,
+        });
+        done(null, { ...savedUser, token, refreshToken });
     }
     catch (err) {
         done(err);

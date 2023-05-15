@@ -26,7 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.revokeRefreshToken = exports.getRefreshToken = exports.storeRefreshToken = exports.redisClient = void 0;
+exports.revokeRefreshToken = exports.getRefreshToken = exports.storeRefreshToken = exports.connectRedis = exports.redisClient = void 0;
 const redis = __importStar(require("redis"));
 const util_1 = require("util");
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -39,9 +39,14 @@ exports.redisClient = redis.createClient({
     },
     legacyMode: true,
 });
-exports.redisClient.connect().then(() => {
-    console.log("레디스 연결 성공");
-});
+const connectRedis = async () => {
+    await exports.redisClient.connect();
+    console.log("레디스 연결 완료");
+};
+exports.connectRedis = connectRedis;
+if (process.env.NODE_ENV !== "test") {
+    (0, exports.connectRedis)();
+}
 const getAsync = (0, util_1.promisify)(exports.redisClient.get).bind(exports.redisClient);
 const setAsync = (0, util_1.promisify)(exports.redisClient.set).bind(exports.redisClient);
 const delAsync = (0, util_1.promisify)(exports.redisClient.del).bind(exports.redisClient);

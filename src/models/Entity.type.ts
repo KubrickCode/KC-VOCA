@@ -5,6 +5,7 @@ export interface UserType {
   password: string;
   registration_date: Date;
   token?: string;
+  refreshToken?: string;
 }
 
 export interface FolderType {
