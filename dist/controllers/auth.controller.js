@@ -45,10 +45,10 @@ const googleLogin = async (req, res, next) => {
 };
 exports.googleLogin = googleLogin;
 const googleCallback = async (req, res, next) => {
-    const { token } = (await (0, handleLogin_1.googleCallbackAuthenticate)(req, res, next));
+    const { token, refreshToken } = (await (0, handleLogin_1.googleCallbackAuthenticate)(req, res, next));
     res
         .status(303)
-        .redirect(`${process.env.REDIRECT_ROOT}/authorize?token=${token}`);
+        .redirect(`${process.env.REDIRECT_ROOT}/authorize?token=${token}&refreshToken=${refreshToken}`);
 };
 exports.googleCallback = googleCallback;
 const kakaoLogin = async (req, res, next) => {
@@ -56,9 +56,9 @@ const kakaoLogin = async (req, res, next) => {
 };
 exports.kakaoLogin = kakaoLogin;
 const kakaoCallback = async (req, res, next) => {
-    const { token } = (await (0, handleLogin_1.kakaoCallbackAuthenticate)(req, res, next));
+    const { token, refreshToken } = (await (0, handleLogin_1.kakaoCallbackAuthenticate)(req, res, next));
     res
         .status(303)
-        .redirect(`${process.env.REDIRECT_ROOT}/authorize?token=${token}`);
+        .redirect(`${process.env.REDIRECT_ROOT}/authorize?token=${token}&refreshToken=${refreshToken}`);
 };
 exports.kakaoCallback = kakaoCallback;

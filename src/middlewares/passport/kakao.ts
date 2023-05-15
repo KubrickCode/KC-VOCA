@@ -18,8 +18,12 @@ const kakaoStrategy = new KakaoStrategy(
 
       if (existingUser) {
         const { id } = existingUser;
-        const token = signJWT({ id, email, nickname: displayName });
-        return done(null, { ...existingUser, token });
+        const { token, refreshToken } = signJWT({
+          id,
+          email,
+          nickname: displayName,
+        });
+        return done(null, { ...existingUser, token, refreshToken });
       }
 
       const hashedPassword = await hashPassword(getRandomPassword());
@@ -33,9 +37,13 @@ const kakaoStrategy = new KakaoStrategy(
       const savedUser = await User.getUserByEmail(email as string);
       const { id } = savedUser;
 
-      const token = signJWT({ id, email, nickname: displayName });
+      const { token, refreshToken } = signJWT({
+        id,
+        email,
+        nickname: displayName,
+      });
 
-      done(null, { ...savedUser, token });
+      done(null, { ...savedUser, token, refreshToken });
     } catch (err) {
       done(err);
     }

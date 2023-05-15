@@ -13,7 +13,8 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  config.headers["Authorization"] = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
+  config.headers["Authorization"] = token ? `Bearer ${token}` : "";
   return config;
 });
 
@@ -29,7 +30,8 @@ api.interceptors.response.use(
     if (error.config.url === "/auth/refresh") {
       localStorage.removeItem("token");
       localStorage.removeItem("refreshToken");
-      window.location.href = "/login";
+      localStorage.removeItem("persistStore");
+      window.location.href = "/";
       return Promise.reject(error);
     }
 
@@ -49,7 +51,8 @@ api.interceptors.response.use(
     } catch (refreshError) {
       localStorage.removeItem("token");
       localStorage.removeItem("refreshToken");
-      window.location.href = "/login";
+      localStorage.removeItem("persistStore");
+      window.location.href = "/";
       throw refreshError;
     }
   }

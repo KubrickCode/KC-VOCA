@@ -71,6 +71,7 @@ const SetDialog = () => {
             onClick={() => {
               localStorage.removeItem("token");
               localStorage.removeItem("refreshToken");
+              localStorage.removeItem("persistStore");
               location.href = "/";
             }}
             sx={toggleBtnGroupStyle}
