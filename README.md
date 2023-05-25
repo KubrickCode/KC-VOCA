@@ -1,83 +1,69 @@
 # KC-VOCA
 
-KC VOCA APP
+### 언어 학습용 단어장 웹
 
-이 프로젝트는 사용자들이 외국어 단어나 표현(혹은 외우고 싶은 어떠한 것)을 배우고 연습하는 것을 돕는 웹 애플리케이션인 어휘 프로젝트 입니다. 이 프로젝트는 프론트 엔드에 React, 개발 환경에 Vite, 백엔드 서버에 Express, 데이터베이스로 MySQL을 사용합니다.
-
-회원 인증 구현으로는 passport-local, passport-google-oauth2, passport-kakao 를 사용하여, 로컬회원, 구글로그인, 카카오로그인 등을 구현하였습니다.
-그리고 AWS의 IAM 자격증명으로 API를 사용하여, AWS Polly로 TTS 서비스를 구현하고, AWS SES를 통해 메일 서비스를 구현하였습니다.
+https://kcvoca.duckdns.org/
 
 ## 컨텐츠 목록
 
-1. [시작하기](#시작하기)
-   - [필수요건](#필수요건)
-   - [설치](#설치)
-2. [사용법](#사용법)
+1. [사이트 이용 설명](#사이트-이용-설명)
+2. [프로젝트 및 기술 설명](#프로젝트-및-기술-설명)
 3. [프로젝트 참여](#프로젝트-참여)
 4. [저작권](#저작권)
 5. [연락 정보](#연락-정보)
-6. [폴더 트리](#폴더-트리)
 
-## 시작하기
+## 사이트 이용 설명
 
-로컬 복사본을 설치 및 실행하려면 다음과 같은 간단한 단계를 수행하세요.
+<br/>회원가입 혹은 소셜 로그인을 진행합니다.<br/>
 
-### 필수요건
+폴더,단어장,데이터 등을 저장할 수 있습니다. 추가,수정,삭제,이동 모두 가능하고, 회원정보에 대한 수정 또한 가능합니다.<br/>
 
-이 프로젝트를 수행하려면 Node.js 및 npm이 시스템에 설치되어 있어야 합니다. Node.js는 [here](https://nodejs.org/)에서 다운로드할 수 있으며 npm이 함께 제공됩니다.
+단어장 데이터는 Hide방식, 쉐도잉등을 위한 반복횟수, TTS서비스를 통한 원어민 발음 듣기 등 서비스를 이용 가능합니다.<br/>
 
-### 설치
+즐겨찾기, 회원들과 공유 기능, 다른 회원이 공유한 단어장 열람, 다크모드 등이 가능합니다.<br/>
 
-1. 저장소 Clone 혹은 Download Zip
+## 프로젝트 및 기술 설명
 
-2. 프로젝트 폴더로 이동
+### 프로젝트의 목표
 
-3. 프로젝트 폴더에서 npm install, 그리고 client 폴더에서 npm install을 각각 실행하여 종속성 설치.
+<br/>첫 개인 프로젝트.<br/>
+<br/>설계 단계에서부터 미숙했던 부분이 많았지만, 최대한 업데이트 및 마이그레이션을 하며 성장해나가는 프로젝트.<br/>
+그리고 프로그래밍적 학습 목표 외에도 개인적인 언어 학습에 유용하게 쓰기 위한 커스터마이징 단어장.<br/><br/>
 
-4. 프로젝트의 루트 디렉터리에 .env 파일을 생성하고 환경 변수를 구성하세요. 다음 형식을 참조로 사용합니다
+최초 기술적 목표는 단순 Express 기반 단어장 프로그램 만들기.<br/>
+그렇기에 바닐라 자바스크립트와 EJS 기반의 프로젝트로 시작하였으며, 천천히 업그레이드 시켜나갔음.<br/><br/>
 
-```ini
-DB_host = 데이터베이스 엔드포인트
-DB_user = 데이터베이스 유저
-DB_password = 데이터베이스 비밀번호
-DB_port = 데이터베이스 포트(일반적으로 3306)
-DB_database = 기본 데이터베이스
-DB_dateStrings = date
-SESSION_SECRET = 세션 암호
-ACCESSKEYID = AWS IAM 액세스 아이디
-SECRETACCESSKEY = AWS IAM 시크릿 액세스키
-SIGNATUREVERSION = v4
-REGION = us-east-1
-K_REGION = ap-northeast-2
-GOOGLE_ID = 구글 로그인 API ID
-GOOGLE_SECRET = 구글 로그인 API 암호
-GOOGLE_CALLBACK = http://localhost:3000/api/signpage/google/callback (배포 시에는 내 도메인/api/signpage/google/callback)
-KAKAO_ID = 카카오 로그인 API ID
-KAKAO_CALLBACK = http://localhost:3000/api/signpage/kakao/callback (배포 시에는 내 도메인/api/signpage/kakao/callback)
-REDIRECT_ROOT = http://localhost:5173 (배포 시에는 /)
-```
+프론트엔드 : EJS -> 리액트 -> MUI적용 -> 상태관리 라이브러리 적용<br/>
+백엔드 : Express기반 2tier 프로젝트 -> MVC패턴 적용 -> 테스트 적용 -> Swagger 문서화 적용<br/>
 
-client 폴더 내에도 .env 파일을 생성하고 다음과 같이 작성합니다
+### 기술 설명
 
-```ini
-VITE_SERVER_HOST = http://localhost:3000/api (배포 시에는 /api)
-```
+#### 프론트엔드
 
-5. npm run dev 시, localhost:3000에 백엔드 서버, localhost:5173에 클라이언트 서버가 동시에 실행됩니다.
+- Vite 개발환경 기반 React
+- MUI 컴포넌트 기반 디자인
+- React-Query 기반 커스텀 훅 서버 통신
+- Zustand 기반 전역 상태 관리
 
-## 사용법
+#### 백엔드
 
-브라우저에서 응용프로그램을 오픈한 뒤, 회원가입 혹은 Google,KaKao 로그인을 진행합니다.
+- 사용된 DB : MySQL, ORM사용 X
 
-폴더,단어장,데이터 등을 저장할 수 있습니다. 추가,수정,삭제 모두 가능하고, 회원정보에 대한 수정 또한 가능합니다.
+- 암호화 : bcrypt 해싱으로 Local 유저들의 비밀번호 관리
 
-UI가 직관적인 편이기에, 상세한 설명 없이도 무리없이 파악하고 이용 가능합니다.
+- 인증관리 : 로컬, 소셜로그인 모두 passport 미들웨어, JWT 토큰 이용, 리프레시 토큰은 Redis에 저장
 
-즐겨찾기, 회원들과 공유하는 기능, 다크모드 등이 가능합니다.
+- DTO : class-validator를 사용하여 계층간 데이터 전달 관리.
+
+- 테스트 : 기본적으로 Jest를 사용하며, 앞으로도 계속해서 테스트 수정예정
+
+- 배포 : AWS EC2서버와 RDS 데이터베이스를 사용함. 클라이언트는 nginx와 letsencrypt로 관리하며, 백엔드 서버는 pm2로 실행중.
+
+- ExpressJS 구조 설명 : routes(오로지 요청에 대한 경로설정만 담당), controllers(라우터와 연결된 경로기반으로 요청 받음. 이후 연결된 서비스 로직기반으로 결과를 클라이언트에 응답함), services(DB와 연동되는 실제 리포지토리 로직 혹은 integration쪽 로직 사용하여 컨트롤러에 결과 전달), db(DB연결 및 타입지정.), repository(prisma를 이용한 실제 db로직 모음), dependency(종속성 주입을 위한 컨테이너 지정), dto(계층간 데이터 전달을 위한 객체 지정), integrations(마이그레이션 가능성이 있는 외부 라이브러리등의 로직 지정), middlewares(인증 미들웨어 등 모음), shared(전역적으로 사용되는 config 혹은 util 로직등 모음), swagger(스웨거 문서 정리), test(테스트 코드 정리)
 
 ## 프로젝트 참여
 
-프로젝트 참여를 환영합니다! 기여하려면 다음 단계를 수행하세요:
+<br />프로젝트 참여를 환영합니다! 기여하려면 다음 단계를 수행하세요<br />
 
 1. 프로젝트를 Fork하세요.
 2. 자신만의 branch를 만드세요 (`git checkout -b feature/YourFeature`)
@@ -87,80 +73,8 @@ UI가 직관적인 편이기에, 상세한 설명 없이도 무리없이 파악�
 
 ## 저작권
 
-MIT 라이선스에 따라 배포됩니다. 자세한 내용은 '라이센스'를 참조하십시오.
+<br />MIT 라이선스에 따라 배포됩니다. 자세한 내용은 '라이센스'를 참조하십시오.<br />
 
 ## 연락 정보
 
-kubrick code - kubrickcode@gmail.com
-
-Project Link: https://github.com/kubrickcode/KC-VOCA
-
-## 폴더 트리
-
-```
-kcvoca
-├─ .vscode
-│  └─ settings.json
-├─ app.js
-├─ client
-│  ├─ .gitignore
-│  ├─ index.html
-│  ├─ package-lock.json
-│  ├─ package.json
-│  ├─ public
-│  │  ├─ google.png
-│  │  ├─ kakao.png
-│  │  ├─ kcvoca_logo.png
-│  │  └─ vite.svg
-│  ├─ src
-│  │  ├─ App.jsx
-│  │  ├─ assets
-│  │  │  └─ react.svg
-│  │  ├─ Context.jsx
-│  │  ├─ CustomHook.jsx
-│  │  ├─ index.jsx
-│  │  ├─ Logoff
-│  │  │  ├─ Sign.jsx
-│  │  │  ├─ Signin.jsx
-│  │  │  └─ Signup.jsx
-│  │  ├─ Main
-│  │  │  ├─ Content.jsx
-│  │  │  ├─ Dialog
-│  │  │  │  ├─ CheckDialog.jsx
-│  │  │  │  ├─ FileDial.jsx
-│  │  │  │  ├─ MoveDialog.jsx
-│  │  │  │  ├─ MySnackbar.jsx
-│  │  │  │  ├─ PostDialog.jsx
-│  │  │  │  ├─ SetDialog.jsx
-│  │  │  │  ├─ SpeedDial.jsx
-│  │  │  │  └─ workspace.code-workspace
-│  │  │  ├─ FileArea.jsx
-│  │  │  ├─ FolderArea.jsx
-│  │  │  ├─ SearchPage.jsx
-│  │  │  ├─ SharePage.jsx
-│  │  │  └─ VocaLoad.jsx
-│  │  ├─ Module.jsx
-│  │  ├─ Reducer.jsx
-│  │  └─ Style
-│  │     └─ MUIStyle.jsx
-│  └─ vite.config.js
-├─ lib
-│  ├─ config.js
-│  ├─ module.js
-│  └─ passport.js
-├─ LICENSE
-├─ package-lock.json
-├─ package.json
-├─ privacy_policy.html
-├─ public
-│  ├─ images
-│  ├─ javascripts
-│  └─ stylesheets
-│     └─ style.css
-├─ README.md
-├─ views
-│  ├─ error.jade
-│  └─ index.jade
-└─ www
-
-```
+<br />kubrick code - kubrickcode@gmail.com

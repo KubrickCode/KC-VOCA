@@ -13,7 +13,8 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "baseUrl": ".",
-    "typeRoots": ["./@types", "./node_modules/@types"]
+    "typeRoots": ["./@types", "./node_modules/@types"],
+    "allowJs": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]

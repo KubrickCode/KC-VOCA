@@ -5,9 +5,10 @@ import localPassport from "./local";
 import googleStrategy from "./google";
 import kakaoStrategy from "./kakao";
 import User from "../../models/queries/User";
+import { UserType } from "../../models/Entity.type";
 
 export const initializePassport = () => {
-  passport.serializeUser((user, done) => {
+  passport.serializeUser((user: UserType, done) => {
     done(null, user.email);
   });
 
