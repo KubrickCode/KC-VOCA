@@ -356,7 +356,7 @@ const DataBody = ({
     },
     {
       title: "예문 뜻",
-      label: example_sentence,
+      label: example_sentence_meaning,
       url: url,
       key: "example_sentence_meaning" + index,
     },

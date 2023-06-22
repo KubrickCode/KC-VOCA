@@ -67,7 +67,8 @@ const SignUp = () => {
         { body: { email, nickname, password } },
         {
           onSuccess: (data) => {
-            localStorage.setItem("token", data.token);
+            localStorage.setItem("token", data.token.token);
+            localStorage.setItem("refreshToken", data.token.refreshToken);
             location.href = "/";
           },
         }
